@@ -1,0 +1,15 @@
+# node / build
+node_modules/
+dist/
+.out/
+.output/
+.cache/
+.vercel/
+.netlify/
+
+# OS/IDE
+.DS_Store
+Thumbs.db
+*.log
+.vscode/
+.idea/
