@@ -1,0 +1,21 @@
+---
+import DuelContainer from '@/components/DuelContainer';
+import '../styles/tailwind.css';
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Kibaki — Duel</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+  </head>
+  <body class="min-h-screen bg-gray-50">
+    <div class="max-w-5xl mx-auto px-4 py-8">
+      <h1 class="text-2xl font-bold mb-4">Who Beats Who?</h1>
+      <p class="text-sm text-gray-600 mb-6">Pick the winner. We’ll wire up ELO in Step 4.</p>
+      <DuelContainer client:load />
+    </div>
+  </body>
+</html>
+
+
