@@ -12,6 +12,7 @@ import {
 } from '@/lib/duels';
 import CharacterCard from '@/components/CharacterCard';
 import Modal from '@/components/Modal';
+import { supabase } from '@/lib/supabaseClient';
 
 type LoadState = 'idle' | 'loading' | 'ready' | 'error';
 
@@ -23,6 +24,7 @@ export default function DuelContainer() {
   const [openLeft, setOpenLeft] = useState(false);
   const [openRight, setOpenRight] = useState(false);
   const [lastVote, setLastVote] = useState<'left' | 'right' | null>(null);
+  const [rateLimitedAt, setRateLimitedAt] = useState<number | null>(null);
 
   const usedPairs = useMemo(() => getUsedPairs(), []);
 
@@ -61,8 +63,37 @@ export default function DuelContainer() {
     setPair({ left, right, hash });
   };
 
+  const postVote = async (winnerId: number, loserId: number) => {
+    const nonce = crypto.randomUUID();
+    const { data } = await supabase.auth.getSession();
+    const token = data.session?.access_token ?? import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
+    const url = `${import.meta.env.PUBLIC_SUPABASE_URL}/functions/v1/vote`;
+    await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify({ winner_id: winnerId, loser_id: loserId, nonce }),
+    })
+      .then(async (r) => {
+        const j: any = await r.json().catch(() => ({}));
+        if (!r.ok && j?.reason === 'rate_limited') {
+          // show a soft banner for a few seconds
+          // you can implement: setRateLimitedAt(Date.now())
+          setRateLimitedAt(Date.now());
+        }
+      })
+      .catch((err) => console.warn('vote error', err));
+  };
+
   const vote = async (side: 'left' | 'right') => {
     if (!pair) return;
+    const currentPair = pair;
+    const winnerId = side === 'left' ? currentPair.left.id : currentPair.right.id;
+    const loserId = side === 'left' ? currentPair.right.id : currentPair.left.id;
+    // Fire-and-forget: do not block optimistic UI
+    void postVote(winnerId, loserId);
     addUsedPair(pair.hash);
     setLastVote(side);
     // Optimistic: load next pair immediately
