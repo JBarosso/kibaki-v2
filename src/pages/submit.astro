@@ -1,0 +1,22 @@
+---
+import SubmitIsland from '@/components/SubmitIsland';
+import '../styles/tailwind.css';
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Kibaki — Submit</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+  </head>
+  <body class="min-h-screen bg-gray-50">
+    <div class="mx-auto max-w-3xl px-4 py-8">
+      <h1 class="mb-2 text-2xl font-bold">Submit a character</h1>
+      <p class="mb-6 text-sm text-gray-600">Propose a character for review.</p>
+      <SubmitIsland client:load />
+    </div>
+  </body>
+  
+</html>
+
+
