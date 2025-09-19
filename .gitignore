@@ -7,6 +7,10 @@ dist/
 .vercel/
 .netlify/
 
+#env
+.env
+.env.local
+
 # OS/IDE
 .DS_Store
 Thumbs.db
