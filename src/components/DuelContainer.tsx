@@ -13,6 +13,7 @@ import {
 import CharacterCard from '@/components/CharacterCard';
 import Modal from '@/components/Modal';
 import { supabase } from '@/lib/supabaseClient';
+import { showToast } from '@/lib/toast';
 
 type LoadState = 'idle' | 'loading' | 'ready' | 'error';
 
@@ -82,9 +83,17 @@ export default function DuelContainer() {
           // show a soft banner for a few seconds
           // you can implement: setRateLimitedAt(Date.now())
           setRateLimitedAt(Date.now());
+          showToast({ type: 'error', message: 'Trop de votes, réessayez dans un instant.' });
+        } else if (!r.ok) {
+          showToast({ type: 'error', message: 'Une erreur est survenue lors du vote.' });
+        } else {
+          showToast({ type: 'info', message: 'Vote pris en compte' });
         }
       })
-      .catch((err) => console.warn('vote error', err));
+      .catch((err) => {
+        console.warn('vote error', err);
+        showToast({ type: 'error', message: 'Impossible d\'envoyer votre vote.' });
+      });
   };
 
   const vote = async (side: 'left' | 'right') => {

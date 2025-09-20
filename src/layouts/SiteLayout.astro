@@ -1,5 +1,6 @@
 ---
 import AppHeader from '@/components/AppHeader';
+import ToastProvider from '@/components/ToastProvider';
 import '../styles/tailwind.css';
 
 const { title = 'Kibaki' } = Astro.props;
@@ -13,6 +14,7 @@ const { title = 'Kibaki' } = Astro.props;
   </head>
   <body class="min-h-screen bg-gray-50">
     <AppHeader client:load />
+    <ToastProvider client:load />
     <main class="mx-auto max-w-5xl px-4 py-8">
       <slot />
     </main>

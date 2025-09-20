@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import { ensureOwnProfile } from '@/lib/profiles';
+import { showToast } from '@/lib/toast';
 
 type UniverseRow = { id: number; slug: string; name: string };
 
@@ -132,8 +133,10 @@ export default function SubmitIsland() {
       const profile = await ensureOwnProfile();
       const username = (profile as any)?.username as string | undefined;
       setSuccess({ username: username ?? '' });
+      showToast({ type: 'success', message: 'Soumission envoyée' });
     } catch (e: any) {
       setSubmitError(e.message ?? String(e));
+      showToast({ type: 'error', message: 'Échec de la soumission.' });
     } finally {
       setSubmitting(false);
     }
