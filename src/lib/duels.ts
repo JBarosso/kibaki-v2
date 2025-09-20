@@ -1,8 +1,11 @@
 import { supabase } from '@/lib/supabaseClient';
 
-// LocalStorage keys
-export const LS_IDS = 'kibaki_char_ids_v1' as const; // stores { ids:number[], ts:number }
-export const LS_PAIRS = 'kibaki_pair_hashes_v1' as const; // stores string[] of "minId:maxId"
+// Scoped LocalStorage keys
+export const SCOPE_KEY = 'kibaki_duel_scope_v1' as const; // UI reads/writes this
+export const IDS_BASE = 'kibaki_char_ids_v1' as const; // stores { ids:number[], ts:number }
+export const PAIRS_BASE = 'kibaki_pair_hashes_v1' as const; // stores string[] of "minId:maxId"
+
+const keyFor = (base: string, scope?: string) => `${base}::${(scope || 'global')}`;
 
 // Types
 export type CharacterRow = {
@@ -57,15 +60,15 @@ function writeLocalStorageJson<T>(key: string, value: T): void {
   }
 }
 
-// 1) Get all character ids with caching
-export async function getAllCharacterIds(forceRefresh = false): Promise<number[]> {
+// 1) Get all character ids with caching (scoped)
+export async function getAllCharacterIds(scope?: string, forceRefresh = false): Promise<number[]> {
+  const idsKey = keyFor(IDS_BASE, scope);
   // Try cache
   if (!forceRefresh) {
-    const cached = readLocalStorageJson<{ ids: number[]; ts: number }>(LS_IDS);
+    const cached = readLocalStorageJson<{ ids: number[]; ts: number }>(idsKey);
     if (cached && Array.isArray(cached.ids) && typeof cached.ts === 'number') {
       const isFresh = Date.now() - cached.ts < ONE_HOUR_MS;
       if (isFresh) {
-        if (cached.ids.length < 2) throw new Error('Need at least 2 characters');
         if (import.meta.env?.DEV) {
           console.debug('[duels] cache HIT ids', cached.ids.length);
         }
@@ -75,10 +78,33 @@ export async function getAllCharacterIds(forceRefresh = false): Promise<number[]
   }
 
   // Fetch from Supabase
-  const { data, error } = await supabase
+  let universeId: number | undefined = undefined;
+  const slug = (scope || 'global');
+  if (slug && slug !== 'global') {
+    const { data: u, error: ue } = await supabase
+      .from('univers')
+      .select('id')
+      .eq('slug', slug)
+      .maybeSingle();
+    if (ue) throw new Error(`Failed to resolve universe: ${ue.message}`);
+    universeId = u?.id;
+    if (universeId === undefined) {
+      // Unknown slug => treat as empty scope
+      writeLocalStorageJson(idsKey, { ids: [], ts: Date.now() });
+      return [];
+    }
+  }
+
+  let query = supabase
     .from('characters')
     .select('id')
     .order('id', { ascending: true });
+
+  if (universeId !== undefined) {
+    query = query.eq('universe_id', universeId);
+  }
+
+  const { data, error } = await query;
 
   if (error) {
     throw new Error(`Failed to fetch character ids: ${error.message}`);
@@ -88,43 +114,43 @@ export async function getAllCharacterIds(forceRefresh = false): Promise<number[]
     .map((row) => (typeof (row as any).id === 'number' ? (row as any).id as number : Number((row as any).id)))
     .filter((n) => Number.isFinite(n)) as number[];
 
-  if (ids.length < 2) {
-    throw new Error('Need at least 2 characters');
-  }
-
-  writeLocalStorageJson(LS_IDS, { ids, ts: Date.now() });
+  // Cache regardless of count; caller decides behavior when < 2
+  writeLocalStorageJson(idsKey, { ids, ts: Date.now() });
   if (import.meta.env?.DEV) {
     console.debug('[duels] cache MISS ids fetched', ids.length);
   }
   return ids;
 }
 
-// 2) Read used pairs as Set
-export function getUsedPairs(): Set<string> {
-  const arr = readLocalStorageJson<string[]>(LS_PAIRS);
+// 2) Read used pairs as Set (scoped)
+export function getUsedPairs(scope?: string): Set<string> {
+  const pairsKey = keyFor(PAIRS_BASE, scope);
+  const arr = readLocalStorageJson<string[]>(pairsKey);
   if (!arr || !Array.isArray(arr)) return new Set<string>();
   return new Set<string>(arr.filter((s) => typeof s === 'string'));
 }
 
-// 3) Add used pair (keep at most last 500 entries)
-export function addUsedPair(hash: string): void {
+// 3) Add used pair (keep at most last 500 entries) (scoped)
+export function addUsedPair(hash: string, scope?: string): void {
   if (typeof hash !== 'string' || !hash.includes(':')) return;
-  const arr = readLocalStorageJson<string[]>(LS_PAIRS) ?? [];
+  const pairsKey = keyFor(PAIRS_BASE, scope);
+  const arr = readLocalStorageJson<string[]>(pairsKey) ?? [];
   // Remove existing occurrences to move it to the end (most recent)
   const filtered = arr.filter((h) => h !== hash && typeof h === 'string');
   filtered.push(hash);
   const trimmed = filtered.slice(-500);
-  writeLocalStorageJson(LS_PAIRS, trimmed);
+  writeLocalStorageJson(pairsKey, trimmed);
   if (import.meta.env?.DEV) {
     console.debug('[duels] addUsedPair size', trimmed.length);
   }
 }
 
-// 4) Clear used pairs
-export function clearUsedPairs(): void {
+// 4) Clear used pairs (scoped)
+export function clearUsedPairs(scope?: string): void {
   if (!isLocalStorageAvailable()) return;
   try {
-    window.localStorage.removeItem(LS_PAIRS);
+    const pairsKey = keyFor(PAIRS_BASE, scope);
+    window.localStorage.removeItem(pairsKey);
   } catch {
     // ignore
   }
