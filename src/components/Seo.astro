@@ -1,0 +1,43 @@
+---
+interface Props {
+  title?: string;
+  description?: string;
+  url?: string;
+  image?: string;
+}
+
+const {
+  title,
+  description,
+  url,
+  image,
+}: Props = Astro.props;
+
+const siteName = 'Kibaki — Who Beats Who?';
+const defaultDescription = 'Vote les duels, classements ELO, personnages par univers.';
+
+// Build canonical URL
+const baseUrl = import.meta.env.PUBLIC_SITE_URL?.replace(/\/$/, '') ?? '';
+const currentPath = Astro.url.pathname;
+const canonical = (url && url.length > 0) ? url : `${baseUrl}${currentPath}`;
+
+const metaTitle = title ? `${title}` : siteName;
+const metaDescription = description ?? defaultDescription;
+const ogType = 'website';
+---
+
+<title>{metaTitle}</title>
+<meta name="description" content={metaDescription} />
+
+<meta property="og:title" content={metaTitle} />
+<meta property="og:description" content={metaDescription} />
+<meta property="og:type" content={ogType} />
+{canonical && <meta property="og:url" content={canonical} />}
+{image && <meta property="og:image" content={image} />}
+
+<meta name="twitter:card" content="summary_large_image" />
+{image && <meta name="twitter:image" content={image} />}
+
+{canonical && <link rel="canonical" href={canonical} />}
+
+

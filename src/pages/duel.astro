@@ -1,9 +1,11 @@
 ---
 import SiteLayout from '@/layouts/SiteLayout.astro';
+import Seo from '@/components/Seo.astro';
 import DuelContainer from '@/components/DuelContainer';
 ---
 
 <SiteLayout title="Kibaki — Duel">
+  <Seo slot="head" title="Kibaki — Duel" description="Vote dans le duel en cours." />
   <h1 class="text-2xl font-bold mb-4">Who Beats Who?</h1>
   <p class="text-sm text-gray-600 mb-6">Pick the winner. We’ll wire up ELO in Step 4.</p>
   <DuelContainer client:load />

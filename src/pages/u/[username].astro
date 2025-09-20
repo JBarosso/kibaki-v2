@@ -2,6 +2,7 @@
 export const prerender = false;
 
 import SiteLayout from '@/layouts/SiteLayout.astro';
+import Seo from '@/components/Seo.astro';
 import UserVotesIsland from '@/components/UserVotesIsland';
 
 const { username } = Astro.params;
@@ -9,6 +10,7 @@ const safeUsername = String(username ?? '');
 ---
 
 <SiteLayout title={`@${safeUsername} — Recent votes`}>
+  <Seo slot="head" title={`@${safeUsername} — Votes récents`} description={`Derniers votes de @${safeUsername}.`} />
   <div class="mx-auto max-w-3xl">
     <h1 class="mb-2 text-2xl font-bold">@{safeUsername} — Recent votes</h1>
     <p class="mb-6 text-sm text-gray-600">Derniers votes enregistrés pour cet utilisateur.</p>

@@ -1,9 +1,11 @@
 ---
 import SiteLayout from '@/layouts/SiteLayout.astro';
+import Seo from '@/components/Seo.astro';
 import LeaderboardIsland from '@/components/LeaderboardIsland';
 ---
 
 <SiteLayout title="Kibaki — Top">
+  <Seo slot="head" title="Kibaki — Top" description="Classement ELO des personnages." />
   <LeaderboardIsland client:load />
   
 </SiteLayout>

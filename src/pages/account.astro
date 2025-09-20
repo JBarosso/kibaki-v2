@@ -1,9 +1,11 @@
 ---
 import SiteLayout from '@/layouts/SiteLayout.astro';
+import Seo from '@/components/Seo.astro';
 import AccountIsland from '@/components/AccountIsland';
 ---
 
 <SiteLayout title="Kibaki — Account">
+  <Seo slot="head" title="Kibaki — Account" description="Gère ton compte et ton pseudo." />
   <div class="max-w-3xl mx-auto">
     <h1 class="text-2xl font-bold">Account</h1>
     <p class="text-sm text-gray-600">Sign in / Sign up, then manage your username.</p>

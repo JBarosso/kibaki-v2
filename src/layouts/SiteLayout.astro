@@ -4,13 +4,15 @@ import ToastProvider from '@/components/ToastProvider';
 import '../styles/tailwind.css';
 
 const { title = 'Kibaki' } = Astro.props;
+const hasHead = Astro.slots?.has?.('head') ?? false;
 ---
 
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>{title}</title>
+    {!hasHead && <title>{title}</title>}
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <slot name="head" />
   </head>
   <body class="min-h-screen bg-gray-50">
     <AppHeader client:load />

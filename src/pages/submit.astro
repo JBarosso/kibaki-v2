@@ -1,9 +1,11 @@
 ---
 import SiteLayout from '@/layouts/SiteLayout.astro';
+import Seo from '@/components/Seo.astro';
 import SubmitIsland from '@/components/SubmitIsland';
 ---
 
 <SiteLayout title="Kibaki — Submit">
+  <Seo slot="head" title="Kibaki — Submit" description="Propose un personnage à ajouter." />
   <div class="mx-auto max-w-3xl">
     <h1 class="mb-2 text-2xl font-bold">Submit a character</h1>
     <p class="mb-6 text-sm text-gray-600">Propose a character for review.</p>
