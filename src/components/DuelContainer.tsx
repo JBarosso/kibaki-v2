@@ -34,21 +34,24 @@ export default function DuelContainer() {
   const [universes, setUniverses] = useState<Universe[]>([]);
   const [scope, setScope] = useState<string>('global');
   const scopeRef = useRef<string>('global');
+  const mountedRef = useRef<boolean>(false);
+  const bootstrappedRef = useRef<boolean>(false);
 
   const usedPairs = useMemo(() => getUsedPairs(scope), [scope]);
 
   // bootstrap
   useEffect(() => {
-    let cancelled = false;
-    const init = async () => {
+    if (bootstrappedRef.current) return;
+    bootstrappedRef.current = true;
+    mountedRef.current = true;
+
+    (async () => {
       setState('loading');
       setError(null);
       try {
-        // Load universes and saved scope
-        const [u] = await Promise.all([
-          fetchUniverses(),
-        ]);
-        if (cancelled) return;
+        // Load universes
+        const u = await fetchUniverses();
+        if (!mountedRef.current) return;
         setUniverses(u);
 
         // Load saved scope from LS
@@ -59,39 +62,45 @@ export default function DuelContainer() {
             if (s && typeof s === 'string') savedScope = s;
           }
         } catch {}
+        if (!mountedRef.current) return;
         setScope(savedScope);
 
+        // Fetch ids for scope
         const fetchedIds = await getAllCharacterIds(savedScope);
-        if (cancelled) return;
+        if (!mountedRef.current) return;
         setIds(fetchedIds);
-        // Merge server-seen pairs (if logged-in) into local avoid set before first pick
-        try {
-          const server = await getRecentSeenPairs(500);
-          server.forEach((k) => addUsedPair(k, savedScope));
-        } catch {}
+
+        // (A) Immediately load a local pair without waiting for any auth/server merge
         if (fetchedIds.length >= 2) {
           await loadFreshPair(fetchedIds, getUsedPairs(savedScope));
         } else {
           setPair(null);
         }
-        if (cancelled) return;
+        if (!mountedRef.current) return;
         setState('ready');
       } catch (e: any) {
-        if (cancelled) return;
+        if (!mountedRef.current) return;
         setError(e?.message ?? String(e));
         setState('error');
       }
-    };
-    init();
-    return () => {
-      cancelled = true;
-    };
+    })();
+
+    // (B) In parallel, non-blocking: merge server seen pairs if user is logged-in
+    (async () => {
+      try {
+        const server = await getRecentSeenPairs(500);
+        if (!mountedRef.current) return;
+        const currentScope = scopeRef.current || 'global';
+        server.forEach((k) => addUsedPair(k, currentScope));
+      } catch {}
+    })();
+
+    return () => { mountedRef.current = false; };
   }, []);
 
   // When scope changes (via UI), reload ids and reset pair memory for that scope
   useEffect(() => {
     scopeRef.current = scope;
-    let cancelled = false;
     const run = async () => {
       // Skip first pass if state is still idle/loading from init; init handles first fetch
       if (state === 'idle') return;
@@ -110,32 +119,33 @@ export default function DuelContainer() {
         setPair(null);
 
         const fetchedIds = await getAllCharacterIds(scope, true);
-        if (cancelled) return;
+        if (!mountedRef.current) return;
         setIds(fetchedIds);
 
-        // Merge server-seen pairs (if logged-in) for this scope before next pick
-        try {
-          const server = await getRecentSeenPairs(500);
-          server.forEach((k) => addUsedPair(k, scope));
-        } catch {}
-
+        // Immediately load a local pair for the new scope
         if (fetchedIds.length >= 2) {
           await loadFreshPair(fetchedIds, getUsedPairs(scope));
         } else {
           setPair(null);
         }
-        if (cancelled) return;
+
         setState('ready');
       } catch (e: any) {
-        if (cancelled) return;
+        if (!mountedRef.current) return;
         setError(e?.message ?? String(e));
         setState('error');
       }
     };
     run();
-    return () => {
-      cancelled = true;
-    };
+
+    // Non-blocking merge of server-seen pairs for this scope
+    (async () => {
+      try {
+        const server = await getRecentSeenPairs(500);
+        if (!mountedRef.current) return;
+        server.forEach((k) => addUsedPair(k, scope));
+      } catch {}
+    })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [scope]);
 
