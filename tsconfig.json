@@ -3,6 +3,12 @@
     "compilerOptions": {
       "baseUrl": ".",
       "paths": { "@/*": ["src/*"] }
-    }
+    },
+    "exclude": [
+      "supabase/functions/**",
+      "node_modules",
+      "dist",
+      ".astro"
+    ]
   }
   
