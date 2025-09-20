@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   addUsedPair,
   clearUsedPairs,
@@ -16,6 +16,7 @@ import Modal from '@/components/Modal';
 import { supabase } from '@/lib/supabaseClient';
 import { showToast } from '@/lib/toast';
 import { fetchUniverses, type Universe } from '@/lib/top';
+import { getRecentSeenPairs, markPairSeen } from '@/lib/seenPairs';
 
 type LoadState = 'idle' | 'loading' | 'ready' | 'error';
 
@@ -32,6 +33,7 @@ export default function DuelContainer() {
   const [lastVoteAt, setLastVoteAt] = useState<number | null>(null);
   const [universes, setUniverses] = useState<Universe[]>([]);
   const [scope, setScope] = useState<string>('global');
+  const scopeRef = useRef<string>('global');
 
   const usedPairs = useMemo(() => getUsedPairs(scope), [scope]);
 
@@ -62,6 +64,11 @@ export default function DuelContainer() {
         const fetchedIds = await getAllCharacterIds(savedScope);
         if (cancelled) return;
         setIds(fetchedIds);
+        // Merge server-seen pairs (if logged-in) into local avoid set before first pick
+        try {
+          const server = await getRecentSeenPairs(500);
+          server.forEach((k) => addUsedPair(k, savedScope));
+        } catch {}
         if (fetchedIds.length >= 2) {
           await loadFreshPair(fetchedIds, getUsedPairs(savedScope));
         } else {
@@ -83,6 +90,7 @@ export default function DuelContainer() {
 
   // When scope changes (via UI), reload ids and reset pair memory for that scope
   useEffect(() => {
+    scopeRef.current = scope;
     let cancelled = false;
     const run = async () => {
       // Skip first pass if state is still idle/loading from init; init handles first fetch
@@ -105,6 +113,12 @@ export default function DuelContainer() {
         if (cancelled) return;
         setIds(fetchedIds);
 
+        // Merge server-seen pairs (if logged-in) for this scope before next pick
+        try {
+          const server = await getRecentSeenPairs(500);
+          server.forEach((k) => addUsedPair(k, scope));
+        } catch {}
+
         if (fetchedIds.length >= 2) {
           await loadFreshPair(fetchedIds, getUsedPairs(scope));
         } else {
@@ -124,6 +138,24 @@ export default function DuelContainer() {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [scope]);
+
+  // When user logs in during the session, merge server-seen pairs into current scope
+  useEffect(() => {
+    const { data: listener } = supabase.auth.onAuthStateChange(async (event) => {
+      if (event === 'SIGNED_IN') {
+        try {
+          const server = await getRecentSeenPairs(500);
+          const currentScope = scopeRef.current;
+          server.forEach((k) => addUsedPair(k, currentScope));
+        } catch {}
+      }
+    });
+    return () => {
+      listener.subscription.unsubscribe();
+    };
+    // We intentionally don't include scope to avoid re-subscribing; scope value is captured
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const loadFreshPair = async (allIds: number[], avoid: Set<string>) => {
     if (!Array.isArray(allIds) || allIds.length < 2) {
@@ -182,6 +214,8 @@ export default function DuelContainer() {
       await postVote(winnerId, loserId);
       setLastVoteAt(Date.now());
       addUsedPair(currentPair.hash, scope);
+      // Fire-and-forget server write for logged-in users
+      try { void markPairSeen(currentPair.hash).catch(() => {}); } catch {}
       setLastVote(side);
       await loadFreshPair(ids, getUsedPairs(scope));
     } catch (e: any) {
@@ -195,6 +229,8 @@ export default function DuelContainer() {
   const skip = async () => {
     if (!pair) return;
     addUsedPair(pair.hash, scope);
+    // Fire-and-forget server write for logged-in users
+    try { void markPairSeen(pair.hash).catch(() => {}); } catch {}
     try {
       await loadFreshPair(ids, getUsedPairs(scope));
     } catch (e: any) {
@@ -241,6 +277,19 @@ export default function DuelContainer() {
         </div>
         <div className="rounded-2xl border bg-white p-6 text-sm text-gray-600">
           Pas assez de personnages dans cet univers pour lancer un duel.
+        </div>
+      </div>
+    );
+  }
+
+  if (!pair) {
+    return (
+      <div className="space-y-4">
+        <div className="flex items-center gap-3">
+          <ScopeSelector universes={universes} value={scope} onChange={(s) => setScope(s)} />
+        </div>
+        <div className="rounded-2xl border bg-white p-6 text-sm text-gray-600">
+          Chargement d'une paire...
         </div>
       </div>
     );
