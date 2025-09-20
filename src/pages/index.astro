@@ -1,0 +1,6 @@
+---
+export const prerender = false;
+const to = '/duel';
+const status = import.meta.env.PROD ? 308 : 302;
+return Astro.redirect(to, status);
+---
