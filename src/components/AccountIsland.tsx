@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import humanizeError from '@/lib/humanizeError';
 import { ensureOwnProfile, updateUsername } from '@/lib/profiles';
+import { showToast } from '@/lib/toast';
 
 type Profile = { id: string; username: string; created_at: string; updated_at: string };
 
@@ -94,6 +95,10 @@ export default function AccountIsland() {
     setPwErrorMsg(null);
     setPwSuccessMsg(null);
 
+    if (!currentPassword) {
+      setPwErrorMsg('Le mot de passe actuel est requis.');
+      return;
+    }
     if (newPassword.length < 8) {
       setPwErrorMsg('Le nouveau mot de passe doit contenir au moins 8 caractères.');
       return;
@@ -105,27 +110,22 @@ export default function AccountIsland() {
 
     setPwSubmitting(true);
     try {
-      // Optionnel: réauthentifier si l'utilisateur a fourni son mot de passe actuel
-      if (currentPassword && session?.user?.email) {
-        const { error: reauthError } = await supabase.auth.signInWithPassword({
-          email: session.user.email,
-          password: currentPassword,
-        });
-        if (reauthError) {
-          setPwErrorMsg(humanizeError(reauthError));
-          return;
-        }
-      }
+      const { data: user } = await supabase.auth.getUser();
+      if (!user.user?.email) throw new Error('Session invalide.');
 
-      const { error } = await supabase.auth.updateUser({ password: newPassword });
-      if (error) {
-        setPwErrorMsg(humanizeError(error));
-      } else {
-        setPwSuccessMsg('Mot de passe mis à jour avec succès.');
-        setCurrentPassword('');
-        setNewPassword('');
-        setConfirmPassword('');
-      }
+      const r = await supabase.auth.signInWithPassword({
+        email: user.user.email,
+        password: currentPassword,
+      });
+      if ((r as any).error) throw (r as any).error;
+
+      const upd = await supabase.auth.updateUser({ password: newPassword });
+      if ((upd as any).error) throw (upd as any).error;
+
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+      showToast({ type: 'success', message: 'Mot de passe mis à jour.' });
     } catch (err: any) {
       setPwErrorMsg(humanizeError(err));
     } finally {
@@ -186,9 +186,10 @@ export default function AccountIsland() {
           <input
             className="w-full border rounded px-3 py-2"
             type="password"
-            placeholder="Mot de passe actuel (optionnel)"
+            placeholder="Mot de passe actuel"
             value={currentPassword}
             onChange={(e)=>setCurrentPassword(e.target.value)}
+            required
           />
           <input
             className="w-full border rounded px-3 py-2"
