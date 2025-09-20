@@ -17,17 +17,24 @@ export default function CharacterCard({ character, side, onMore }: CharacterCard
 
   return (
     <div className="flex h-full flex-col rounded-2xl border bg-white shadow-sm">
-      {image_url ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={image_url}
-          alt={name}
-          className={`h-56 w-full rounded-t-2xl object-cover ${side === 'left' ? 'object-[center_left]' : 'object-[center_right]'}`}
-          loading="lazy"
-        />
-      ) : (
-        <div className="h-56 w-full rounded-t-2xl bg-gray-100" />
-      )}
+      <div className="flex items-center justify-center p-4">
+        {image_url ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={image_url}
+            alt={name}
+            className="w-32 h-32 object-cover rounded-xl"
+            loading="lazy"
+            decoding="async"
+            referrerPolicy="no-referrer"
+            width={128}
+            height={128}
+            sizes="(max-width: 640px) 33vw, 128px"
+          />
+        ) : (
+          <div className="w-32 h-32 rounded-xl bg-gray-100" />
+        )}
+      </div>
 
       <div className="flex flex-1 flex-col p-4">
         <div className="mb-1 flex items-center justify-between gap-2">
