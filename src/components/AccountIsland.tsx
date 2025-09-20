@@ -15,6 +15,13 @@ export default function AccountIsland() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [username, setUsername] = useState('');
+  // change password state
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [pwSubmitting, setPwSubmitting] = useState(false);
+  const [pwSuccessMsg, setPwSuccessMsg] = useState<string | null>(null);
+  const [pwErrorMsg, setPwErrorMsg] = useState<string | null>(null);
 
   useEffect(() => {
     const init = async () => {
@@ -81,6 +88,50 @@ export default function AccountIsland() {
     setProfile(null);
   };
 
+  const doChangePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setPwErrorMsg(null);
+    setPwSuccessMsg(null);
+
+    if (newPassword.length < 8) {
+      setPwErrorMsg('Le nouveau mot de passe doit contenir au moins 8 caractères.');
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      setPwErrorMsg('Les mots de passe ne correspondent pas.');
+      return;
+    }
+
+    setPwSubmitting(true);
+    try {
+      // Optionnel: réauthentifier si l'utilisateur a fourni son mot de passe actuel
+      if (currentPassword && session?.user?.email) {
+        const { error: reauthError } = await supabase.auth.signInWithPassword({
+          email: session.user.email,
+          password: currentPassword,
+        });
+        if (reauthError) {
+          setPwErrorMsg(reauthError.message);
+          return;
+        }
+      }
+
+      const { error } = await supabase.auth.updateUser({ password: newPassword });
+      if (error) {
+        setPwErrorMsg(error.message);
+      } else {
+        setPwSuccessMsg('Mot de passe mis à jour avec succès.');
+        setCurrentPassword('');
+        setNewPassword('');
+        setConfirmPassword('');
+      }
+    } catch (err: any) {
+      setPwErrorMsg(err?.message ?? String(err));
+    } finally {
+      setPwSubmitting(false);
+    }
+  };
+
   if (loading) return <div className="p-6 text-sm text-gray-500">Loading…</div>;
 
   if (!session) {
@@ -124,6 +175,40 @@ export default function AccountIsland() {
         <input className="w-full border rounded px-3 py-2" type="text" placeholder="New username" value={username} onChange={e=>setUsername(e.target.value)} required />
         <button className="w-full bg-black text-white rounded px-3 py-2">Update username</button>
       </form>
+
+      <div className="mt-6 pt-6 border-t">
+        <h2 className="text-lg font-semibold mb-3">Change password</h2>
+        <form onSubmit={doChangePassword} className="space-y-3">
+          <input
+            className="w-full border rounded px-3 py-2"
+            type="password"
+            placeholder="Mot de passe actuel (optionnel)"
+            value={currentPassword}
+            onChange={(e)=>setCurrentPassword(e.target.value)}
+          />
+          <input
+            className="w-full border rounded px-3 py-2"
+            type="password"
+            placeholder="Nouveau mot de passe"
+            value={newPassword}
+            onChange={(e)=>setNewPassword(e.target.value)}
+            required
+          />
+          <input
+            className="w-full border rounded px-3 py-2"
+            type="password"
+            placeholder="Confirmer le mot de passe"
+            value={confirmPassword}
+            onChange={(e)=>setConfirmPassword(e.target.value)}
+            required
+          />
+          <button className="w-full bg-black text-white rounded px-3 py-2 disabled:opacity-60" disabled={pwSubmitting}>
+            {pwSubmitting ? 'Mise à jour…' : 'Mettre à jour le mot de passe'}
+          </button>
+        </form>
+        {pwSuccessMsg && <p className="mt-3 text-sm text-green-700">{pwSuccessMsg}</p>}
+        {pwErrorMsg && <p className="mt-3 text-sm text-red-600">{pwErrorMsg}</p>}
+      </div>
 
       <button onClick={doSignOut} className="w-full mt-4 border rounded px-3 py-2">Sign out</button>
       {errorMsg && <p className="mt-3 text-sm text-red-600">{errorMsg}</p>}
