@@ -1,28 +1,21 @@
 ---
 export const prerender = false;
 
+import SiteLayout from '@/layouts/SiteLayout.astro';
 import UserVotesIsland from '@/components/UserVotesIsland';
-import '../../styles/tailwind.css';
 
 const { username } = Astro.params;
 const safeUsername = String(username ?? '');
 ---
 
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <title>@{safeUsername} — Recent votes</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-  </head>
-  <body class="min-h-screen bg-gray-50">
-    <div class="mx-auto max-w-3xl px-4 py-8">
-      <h1 class="mb-2 text-2xl font-bold">@{safeUsername} — Recent votes</h1>
-      <p class="mb-6 text-sm text-gray-600">Derniers votes enregistrés pour cet utilisateur.</p>
-      <div class="rounded-2xl bg-white p-4 shadow-sm">
-        <UserVotesIsland client:load username={safeUsername} />
-      </div>
+<SiteLayout title={`@${safeUsername} — Recent votes`}>
+  <div class="mx-auto max-w-3xl">
+    <h1 class="mb-2 text-2xl font-bold">@{safeUsername} — Recent votes</h1>
+    <p class="mb-6 text-sm text-gray-600">Derniers votes enregistrés pour cet utilisateur.</p>
+    <div class="rounded-2xl bg-white p-4 shadow-sm">
+      <UserVotesIsland client:load username={safeUsername} />
     </div>
-  </body>
-</html>
+  </div>
+</SiteLayout>
 
 

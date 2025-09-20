@@ -1,0 +1,23 @@
+---
+import AppHeader from '@/components/AppHeader';
+import '../styles/tailwind.css';
+
+const { title = 'Kibaki' } = Astro.props;
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>{title}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+  </head>
+  <body class="min-h-screen bg-gray-50">
+    <AppHeader client:load />
+    <main class="mx-auto max-w-5xl px-4 py-8">
+      <slot />
+    </main>
+  </body>
+  
+</html>
+
+
