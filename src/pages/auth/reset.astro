@@ -1,0 +1,20 @@
+---
+import ResetPasswordIsland from '@/components/ResetPasswordIsland';
+import '../../styles/tailwind.css';
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Kibaki — Reset password</title>
+  </head>
+  <body class="min-h-screen bg-gray-50">
+    <div class="max-w-3xl mx-auto py-10 px-4">
+      <h1 class="text-2xl font-bold">Reset password</h1>
+      <p class="text-sm text-gray-600">If you requested a reset link, set your new password below.</p>
+      <ResetPasswordIsland client:load />
+    </div>
+  </body>
+</html>
+
+
