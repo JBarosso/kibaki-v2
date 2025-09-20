@@ -1,10 +1,10 @@
 ---
-import AppHeader from '@/components/AppHeader';
-import ToastProvider from '@/components/ToastProvider';
-import '../styles/tailwind.css';
+import AppHeader from "@/components/AppHeader";
+import ToastProvider from "@/components/ToastProvider";
+import "../styles/tailwind.css";
 
-const { title = 'Kibaki' } = Astro.props;
-const hasHead = Astro.slots?.has?.('head') ?? false;
+const { title = "Kibaki" } = Astro.props;
+const hasHead = Astro.slots?.has?.("head") ?? false;
 ---
 
 <html lang="en">
@@ -13,6 +13,11 @@ const hasHead = Astro.slots?.has?.('head') ?? false;
     {!hasHead && <title>{title}</title>}
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <slot name="head" />
+    <!-- <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="alternate icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta name="theme-color" content="#ffffff" /> -->
   </head>
   <body class="min-h-screen bg-gray-50">
     <AppHeader client:load />
@@ -21,7 +26,4 @@ const hasHead = Astro.slots?.has?.('head') ?? false;
       <slot />
     </main>
   </body>
-  
 </html>
-
-

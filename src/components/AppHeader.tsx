@@ -57,6 +57,7 @@ export default function AppHeader() {
         <nav className="flex items-center gap-4 text-sm">
           <a href="/duel" className={linkCls(isActive('/duel'))}>Duel</a>
           <a href="/top" className={linkCls(isActive('/top'))}>Top</a>
+          <a href="/submit" className={linkCls(isActive('/submit'))}>Soumettre</a>
           {session ? (
             <>
               <a href="/account" className={linkCls(isActive('/account'))}>Mon compte</a>
