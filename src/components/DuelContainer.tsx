@@ -26,6 +26,8 @@ export default function DuelContainer() {
   const [openRight, setOpenRight] = useState(false);
   const [lastVote, setLastVote] = useState<'left' | 'right' | null>(null);
   const [rateLimitedAt, setRateLimitedAt] = useState<number | null>(null);
+  const [isVoting, setIsVoting] = useState(false);
+  const [lastVoteAt, setLastVoteAt] = useState<number | null>(null);
 
   const usedPairs = useMemo(() => getUsedPairs(), []);
 
@@ -98,19 +100,26 @@ export default function DuelContainer() {
 
   const vote = async (side: 'left' | 'right') => {
     if (!pair) return;
+    if (isVoting) return; // ignore if already voting
+    const now = Date.now();
+    if (now - (lastVoteAt ?? 0) < 700) return; // throttle rapid clicks
+
     const currentPair = pair;
     const winnerId = side === 'left' ? currentPair.left.id : currentPair.right.id;
     const loserId = side === 'left' ? currentPair.right.id : currentPair.left.id;
-    // Fire-and-forget: do not block optimistic UI
-    void postVote(winnerId, loserId);
-    addUsedPair(pair.hash);
-    setLastVote(side);
-    // Optimistic: load next pair immediately
+
+    setIsVoting(true);
     try {
+      await postVote(winnerId, loserId);
+      setLastVoteAt(Date.now());
+      addUsedPair(currentPair.hash);
+      setLastVote(side);
       await loadFreshPair(ids, getUsedPairs());
     } catch (e: any) {
       setError(e?.message ?? String(e));
       setState('error');
+    } finally {
+      setIsVoting(false);
     }
   };
 
@@ -172,7 +181,8 @@ export default function DuelContainer() {
           <CharacterCard character={left} side="left" onMore={() => setOpenLeft(true)} />
           <button
             onClick={() => vote('left')}
-            className="mt-3 rounded-lg bg-black px-4 py-2 text-white hover:bg-black/90"
+            disabled={isVoting}
+            className="mt-3 rounded-lg bg-black px-4 py-2 text-white hover:bg-black/90 disabled:opacity-60 disabled:cursor-not-allowed"
           >
             Vote Left
           </button>
@@ -182,7 +192,8 @@ export default function DuelContainer() {
           <CharacterCard character={right} side="right" onMore={() => setOpenRight(true)} />
           <button
             onClick={() => vote('right')}
-            className="mt-3 rounded-lg bg-black px-4 py-2 text-white hover:bg-black/90"
+            disabled={isVoting}
+            className="mt-3 rounded-lg bg-black px-4 py-2 text-white hover:bg-black/90 disabled:opacity-60 disabled:cursor-not-allowed"
           >
             Vote Right
           </button>
