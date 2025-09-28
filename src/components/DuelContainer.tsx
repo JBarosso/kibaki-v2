@@ -28,6 +28,24 @@ type OptimisticVoteState = {
 
 // Debug mode for testing scenarios
 const DEBUG_MODE = import.meta.env.DEV;
+const DEBUG_PREFETCH = import.meta.env.DEV;
+
+// Prefetch system types and config
+interface PrefetchedDuel {
+  left: CharacterRow;
+  right: CharacterRow;
+  hash: string;
+  timestamp: number;
+  scope: string;
+  imagesLoaded: boolean;
+}
+
+const PREFETCH_CONFIG = {
+  maxQueueSize: 3,
+  prefetchDelay: 500, // Start prefetching 500ms after duel display
+  imageTimeout: 5000, // Max time to wait for image preload
+  maxAge: 60000, // 1 minute max age for prefetched duels
+};
 
 export default function DuelContainer() {
   const [state, setState] = useState<LoadState>('idle');
@@ -47,6 +65,10 @@ export default function DuelContainer() {
     status: 'idle'
   });
   const [isTransitioning, setIsTransitioning] = useState(false);
+
+  // Prefetch system states
+  const [prefetchQueue, setPrefetchQueue] = useState<PrefetchedDuel[]>([]);
+  const prefetchingRef = useRef<boolean>(false);
   const [universes, setUniverses] = useState<Universe[]>([]);
   const [scope, setScope] = useState<string>('global');
   const scopeRef = useRef<string>('global');
@@ -54,6 +76,121 @@ export default function DuelContainer() {
   const bootstrappedRef = useRef<boolean>(false);
 
   const usedPairs = useMemo(() => getUsedPairs(scope), [scope]);
+
+  // Image preloading utility
+  const preloadImages = async (characters: CharacterRow[]): Promise<boolean> => {
+    const promises = characters
+      .filter(char => char.image_url)
+      .map(char => {
+        return new Promise<boolean>((resolve) => {
+          const img = new Image();
+          const timeout = setTimeout(() => {
+            if (DEBUG_PREFETCH) console.log('Image preload timeout:', char.name);
+            resolve(false);
+          }, PREFETCH_CONFIG.imageTimeout);
+
+          img.onload = () => {
+            clearTimeout(timeout);
+            if (DEBUG_PREFETCH) console.log('Image preloaded:', char.name);
+            resolve(true);
+          };
+          img.onerror = () => {
+            clearTimeout(timeout);
+            if (DEBUG_PREFETCH) console.warn('Image preload failed:', char.name);
+            resolve(false); // Don't fail entire prefetch on image error
+          };
+
+          img.src = char.image_url!;
+        });
+      });
+
+    try {
+      const results = await Promise.all(promises);
+      const allLoaded = results.every(Boolean);
+      if (DEBUG_PREFETCH) {
+        console.log('Images preload result:', { allLoaded, loaded: results.filter(Boolean).length, total: results.length });
+      }
+      return allLoaded;
+    } catch {
+      return false; // Partial load is still acceptable
+    }
+  };
+
+  // Memory monitoring (development only)
+  const monitorMemory = () => {
+    if (DEBUG_PREFETCH && 'memory' in performance) {
+      const memory = (performance as any).memory;
+      console.log('Memory usage:', {
+        used: Math.round(memory.usedJSHeapSize / 1048576) + 'MB',
+        total: Math.round(memory.totalJSHeapSize / 1048576) + 'MB',
+        queueSize: prefetchQueue.length
+      });
+    }
+  };
+
+  // Intelligent prefetch logic
+  const prefetchNextDuels = async () => {
+    if (prefetchingRef.current) return; // Prevent concurrent prefetching
+    if (prefetchQueue.length >= PREFETCH_CONFIG.maxQueueSize) return;
+    if (!ids.length || ids.length < 2) return;
+
+    prefetchingRef.current = true;
+
+    try {
+      // Calculate how many to prefetch
+      const toPrefetch = PREFETCH_CONFIG.maxQueueSize - prefetchQueue.length;
+      const currentUsedPairs = getUsedPairs(scope);
+
+      if (DEBUG_PREFETCH) {
+        console.log('Starting prefetch:', { toPrefetch, queueSize: prefetchQueue.length, scope });
+      }
+
+      for (let i = 0; i < toPrefetch; i++) {
+        try {
+          // Get next pair
+          const [leftId, rightId, hash] = pickRandomDistinctPair(ids, currentUsedPairs);
+          const { left, right } = await loadPairDetails(leftId, rightId);
+
+          // Start image preloading
+          const imagesLoaded = await preloadImages([left, right]);
+
+          // Add to queue
+          const prefetchedDuel: PrefetchedDuel = {
+            left,
+            right,
+            hash,
+            timestamp: Date.now(),
+            scope,
+            imagesLoaded
+          };
+
+          setPrefetchQueue(prev => {
+            // Check if this pair is already in queue
+            if (prev.some(d => d.hash === hash)) {
+              if (DEBUG_PREFETCH) console.log('Duplicate pair in prefetch, skipping:', hash);
+              return prev;
+            }
+            const newQueue = [...prev, prefetchedDuel];
+            if (DEBUG_PREFETCH) {
+              console.log('Added to prefetch queue:', { hash, imagesLoaded, queueSize: newQueue.length });
+            }
+            return newQueue;
+          });
+
+          // Add to used pairs to avoid duplicates in future prefetches
+          addUsedPair(hash, scope);
+        } catch (error) {
+          if (DEBUG_PREFETCH) console.warn('Individual prefetch failed:', error);
+          // Continue prefetching others
+        }
+      }
+    } catch (error) {
+      if (DEBUG_PREFETCH) console.warn('Prefetch batch failed:', error);
+    } finally {
+      prefetchingRef.current = false;
+      if (DEBUG_PREFETCH) monitorMemory();
+    }
+  };
 
   // bootstrap
   useEffect(() => {
@@ -94,6 +231,9 @@ export default function DuelContainer() {
         }
         if (!mountedRef.current) return;
         setState('ready');
+
+        // (C) Start initial prefetching after first duel is loaded
+        setTimeout(() => prefetchNextDuels(), PREFETCH_CONFIG.prefetchDelay);
       } catch (e: any) {
         if (!mountedRef.current) return;
         setError(e?.message ?? String(e));
@@ -117,6 +257,20 @@ export default function DuelContainer() {
   // When scope changes (via UI), reload ids and reset pair memory for that scope
   useEffect(() => {
     scopeRef.current = scope;
+
+    // Clear prefetch queue for scope changes (keep only matching scope)
+    setPrefetchQueue(prev => {
+      const filtered = prev.filter(d => d.scope === scope);
+      if (DEBUG_PREFETCH && filtered.length !== prev.length) {
+        console.log('Cleared prefetch queue for scope change:', {
+          from: prev.length,
+          to: filtered.length,
+          scope
+        });
+      }
+      return filtered;
+    });
+
     const run = async () => {
       // Skip first pass if state is still idle/loading from init; init handles first fetch
       if (state === 'idle') return;
@@ -146,6 +300,9 @@ export default function DuelContainer() {
         }
 
         setState('ready');
+
+        // Start prefetching for new scope after initial load
+        setTimeout(() => prefetchNextDuels(), PREFETCH_CONFIG.prefetchDelay);
       } catch (e: any) {
         if (!mountedRef.current) return;
         setError(e?.message ?? String(e));
@@ -183,14 +340,118 @@ export default function DuelContainer() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Auto-cleanup old prefetches and memory management
+  useEffect(() => {
+    const cleanup = setInterval(() => {
+      const now = Date.now();
+      setPrefetchQueue(prev => {
+        const filtered = prev.filter(d =>
+          (now - d.timestamp) < PREFETCH_CONFIG.maxAge && d.scope === scope
+        );
+        if (DEBUG_PREFETCH && filtered.length !== prev.length) {
+          console.log('Cleaned up old prefetches:', {
+            from: prev.length,
+            to: filtered.length,
+            removed: prev.length - filtered.length
+          });
+          monitorMemory();
+        }
+        return filtered;
+      });
+    }, 30000); // Check every 30s
+
+    return () => clearInterval(cleanup);
+  }, [scope]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      // Clear prefetch queue to free memory
+      setPrefetchQueue([]);
+      prefetchingRef.current = false;
+      if (DEBUG_PREFETCH) {
+        console.log('Component unmounting, cleared prefetch queue');
+      }
+    };
+  }, []);
+
+  // Debug helpers for development
+  useEffect(() => {
+    if (DEBUG_PREFETCH && typeof window !== 'undefined') {
+      (window as any).kibakiDebug = {
+        clearPrefetch: () => {
+          setPrefetchQueue([]);
+          console.log('Prefetch queue cleared manually');
+        },
+        queueStatus: () => {
+          console.table(prefetchQueue.map(d => ({
+            hash: d.hash,
+            scope: d.scope,
+            imagesLoaded: d.imagesLoaded,
+            age: Math.round((Date.now() - d.timestamp) / 1000) + 's'
+          })));
+          return prefetchQueue;
+        },
+        forcePrefetch: () => {
+          prefetchNextDuels();
+          console.log('Forced prefetch triggered');
+        },
+        memoryStatus: () => {
+          monitorMemory();
+        },
+        simulateSlowNetwork: () => {
+          console.log('Use ?debug=slow-network in URL to simulate slow network');
+        }
+      };
+
+      console.log('🔧 Kibaki Debug helpers available on window.kibakiDebug');
+    }
+  }, [prefetchQueue]);
+
   const loadFreshPair = async (allIds: number[], avoid: Set<string>) => {
     if (!Array.isArray(allIds) || allIds.length < 2) {
       setPair(null);
       return;
     }
+
+    // Try to use prefetched duel first
+    const validPrefetch = prefetchQueue.find(d =>
+      d.scope === scope &&
+      !avoid.has(d.hash) &&
+      (Date.now() - d.timestamp) < PREFETCH_CONFIG.maxAge
+    );
+
+    if (validPrefetch) {
+      // Use prefetched duel immediately
+      setPair({ left: validPrefetch.left, right: validPrefetch.right, hash: validPrefetch.hash });
+
+      // Remove used duel from queue
+      setPrefetchQueue(prev => prev.filter(d => d !== validPrefetch));
+
+      if (DEBUG_PREFETCH) {
+        console.log('Used prefetched duel:', {
+          hash: validPrefetch.hash,
+          imagesLoaded: validPrefetch.imagesLoaded,
+          age: Date.now() - validPrefetch.timestamp
+        });
+      }
+
+      // Start prefetching more in background
+      setTimeout(() => prefetchNextDuels(), PREFETCH_CONFIG.prefetchDelay);
+      return;
+    }
+
+    // Fallback to normal loading
+    if (DEBUG_PREFETCH) {
+      console.log('No valid prefetch available, using normal loading');
+    }
+
     const [leftId, rightId, hash] = pickRandomDistinctPair(allIds, avoid);
     const { left, right } = await loadPairDetails(leftId, rightId);
     setPair({ left, right, hash });
+
+    // Start prefetching for future after loading current pair
+    setTimeout(() => prefetchNextDuels(), PREFETCH_CONFIG.prefetchDelay);
   };
 
   const postVote = async (winnerId: number, loserId: number) => {
