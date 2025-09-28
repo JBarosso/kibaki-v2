@@ -5,6 +5,7 @@ export type CharacterCardProps = {
   character: CharacterRow;
   side: 'left' | 'right';
   onMore?: () => void;
+  className?: string;
 };
 
 function truncate(text: string, max = 120): string {
@@ -12,11 +13,11 @@ function truncate(text: string, max = 120): string {
   return text.slice(0, max - 1) + '…';
 }
 
-export default function CharacterCard({ character, side, onMore }: CharacterCardProps) {
+export default function CharacterCard({ character, side, onMore, className }: CharacterCardProps) {
   const { name, description, image_url, elo, wins, losses } = character;
 
   return (
-    <div className="flex h-full flex-col rounded-2xl border bg-white shadow-sm">
+    <div className={`flex h-full flex-col rounded-2xl border bg-white shadow-sm ${className || ''}`}>
       <div className="flex items-center justify-center p-4">
         {image_url ? (
           // eslint-disable-next-line @next/next/no-img-element

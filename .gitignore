@@ -6,6 +6,7 @@ dist/
 .cache/
 .vercel/
 .netlify/
+.claude/
 
 #env
 .env

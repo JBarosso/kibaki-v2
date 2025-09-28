@@ -20,6 +20,15 @@ import { getRecentSeenPairs, markPairSeen } from '@/lib/seenPairs';
 
 type LoadState = 'idle' | 'loading' | 'ready' | 'error';
 
+// Optimistic vote state types
+type OptimisticVoteState = {
+  winnerId: number | null;
+  status: 'idle' | 'pending' | 'success' | 'error';
+};
+
+// Debug mode for testing scenarios
+const DEBUG_MODE = import.meta.env.DEV;
+
 export default function DuelContainer() {
   const [state, setState] = useState<LoadState>('idle');
   const [error, setError] = useState<string | null>(null);
@@ -31,6 +40,13 @@ export default function DuelContainer() {
   const [rateLimitedAt, setRateLimitedAt] = useState<number | null>(null);
   const [isVoting, setIsVoting] = useState(false);
   const [lastVoteAt, setLastVoteAt] = useState<number | null>(null);
+
+  // Optimistic UI states
+  const [optimisticVote, setOptimisticVote] = useState<OptimisticVoteState>({
+    winnerId: null,
+    status: 'idle'
+  });
+  const [isTransitioning, setIsTransitioning] = useState(false);
   const [universes, setUniverses] = useState<Universe[]>([]);
   const [scope, setScope] = useState<string>('global');
   const scopeRef = useRef<string>('global');
@@ -179,39 +195,71 @@ export default function DuelContainer() {
 
   const postVote = async (winnerId: number, loserId: number) => {
     const nonce = crypto.randomUUID();
+
+    // Debug mode: simulate different scenarios
+    if (DEBUG_MODE) {
+      console.log('🔧 DEBUG: Vote initiated', { winnerId, loserId, nonce });
+
+      // Check URL params for debug scenarios
+      const urlParams = new URLSearchParams(window.location.search);
+      const debugScenario = urlParams.get('debug');
+
+      switch (debugScenario) {
+        case 'rate-limit':
+          console.log('🔧 DEBUG: Simulating rate limit');
+          await new Promise(resolve => setTimeout(resolve, 300)); // Simulate network delay
+          return { ok: false, reason: 'rate_limited', duplicate: false, result: {} };
+
+        case 'server-error':
+          console.log('🔧 DEBUG: Simulating server error');
+          await new Promise(resolve => setTimeout(resolve, 500));
+          return { ok: false, reason: 'server_error', duplicate: false, result: {} };
+
+        case 'network-error':
+          console.log('🔧 DEBUG: Simulating network error');
+          await new Promise(resolve => setTimeout(resolve, 200));
+          throw new Error('Network connection failed');
+
+        case 'slow-network':
+          console.log('🔧 DEBUG: Simulating slow network');
+          await new Promise(resolve => setTimeout(resolve, 2000));
+          break; // Continue to normal flow
+
+        default:
+          console.log('🔧 DEBUG: Normal flow - Add ?debug=rate-limit|server-error|network-error|slow-network to test scenarios');
+      }
+    }
+
     const { data } = await supabase.auth.getSession();
     const token = data.session?.access_token ?? import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
     const url = `${import.meta.env.PUBLIC_SUPABASE_URL}/functions/v1/vote`;
-    await fetch(url, {
+
+    const response = await fetch(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`,
       },
       body: JSON.stringify({ winner_id: winnerId, loser_id: loserId, nonce }),
-    })
-      .then(async (r) => {
-        const j: any = await r.json().catch(() => ({}));
-        if (!r.ok && j?.reason === 'rate_limited') {
-          // show a soft banner for a few seconds
-          // you can implement: setRateLimitedAt(Date.now())
-          setRateLimitedAt(Date.now());
-          showToast({ type: 'error', message: 'Trop de votes, réessayez dans un instant.' });
-        } else if (!r.ok) {
-          showToast({ type: 'error', message: 'Une erreur est survenue lors du vote.' });
-        } else {
-          showToast({ type: 'info', message: 'Vote pris en compte' });
-        }
-      })
-      .catch((err) => {
-        console.warn('vote error', err);
-        showToast({ type: 'error', message: 'Impossible d\'envoyer votre vote.' });
-      });
+    });
+
+    const result: any = await response.json().catch(() => ({}));
+
+    if (DEBUG_MODE) {
+      console.log('🔧 DEBUG: Vote response', { ok: response.ok, result });
+    }
+
+    return {
+      ok: response.ok,
+      reason: result?.reason,
+      duplicate: result?.duplicate,
+      result
+    };
   };
 
   const vote = async (side: 'left' | 'right') => {
     if (!pair) return;
-    if (isVoting) return; // ignore if already voting
+    if (isVoting || isTransitioning) return; // ignore if already voting or transitioning
     const now = Date.now();
     if (now - (lastVoteAt ?? 0) < 700) return; // throttle rapid clicks
 
@@ -219,20 +267,65 @@ export default function DuelContainer() {
     const winnerId = side === 'left' ? currentPair.left.id : currentPair.right.id;
     const loserId = side === 'left' ? currentPair.right.id : currentPair.left.id;
 
+    // Optimistic UI: Immediate visual feedback
+    setOptimisticVote({ winnerId, status: 'pending' });
+    setIsTransitioning(true);
     setIsVoting(true);
+
     try {
-      await postVote(winnerId, loserId);
-      setLastVoteAt(Date.now());
-      addUsedPair(currentPair.hash, scope);
-      // Fire-and-forget server write for logged-in users
-      try { void markPairSeen(currentPair.hash).catch(() => {}); } catch {}
-      setLastVote(side);
-      await loadFreshPair(ids, getUsedPairs(scope));
+      // API call in background
+      const voteResult = await postVote(winnerId, loserId);
+
+      if (!voteResult.ok && voteResult.reason === 'rate_limited') {
+        // Rollback with shake animation
+        setOptimisticVote({ winnerId, status: 'error' });
+        setRateLimitedAt(Date.now());
+        showToast({ type: 'error', message: 'Trop de votes, réessayez dans un instant.' });
+        // Reset UI state after shake animation
+        setTimeout(() => {
+          setOptimisticVote({ winnerId: null, status: 'idle' });
+          setIsTransitioning(false);
+          setIsVoting(false);
+        }, 600);
+        return;
+      } else if (!voteResult.ok) {
+        // Network/server error - rollback
+        setOptimisticVote({ winnerId, status: 'error' });
+        showToast({ type: 'error', message: 'Une erreur est survenue lors du vote.' });
+        setTimeout(() => {
+          setOptimisticVote({ winnerId: null, status: 'idle' });
+          setIsTransitioning(false);
+          setIsVoting(false);
+        }, 600);
+        return;
+      } else {
+        // Success path
+        setOptimisticVote({ winnerId, status: 'success' });
+        showToast({ type: 'info', message: 'Vote pris en compte' });
+
+        // Update state and load next duel during success animation
+        setLastVoteAt(Date.now());
+        addUsedPair(currentPair.hash, scope);
+        try { void markPairSeen(currentPair.hash).catch(() => {}); } catch {}
+        setLastVote(side);
+
+        // Load next duel after brief success animation
+        setTimeout(async () => {
+          await loadFreshPair(ids, getUsedPairs(scope));
+          setOptimisticVote({ winnerId: null, status: 'idle' });
+          setIsTransitioning(false);
+          setIsVoting(false);
+        }, 400);
+      }
     } catch (e: any) {
-      setError(e?.message ?? String(e));
-      setState('error');
-    } finally {
-      setIsVoting(false);
+      // Network error - rollback
+      setOptimisticVote({ winnerId, status: 'error' });
+      showToast({ type: 'error', message: 'Impossible d\'envoyer votre vote.' });
+      setTimeout(() => {
+        setOptimisticVote({ winnerId: null, status: 'idle' });
+        setIsTransitioning(false);
+        setIsVoting(false);
+      }, 600);
     }
   };
 
@@ -307,6 +400,49 @@ export default function DuelContainer() {
 
   const { left, right, hash } = pair;
 
+  // Animation classes for character cards
+  const getCardAnimationClasses = (characterId: number) => {
+    if (optimisticVote.winnerId === characterId) {
+      switch (optimisticVote.status) {
+        case 'pending':
+          return 'transform transition-all duration-300 scale-105 ring-4 ring-green-500 ring-opacity-50 animate-pulse';
+        case 'success':
+          return 'transform transition-all duration-300 scale-105 ring-4 ring-green-500 ring-opacity-75';
+        case 'error':
+          return 'transform transition-all duration-300 animate-shake ring-4 ring-red-500 ring-opacity-50';
+        default:
+          return '';
+      }
+    } else if (optimisticVote.winnerId && optimisticVote.winnerId !== characterId && optimisticVote.status === 'pending') {
+      return 'opacity-50 scale-95 transition-all duration-300';
+    }
+    return '';
+  };
+
+  // Button classes for animation states
+  const getButtonClasses = (characterId: number, baseClasses: string) => {
+    const disabled = isVoting || isTransitioning;
+    const isWinner = optimisticVote.winnerId === characterId;
+
+    let classes = baseClasses;
+
+    if (disabled) {
+      classes += ' cursor-not-allowed opacity-50';
+    } else {
+      classes += ' hover:scale-105';
+    }
+
+    if (isWinner && optimisticVote.status === 'success') {
+      classes += ' bg-green-600';
+    } else if (isWinner && optimisticVote.status === 'error') {
+      classes += ' bg-red-600';
+    }
+
+    classes += ' transition-all duration-200';
+
+    return classes;
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-3">
@@ -314,22 +450,32 @@ export default function DuelContainer() {
       </div>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div className="flex flex-col">
-          <CharacterCard character={left} side="left" onMore={() => setOpenLeft(true)} />
+          <CharacterCard
+            character={left}
+            side="left"
+            onMore={() => setOpenLeft(true)}
+            className={getCardAnimationClasses(left.id)}
+          />
           <button
             onClick={() => vote('left')}
-            disabled={isVoting}
-            className="mt-3 rounded-lg bg-black px-4 py-2 text-white hover:bg-black/90 disabled:opacity-60 disabled:cursor-not-allowed"
+            disabled={isVoting || isTransitioning}
+            className={getButtonClasses(left.id, "mt-3 rounded-lg bg-black px-4 py-2 text-white hover:bg-black/90 disabled:opacity-60 disabled:cursor-not-allowed")}
           >
             Voter à gauche
           </button>
         </div>
 
         <div className="flex flex-col">
-          <CharacterCard character={right} side="right" onMore={() => setOpenRight(true)} />
+          <CharacterCard
+            character={right}
+            side="right"
+            onMore={() => setOpenRight(true)}
+            className={getCardAnimationClasses(right.id)}
+          />
           <button
             onClick={() => vote('right')}
-            disabled={isVoting}
-            className="mt-3 rounded-lg bg-black px-4 py-2 text-white hover:bg-black/90 disabled:opacity-60 disabled:cursor-not-allowed"
+            disabled={isVoting || isTransitioning}
+            className={getButtonClasses(right.id, "mt-3 rounded-lg bg-black px-4 py-2 text-white hover:bg-black/90 disabled:opacity-60 disabled:cursor-not-allowed")}
           >
             Voter à droite
           </button>
