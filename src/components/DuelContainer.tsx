@@ -19,6 +19,10 @@ import { fetchUniverses, type Universe } from '@/lib/top';
 import { getRecentSeenPairs, markPairSeen } from '@/lib/seenPairs';
 import { getStorageAdapter, type StorageAdapter } from '@/lib/storageAdapter';
 import { db } from '@/lib/kibakiDB';
+import { FadeTransition, TransitionWrapper } from '@/components/TransitionWrapper';
+import { SkeletonDuel } from '@/components/SkeletonCard';
+import { useLoadingState } from '@/hooks/useLoadingState';
+import { animationClasses, getPrefersReducedMotion } from '@/lib/animations';
 
 type LoadState = 'idle' | 'loading' | 'ready' | 'error';
 
@@ -74,6 +78,10 @@ export default function DuelContainer() {
 
   // Storage adapter
   const [storage, setStorage] = useState<StorageAdapter | null>(null);
+
+  // Animation and loading states
+  const loadingState = useLoadingState({ minDisplayTime: 300 });
+  const reducedMotion = getPrefersReducedMotion();
   const [universes, setUniverses] = useState<Universe[]>([]);
   const [scope, setScope] = useState<string>('global');
   const scopeRef = useRef<string>('global');
@@ -350,13 +358,17 @@ export default function DuelContainer() {
     (async () => {
       setState('loading');
       setError(null);
+      loadingState.startLoading('Loading characters...');
+
       try {
         // Load universes
+        loadingState.updateProgress(20, 'Loading universes...');
         const u = await fetchUniverses();
         if (!mountedRef.current) return;
         setUniverses(u);
 
         // Load saved scope from LS
+        loadingState.updateProgress(40, 'Initializing scope...');
         let savedScope = 'global';
         try {
           if (typeof window !== 'undefined' && 'localStorage' in window) {
@@ -368,25 +380,32 @@ export default function DuelContainer() {
         setScope(savedScope);
 
         // Fetch ids for scope
+        loadingState.updateProgress(60, 'Fetching character data...');
         const fetchedIds = await getAllCharacterIds(savedScope);
         if (!mountedRef.current) return;
         setIds(fetchedIds);
 
         // (A) Immediately load a local pair without waiting for any auth/server merge
+        loadingState.updateProgress(80, 'Preparing duel...');
         if (fetchedIds.length >= 2) {
           await loadFreshPair(fetchedIds, getUsedPairs(savedScope));
         } else {
           setPair(null);
         }
         if (!mountedRef.current) return;
+
+        loadingState.updateProgress(100, 'Ready!');
         setState('ready');
+        loadingState.stopLoading();
 
         // (C) Start initial prefetching after first duel is loaded
         setTimeout(() => prefetchNextDuels(), PREFETCH_CONFIG.prefetchDelay);
       } catch (e: any) {
         if (!mountedRef.current) return;
-        setError(e?.message ?? String(e));
+        const errorMessage = e?.message ?? String(e);
+        setError(errorMessage);
         setState('error');
+        loadingState.setError(errorMessage);
       }
     })();
 
@@ -685,6 +704,27 @@ export default function DuelContainer() {
 
             return { available, cacheTest: !!retrieved };
           }
+        },
+        // Animation performance monitoring
+        startAnimationMonitoring: () => {
+          (window as any).animationDebug?.startMonitoring();
+        },
+        stopAnimationMonitoring: () => {
+          (window as any).animationDebug?.stopMonitoring();
+        },
+        testReducedMotion: () => {
+          const prefers = getPrefersReducedMotion();
+          console.log('User prefers reduced motion:', prefers);
+          return prefers;
+        },
+        simulateSlowAnimations: (enabled: boolean) => {
+          if (enabled) {
+            document.documentElement.style.setProperty('--animation-multiplier', '3');
+            console.log('🐌 Slow animations enabled');
+          } else {
+            document.documentElement.style.removeProperty('--animation-multiplier');
+            console.log('⚡ Normal animation speed restored');
+          }
         }
       };
 
@@ -899,21 +939,42 @@ export default function DuelContainer() {
 
   if (state === 'loading' || state === 'idle') {
     return (
-      <div className="mx-auto max-w-5xl animate-pulse">
-        <div className="mb-4 h-6 w-40 rounded bg-gray-200" />
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <div className="h-80 rounded-2xl bg-gray-200" />
-          <div className="h-80 rounded-2xl bg-gray-200" />
-        </div>
-      </div>
+      <FadeTransition show={true} className="mx-auto max-w-5xl">
+        <SkeletonDuel />
+        {loadingState.isLoading && loadingState.message && (
+          <div className="mt-4 text-center">
+            <div className="text-sm text-gray-600 mb-2">{loadingState.message}</div>
+            {loadingState.progress !== undefined && (
+              <div className="w-full bg-gray-200 rounded-full h-1">
+                <div
+                  className={`h-1 bg-blue-500 rounded-full transition-all duration-300 ${
+                    reducedMotion ? '' : 'ease-out'
+                  }`}
+                  style={{ width: `${loadingState.progress}%` }}
+                />
+              </div>
+            )}
+          </div>
+        )}
+      </FadeTransition>
     );
   }
 
   if (state === 'error') {
     return (
-      <div className="rounded-2xl border bg-white p-6 text-sm text-red-600">
-        {error ?? 'An error occurred.'}
-      </div>
+      <FadeTransition show={true}>
+        <div className={`rounded-2xl border bg-white p-6 text-sm text-red-600 ${animationClasses.error}`}>
+          <div className="flex items-center space-x-2">
+            <span className="text-red-500">⚠️</span>
+            <span>{error ?? 'An error occurred.'}</span>
+          </div>
+          {loadingState.error && (
+            <div className="mt-2 text-xs text-red-500">
+              {loadingState.error}
+            </div>
+          )}
+        </div>
+      </FadeTransition>
     );
   }
 
@@ -945,21 +1006,23 @@ export default function DuelContainer() {
 
   const { left, right, hash } = pair;
 
-  // Animation classes for character cards
+  // Animation classes for character cards (respects reduced motion)
   const getCardAnimationClasses = (characterId: number) => {
+    const baseTransition = reducedMotion ? '' : 'transform transition-all duration-300';
+
     if (optimisticVote.winnerId === characterId) {
       switch (optimisticVote.status) {
         case 'pending':
-          return 'transform transition-all duration-300 scale-105 ring-4 ring-green-500 ring-opacity-50 animate-pulse';
+          return `${baseTransition} ${reducedMotion ? 'ring-4 ring-green-500 ring-opacity-50' : 'scale-105 ring-4 ring-green-500 ring-opacity-50 animate-pulse'}`;
         case 'success':
-          return 'transform transition-all duration-300 scale-105 ring-4 ring-green-500 ring-opacity-75';
+          return `${baseTransition} ${reducedMotion ? 'ring-4 ring-green-500 ring-opacity-75' : 'scale-105 ring-4 ring-green-500 ring-opacity-75'}`;
         case 'error':
-          return 'transform transition-all duration-300 animate-shake ring-4 ring-red-500 ring-opacity-50';
+          return `${baseTransition} ${reducedMotion ? 'ring-4 ring-red-500 ring-opacity-50' : 'animate-shake ring-4 ring-red-500 ring-opacity-50'}`;
         default:
           return '';
       }
     } else if (optimisticVote.winnerId && optimisticVote.winnerId !== characterId && optimisticVote.status === 'pending') {
-      return 'opacity-50 scale-95 transition-all duration-300';
+      return reducedMotion ? 'opacity-50' : 'opacity-50 scale-95 transition-all duration-300';
     }
     return '';
   };
@@ -989,53 +1052,80 @@ export default function DuelContainer() {
   };
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center gap-3">
-        <ScopeSelector universes={universes} value={scope} onChange={(s) => setScope(s)} />
-      </div>
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <div className="flex flex-col">
-          <CharacterCard
-            character={left}
-            side="left"
-            onMore={() => setOpenLeft(true)}
-            className={getCardAnimationClasses(left.id)}
-          />
-          <button
-            onClick={() => vote('left')}
-            disabled={isVoting || isTransitioning}
-            className={getButtonClasses(left.id, "mt-3 rounded-lg bg-black px-4 py-2 text-white hover:bg-black/90 disabled:opacity-60 disabled:cursor-not-allowed")}
-          >
-            Voter à gauche
-          </button>
-        </div>
+    <TransitionWrapper show={state === 'ready'} duration="fast">
+      <div className="space-y-4">
+        <FadeTransition show={true} duration="fast">
+          <div className="flex items-center gap-3">
+            <ScopeSelector universes={universes} value={scope} onChange={(s) => setScope(s)} />
+          </div>
+        </FadeTransition>
 
-        <div className="flex flex-col">
-          <CharacterCard
-            character={right}
-            side="right"
-            onMore={() => setOpenRight(true)}
-            className={getCardAnimationClasses(right.id)}
-          />
-          <button
-            onClick={() => vote('right')}
-            disabled={isVoting || isTransitioning}
-            className={getButtonClasses(right.id, "mt-3 rounded-lg bg-black px-4 py-2 text-white hover:bg-black/90 disabled:opacity-60 disabled:cursor-not-allowed")}
-          >
-            Voter à droite
-          </button>
-        </div>
-      </div>
+        <TransitionWrapper
+          show={!isTransitioning}
+          duration="normal"
+          className={reducedMotion ? '' : 'transform transition-all duration-300'}
+        >
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div className="flex flex-col">
+              <CharacterCard
+                character={left}
+                side="left"
+                onMore={() => setOpenLeft(true)}
+                className={getCardAnimationClasses(left.id)}
+              />
+              <button
+                onClick={() => vote('left')}
+                disabled={isVoting || isTransitioning}
+                className={getButtonClasses(left.id, "mt-3 rounded-lg bg-black px-4 py-2 text-white hover:bg-black/90 disabled:opacity-60 disabled:cursor-not-allowed")}
+              >
+                Voter à gauche
+              </button>
+            </div>
 
-      <div className="flex flex-wrap items-center gap-3">
-        <button onClick={skip} className="rounded border px-3 py-1.5">Passer</button>
-        <button onClick={resetPairs} className="rounded border px-3 py-1.5">Réinitialiser les paires</button>
-        {import.meta.env.DEV ? (
-          <span className="text-xs text-gray-500">hash: {hash}</span>
-        ) : null}
-        {lastVote ? (
-          <span className="ml-auto text-xs text-gray-500">Sauvegardé localement.</span>
-        ) : null}
+            <div className="flex flex-col">
+              <CharacterCard
+                character={right}
+                side="right"
+                onMore={() => setOpenRight(true)}
+                className={getCardAnimationClasses(right.id)}
+              />
+              <button
+                onClick={() => vote('right')}
+                disabled={isVoting || isTransitioning}
+                className={getButtonClasses(right.id, "mt-3 rounded-lg bg-black px-4 py-2 text-white hover:bg-black/90 disabled:opacity-60 disabled:cursor-not-allowed")}
+              >
+                Voter à droite
+              </button>
+            </div>
+          </div>
+        </TransitionWrapper>
+
+        <FadeTransition show={true} duration="fast">
+          <div className="flex flex-wrap items-center gap-3">
+            <button
+              onClick={skip}
+              className={`rounded border px-3 py-1.5 ${animationClasses.interactive} ${
+                reducedMotion ? '' : 'hover:scale-105'
+              }`}
+            >
+              Passer
+            </button>
+            <button
+              onClick={resetPairs}
+              className={`rounded border px-3 py-1.5 ${animationClasses.interactive} ${
+                reducedMotion ? '' : 'hover:scale-105'
+              }`}
+            >
+              Réinitialiser les paires
+            </button>
+            {import.meta.env.DEV ? (
+              <span className="text-xs text-gray-500">hash: {hash}</span>
+            ) : null}
+            {lastVote ? (
+              <span className="ml-auto text-xs text-gray-500">Sauvegardé localement.</span>
+            ) : null}
+          </div>
+        </FadeTransition>
       </div>
 
       {/* Modals */}
@@ -1045,7 +1135,7 @@ export default function DuelContainer() {
       <Modal open={openRight} onClose={() => setOpenRight(false)} title={right.name}>
         <CharacterDetails character={right} />
       </Modal>
-    </div>
+    </TransitionWrapper>
   );
 }
 
