@@ -1,19 +1,19 @@
 ---
-import { listTournaments } from '@/lib/tournaments';
+import AppLayout from '@/layouts/AppLayout.astro';
 import Seo from '@/components/Seo.astro';
+import { listTournaments } from '@/lib/tournaments';
+
 const { data } = await listTournaments(20, 0);
 ---
-<html lang="fr">
-  <head><Seo title="Tournois" /></head>
-  <body class="p-6 max-w-5xl mx-auto">
-    <h1 class="text-xl font-semibold">Tournois</h1>
-    <div class="mt-4 space-y-3">
-      {data?.length ? data.map(t => (
-        <a href={`/t/${t.id}`} class="block rounded-2xl border bg-white p-4 shadow-sm hover:shadow">
-          <div class="font-medium">{t.name}</div>
-          <div class="text-xs text-gray-500">{t.status} • round {t.round_duration_minutes} min</div>
-        </a>
-      )) : <p class="text-sm text-gray-500">Aucun tournoi.</p>}
-    </div>
-  </body>
-</html>
+
+<AppLayout title="Tournois">
+  <h1 class="text-xl font-semibold">Tournois</h1>
+  <div class="mt-4 space-y-3">
+    {data?.length ? data.map(t => (
+      <a href={`/t/${t.id}`} class="block rounded-2xl border bg-white p-4 shadow-sm hover:shadow">
+        <div class="font-medium">{t.name}</div>
+        <div class="text-xs text-gray-500">{t.status} • round {t.round_duration_minutes} min</div>
+      </a>
+    )) : <p class="text-sm text-gray-500">Aucun tournoi.</p>}
+  </div>
+</AppLayout>

@@ -1,0 +1,12 @@
+---
+import AppLayout from '@/layouts/AppLayout.astro';
+import Seo from '@/components/Seo.astro';
+import TournamentNewIsland from '@/components/TournamentNewIsland';
+---
+
+<AppLayout title="Nouveau tournoi">
+  <h1 class="text-xl font-semibold">Nouveau tournoi</h1>
+  <div class="mt-4">
+    <TournamentNewIsland client:load />
+  </div>
+</AppLayout>
