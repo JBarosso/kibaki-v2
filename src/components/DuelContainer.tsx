@@ -17,6 +17,8 @@ import { supabase } from '@/lib/supabaseClient';
 import { showToast } from '@/lib/toast';
 import { fetchUniverses, type Universe } from '@/lib/top';
 import { getRecentSeenPairs, markPairSeen } from '@/lib/seenPairs';
+import { getStorageAdapter, type StorageAdapter } from '@/lib/storageAdapter';
+import { db } from '@/lib/kibakiDB';
 
 type LoadState = 'idle' | 'loading' | 'ready' | 'error';
 
@@ -69,6 +71,9 @@ export default function DuelContainer() {
   // Prefetch system states
   const [prefetchQueue, setPrefetchQueue] = useState<PrefetchedDuel[]>([]);
   const prefetchingRef = useRef<boolean>(false);
+
+  // Storage adapter
+  const [storage, setStorage] = useState<StorageAdapter | null>(null);
   const [universes, setUniverses] = useState<Universe[]>([]);
   const [scope, setScope] = useState<string>('global');
   const scopeRef = useRef<string>('global');
@@ -76,6 +81,23 @@ export default function DuelContainer() {
   const bootstrappedRef = useRef<boolean>(false);
 
   const usedPairs = useMemo(() => getUsedPairs(scope), [scope]);
+
+  // Initialize storage adapter
+  useEffect(() => {
+    const initStorage = async () => {
+      try {
+        const adapter = await getStorageAdapter();
+        setStorage(adapter);
+
+        // Run initial cleanup
+        await adapter.cleanup();
+      } catch (error) {
+        console.error('Failed to initialize storage:', error);
+      }
+    };
+
+    initStorage();
+  }, []);
 
   // Image preloading utility
   const preloadImages = async (characters: CharacterRow[]): Promise<boolean> => {
@@ -116,6 +138,85 @@ export default function DuelContainer() {
     }
   };
 
+  // Enhanced image preloading with IndexedDB caching
+  const preloadImagesWithCache = async (characters: CharacterRow[]): Promise<boolean> => {
+    if (!storage) return preloadImages(characters);
+
+    const promises = characters
+      .filter(char => char.image_url)
+      .map(async char => {
+        try {
+          // Check if image is already cached
+          const cachedBlob = await storage.getImageBlob(char.id);
+          if (cachedBlob) {
+            if (DEBUG_PREFETCH) console.log('Image found in cache:', char.name);
+            return true;
+          }
+
+          // Download and cache image
+          return new Promise<boolean>((resolve) => {
+            const img = new Image();
+            const timeout = setTimeout(() => {
+              if (DEBUG_PREFETCH) console.log('Image preload timeout:', char.name);
+              resolve(false);
+            }, PREFETCH_CONFIG.imageTimeout);
+
+            img.onload = async () => {
+              clearTimeout(timeout);
+              try {
+                // Convert to blob and cache
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                if (ctx) {
+                  canvas.width = img.naturalWidth;
+                  canvas.height = img.naturalHeight;
+                  ctx.drawImage(img, 0, 0);
+
+                  canvas.toBlob(async (blob) => {
+                    if (blob && storage) {
+                      await storage.cacheImage(char.id, char.image_url!, blob);
+                      if (DEBUG_PREFETCH) {
+                        console.log('Image cached:', char.name, `${blob.size} bytes`);
+                      }
+                    }
+                  }, 'image/jpeg', 0.8);
+                }
+              } catch (error) {
+                if (DEBUG_PREFETCH) console.warn('Image caching failed:', char.name, error);
+              }
+              resolve(true);
+            };
+
+            img.onerror = () => {
+              clearTimeout(timeout);
+              if (DEBUG_PREFETCH) console.warn('Image preload failed:', char.name);
+              resolve(false);
+            };
+
+            img.src = char.image_url!;
+          });
+        } catch (error) {
+          if (DEBUG_PREFETCH) console.warn('Image cache check failed:', char.name, error);
+          return false;
+        }
+      });
+
+    try {
+      const results = await Promise.all(promises);
+      const allLoaded = results.every(Boolean);
+      if (DEBUG_PREFETCH) {
+        console.log('Enhanced images preload result:', {
+          allLoaded,
+          loaded: results.filter(Boolean).length,
+          total: results.length
+        });
+      }
+      return allLoaded;
+    } catch {
+      return false;
+    }
+  };
+
   // Memory monitoring (development only)
   const monitorMemory = () => {
     if (DEBUG_PREFETCH && 'memory' in performance) {
@@ -128,11 +229,11 @@ export default function DuelContainer() {
     }
   };
 
-  // Intelligent prefetch logic
+  // Enhanced prefetch logic with storage adapter
   const prefetchNextDuels = async () => {
     if (prefetchingRef.current) return; // Prevent concurrent prefetching
     if (prefetchQueue.length >= PREFETCH_CONFIG.maxQueueSize) return;
-    if (!ids.length || ids.length < 2) return;
+    if (!ids.length || ids.length < 2 || !storage) return;
 
     prefetchingRef.current = true;
 
@@ -140,19 +241,64 @@ export default function DuelContainer() {
       // Calculate how many to prefetch
       const toPrefetch = PREFETCH_CONFIG.maxQueueSize - prefetchQueue.length;
       const currentUsedPairs = getUsedPairs(scope);
+      const cachedPairs = await storage.getPairHashes(scope);
 
       if (DEBUG_PREFETCH) {
-        console.log('Starting prefetch:', { toPrefetch, queueSize: prefetchQueue.length, scope });
+        console.log('Starting prefetch:', {
+          toPrefetch,
+          queueSize: prefetchQueue.length,
+          scope,
+          cachedPairs: cachedPairs.length
+        });
       }
 
       for (let i = 0; i < toPrefetch; i++) {
         try {
-          // Get next pair
-          const [leftId, rightId, hash] = pickRandomDistinctPair(ids, currentUsedPairs);
-          const { left, right } = await loadPairDetails(leftId, rightId);
+          // Try to get pair from cache first
+          let left: CharacterRow | null = null;
+          let right: CharacterRow | null = null;
+          let hash: string = '';
 
-          // Start image preloading
-          const imagesLoaded = await preloadImages([left, right]);
+          // Attempt to build pair from cached characters
+          const cachedIds = await storage.getCharacterIds(scope);
+          if (cachedIds.length >= 2) {
+            for (let attempt = 0; attempt < 10; attempt++) {
+              const leftId = cachedIds[Math.floor(Math.random() * cachedIds.length)];
+              const rightId = cachedIds[Math.floor(Math.random() * cachedIds.length)];
+
+              if (leftId !== rightId) {
+                hash = makePairHash(leftId, rightId);
+                if (!currentUsedPairs.has(hash) && !cachedPairs.includes(hash)) {
+                  const cachedLeft = await storage.getCharacter(leftId);
+                  const cachedRight = await storage.getCharacter(rightId);
+
+                  if (cachedLeft && cachedRight) {
+                    left = cachedLeft;
+                    right = cachedRight;
+                    break;
+                  }
+                }
+              }
+            }
+          }
+
+          // Fallback to API if cache miss
+          if (!left || !right) {
+            const [leftId, rightId, newHash] = pickRandomDistinctPair(ids, currentUsedPairs);
+            const { left: apiLeft, right: apiRight } = await loadPairDetails(leftId, rightId);
+            left = apiLeft;
+            right = apiRight;
+            hash = newHash;
+
+            // Cache the newly fetched characters
+            if (storage) {
+              await storage.setCharacter(left);
+              await storage.setCharacter(right);
+            }
+          }
+
+          // Enhanced image preloading with caching
+          const imagesLoaded = await preloadImagesWithCache([left, right]);
 
           // Add to queue
           const prefetchedDuel: PrefetchedDuel = {
@@ -177,8 +323,11 @@ export default function DuelContainer() {
             return newQueue;
           });
 
-          // Add to used pairs to avoid duplicates in future prefetches
+          // Add to used pairs cache
           addUsedPair(hash, scope);
+          if (storage) {
+            await storage.addPairHash(scope, hash);
+          }
         } catch (error) {
           if (DEBUG_PREFETCH) console.warn('Individual prefetch failed:', error);
           // Continue prefetching others
@@ -340,10 +489,80 @@ export default function DuelContainer() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Auto-cleanup old prefetches and memory management
+  // Migration from localStorage to IndexedDB
   useEffect(() => {
-    const cleanup = setInterval(() => {
+    const migrateFromLocalStorage = async () => {
+      if (!storage) return;
+
+      try {
+        // Check if migration needed
+        const migrated = localStorage.getItem('kibaki_migrated_to_idb');
+        if (migrated === 'true') return;
+
+        if (DEBUG_PREFETCH) {
+          console.log('🔄 Starting migration from localStorage to IndexedDB...');
+        }
+
+        // Migrate character IDs and universe data if available
+        const keys = Object.keys(localStorage).filter(k =>
+          k.startsWith('kibaki_char_ids_v1::') || k.startsWith('kibaki_pair_hashes_v1::')
+        );
+
+        let migrationCount = 0;
+
+        for (const key of keys) {
+          try {
+            const data = localStorage.getItem(key);
+            if (data) {
+              if (key.includes('char_ids')) {
+                const { ids } = JSON.parse(data);
+                const scopeName = key.split('::')[1];
+                if (DEBUG_PREFETCH) {
+                  console.log(`Migrating ${ids.length} character IDs from scope ${scopeName}`);
+                }
+                // Note: We can't migrate full character data from localStorage
+                // This will be populated on-demand
+              } else if (key.includes('pair_hashes')) {
+                const pairs = JSON.parse(data);
+                const scopeName = key.split('::')[1];
+                if (Array.isArray(pairs)) {
+                  for (const hash of pairs) {
+                    await storage.addPairHash(scopeName, hash);
+                  }
+                  migrationCount += pairs.length;
+                  if (DEBUG_PREFETCH) {
+                    console.log(`Migrated ${pairs.length} pair hashes from scope ${scopeName}`);
+                  }
+                }
+              }
+            }
+          } catch (error) {
+            console.warn('Failed to migrate key:', key, error);
+          }
+        }
+
+        // Mark as migrated
+        localStorage.setItem('kibaki_migrated_to_idb', 'true');
+
+        if (DEBUG_PREFETCH && migrationCount > 0) {
+          console.log(`✅ Migration complete: ${migrationCount} items migrated`);
+        }
+      } catch (error) {
+        console.error('Migration failed:', error);
+      }
+    };
+
+    if (storage) {
+      migrateFromLocalStorage();
+    }
+  }, [storage]);
+
+  // Auto-cleanup old prefetches and storage management
+  useEffect(() => {
+    const cleanup = setInterval(async () => {
       const now = Date.now();
+
+      // Clean prefetch queue
       setPrefetchQueue(prev => {
         const filtered = prev.filter(d =>
           (now - d.timestamp) < PREFETCH_CONFIG.maxAge && d.scope === scope
@@ -358,10 +577,28 @@ export default function DuelContainer() {
         }
         return filtered;
       });
-    }, 30000); // Check every 30s
+
+      // Clean storage
+      if (storage) {
+        try {
+          await storage.cleanup();
+
+          // Monitor storage quota
+          if (storage instanceof Promise || 'getStorageInfo' in storage) {
+            const storageInfo = await db.getStorageInfo();
+            if (storageInfo && storageInfo.percent > 80) {
+              console.warn('Storage quota high:', storageInfo.percent + '%');
+              // Could trigger more aggressive cleanup if needed
+            }
+          }
+        } catch (error) {
+          console.warn('Storage cleanup failed:', error);
+        }
+      }
+    }, 300000); // Every 5 minutes
 
     return () => clearInterval(cleanup);
-  }, [scope]);
+  }, [scope, storage]);
 
   // Cleanup on unmount
   useEffect(() => {
@@ -401,6 +638,53 @@ export default function DuelContainer() {
         },
         simulateSlowNetwork: () => {
           console.log('Use ?debug=slow-network in URL to simulate slow network');
+        },
+        // New storage-related debug helpers
+        storageInfo: async () => {
+          if (storage) {
+            const stats = await db.getCacheStats();
+            const info = await db.getStorageInfo();
+            console.log('💾 Storage Statistics:', stats);
+            console.log('📊 Quota Information:', info);
+            return { stats, info };
+          }
+          console.log('No storage adapter available');
+        },
+        cacheCharacter: async (id: number) => {
+          if (storage) {
+            const char = await storage.getCharacter(id);
+            console.log('Character cache lookup:', char);
+            return char;
+          }
+        },
+        migrationStatus: () => {
+          const migrated = localStorage.getItem('kibaki_migrated_to_idb');
+          console.log('Migration status:', migrated === 'true' ? 'Completed' : 'Pending');
+          return migrated;
+        },
+        testStorageAdapter: async () => {
+          if (storage) {
+            const available = await storage.isAvailable();
+            console.log('Storage adapter available:', available);
+
+            // Test character caching
+            const testChar = {
+              id: 999999,
+              name: 'Test Character',
+              slug: 'test-char',
+              description: 'Test character for debugging',
+              image_url: null,
+              elo: 1000,
+              wins: 0,
+              losses: 0
+            };
+
+            await storage.setCharacter(testChar);
+            const retrieved = await storage.getCharacter(999999);
+            console.log('Character cache test:', retrieved);
+
+            return { available, cacheTest: !!retrieved };
+          }
         }
       };
 
