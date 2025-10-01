@@ -23,6 +23,7 @@ import { FadeTransition, TransitionWrapper } from '@/components/TransitionWrappe
 import { SkeletonDuel } from '@/components/SkeletonCard';
 import { useLoadingState } from '@/hooks/useLoadingState';
 import { animationClasses, getPrefersReducedMotion } from '@/lib/animations';
+import ToastProvider from './ToastProvider';
 
 type LoadState = 'idle' | 'loading' | 'ready' | 'error';
 
@@ -1052,8 +1053,10 @@ export default function DuelContainer() {
   };
 
   return (
-    <TransitionWrapper show={state === 'ready'} duration="fast">
-      <div className="space-y-4">
+    <>
+      <ToastProvider />
+      <TransitionWrapper show={state === 'ready'} duration="fast">
+        <div className="space-y-4">
         <FadeTransition show={true} duration="fast">
           <div className="flex items-center gap-3">
             <ScopeSelector universes={universes} value={scope} onChange={(s) => setScope(s)} />
@@ -1135,7 +1138,8 @@ export default function DuelContainer() {
       <Modal open={openRight} onClose={() => setOpenRight(false)} title={right.name}>
         <CharacterDetails character={right} />
       </Modal>
-    </TransitionWrapper>
+      </TransitionWrapper>
+    </>
   );
 }
 

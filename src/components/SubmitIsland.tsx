@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import { ensureOwnProfile } from '@/lib/profiles';
 import { showToast } from '@/lib/toast';
+import ToastProvider from './ToastProvider';
 
 type UniverseRow = { id: number; slug: string; name: string };
 
@@ -148,18 +149,23 @@ export default function SubmitIsland() {
 
   if (!isSignedIn) {
     return (
-      <div className="max-w-md mx-auto p-6 rounded-2xl shadow border mt-8 bg-white">
+      <>
+        <ToastProvider />
+        <div className="max-w-md mx-auto p-6 rounded-2xl shadow border mt-8 bg-white">
         <div className="text-sm text-gray-700">Vous devez être connecté pour soumettre un personnage.</div>
         <a href="/account" className="mt-4 inline-flex items-center justify-center rounded bg-black px-4 py-2 text-white">
           Se connecter / Créer un compte
         </a>
-      </div>
+        </div>
+      </>
     );
   }
 
   if (success) {
     return (
-      <div className="max-w-md mx-auto p-6 rounded-2xl shadow border mt-8 bg-white">
+      <>
+        <ToastProvider />
+        <div className="max-w-md mx-auto p-6 rounded-2xl shadow border mt-8 bg-white">
         <h2 className="text-lg font-semibold">Merci !</h2>
         <p className="mt-2 text-sm text-gray-700">Votre soumission a été enregistrée et sera examinée.</p>
         <div className="mt-4 flex gap-3">
@@ -168,12 +174,15 @@ export default function SubmitIsland() {
           </button>
           <a className="rounded bg-black px-3 py-2 text-white" href="/duel">Retourner aux duels</a>
         </div>
-      </div>
+        </div>
+      </>
     );
   }
 
   return (
-    <div className="max-w-xl mx-auto p-6 rounded-2xl shadow border mt-8 bg-white">
+    <>
+      <ToastProvider />
+      <div className="max-w-xl mx-auto p-6 rounded-2xl shadow border mt-8 bg-white">
       <h2 className="mb-4 text-xl font-bold">Soumettre un personnage</h2>
       <form onSubmit={onSubmit} className="space-y-4">
         <div>
@@ -255,7 +264,8 @@ export default function SubmitIsland() {
           {submitting ? 'Envoi…' : 'Soumettre'}
         </button>
       </form>
-    </div>
+      </div>
+    </>
   );
 }
 

@@ -1,49 +1,19 @@
 ---
 import Seo from '@/components/Seo.astro';
-import { getTournament, getMatches, fetchCharacterNames, tickTournament } from '@/lib/tournaments';
+import { getTournament } from '@/lib/tournaments';
 import TournamentBracketClient from '@/components/TournamentBracketClient';
+import SiteLayout from '@/layouts/SiteLayout.astro';
 
 const id = Astro.params.id!;
 const { data: t } = await getTournament(id);
 if (!t) {
   return new Response('Not found', { status: 404 });
 }
-const { data: matches = [] } = await getMatches(id);
-
-// Map character names for labels
-const uniqueIds = Array.from(new Set((matches || []).flatMap(m => [m.char1_id, m.char2_id, m.winner_id].filter(Boolean) as number[])));
-const { data: chars = [] } = await fetchCharacterNames(uniqueIds);
-const nameByIdMap = new Map<number, string>();
-(chars || []).forEach(c => nameByIdMap.set(c.id, c.name));
-const nameById = (cid: number | null) => (cid ? (nameByIdMap.get(cid) ?? `#${cid}`) : '—');
-
-// Handle admin tick (optional form POST)
-let tickMessage: string | null = null;
-if (Astro.request.method === 'POST') {
-  const url = new URL(Astro.request.url);
-  if (url.searchParams.get('tick') === '1') {
-    const { error } = await tickTournament(id);
-    tickMessage = error ? `Tick error: ${error.message}` : 'Tick fait.';
-  }
-}
 ---
-<html lang="fr">
+<SiteLayout>
   <head><Seo title={`Tournoi • ${t.name}`} /></head>
-  <body class="p-6 max-w-6xl mx-auto">
-    <div class="mb-4 flex items-center justify-between">
-      <div>
-        <h1 class="text-xl font-semibold">{t.name}</h1>
-        <div class="text-xs text-gray-500">{t.status} • round {t.round_duration_minutes} min</div>
-      </div>
-      <form method="post">
-        <button formaction="?tick=1" class="rounded bg-black px-3 py-2 text-white text-sm">Mettre à jour</button>
-      </form>
-    </div>
-
-    {tickMessage && <div class="mb-4 text-sm text-gray-600">{tickMessage}</div>}
-
-    <div class="mt-4">
-      <TournamentBracketClient matches={matches || []} nameById={nameById} client:load />
-    </div>
-  </body>
-</html>
+  
+  <div class="container mx-auto px-4 py-6 max-w-7xl">
+    <TournamentBracketClient tournamentId={id} client:load />
+  </div>
+</SiteLayout>

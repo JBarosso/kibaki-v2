@@ -3,6 +3,7 @@ import { supabase } from '@/lib/supabaseClient';
 import humanizeError from '@/lib/humanizeError';
 import { ensureOwnProfile, updateUsername } from '@/lib/profiles';
 import { showToast } from '@/lib/toast';
+import ToastProvider from './ToastProvider';
 
 type Profile = { id: string; username: string; created_at: string; updated_at: string };
 
@@ -137,7 +138,9 @@ export default function AccountIsland() {
 
   if (!session) {
     return (
-      <div className="max-w-md mx-auto p-6 rounded-2xl shadow border mt-8 bg-white">
+      <>
+        <ToastProvider />
+        <div className="max-w-md mx-auto p-6 rounded-2xl shadow border mt-8 bg-white">
         <div className="flex gap-3 mb-4">
           <button className={`px-3 py-1 rounded ${mode==='signin'?'bg-black text-white':'bg-gray-100'}`} onClick={()=>setMode('signin')}>Se connecter</button>
           <button className={`px-3 py-1 rounded ${mode==='signup'?'bg-black text-white':'bg-gray-100'}`} onClick={()=>setMode('signup')}>Créer un compte</button>
@@ -163,12 +166,15 @@ export default function AccountIsland() {
 
         {errorMsg && <p className="mt-3 text-sm text-red-600">{errorMsg}</p>}
         <p className="mt-3 text-xs text-gray-500">Note: profiles are auto-created by a DB trigger; we also ensure it client-side.</p>
-      </div>
+        </div>
+      </>
     );
   }
 
   return (
-    <div className="max-w-md mx-auto p-6 rounded-2xl shadow border mt-8 bg-white">
+    <>
+      <ToastProvider />
+      <div className="max-w-md mx-auto p-6 rounded-2xl shadow border mt-8 bg-white">
       <div className="mb-3 text-sm text-gray-600">Connecté en tant que <strong>{session.user?.email}</strong></div>
       <div className="mb-4">
         <div className="text-xs text-gray-500">Pseudo actuel</div>
@@ -217,6 +223,7 @@ export default function AccountIsland() {
 
       <button onClick={doSignOut} className="w-full mt-4 border rounded px-3 py-2">Se déconnecter</button>
       {errorMsg && <p className="mt-3 text-sm text-red-600">{errorMsg}</p>}
-    </div>
+      </div>
+    </>
   );
 }
