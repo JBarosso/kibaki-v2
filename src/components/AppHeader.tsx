@@ -44,7 +44,7 @@ export default function AppHeader() {
     setCurrentPath(typeof window !== 'undefined' ? window.location.pathname : '');
   }, []);
 
-  const isActive = (href: string) => currentPath === href;
+  const isActive = (href: string) => currentPath === href || currentPath.startsWith(href + '/');
 
   const username = profile?.username ?? undefined;
   const isAdmin = profile?.is_admin === true;
@@ -56,6 +56,7 @@ export default function AppHeader() {
 
         <nav className="flex items-center gap-4 text-sm">
           <a href="/duel" className={linkCls(isActive('/duel'))}>Duel</a>
+          <a href="/t" className={linkCls(isActive('/t'))}>Tournois</a>
           <a href="/top" className={linkCls(isActive('/top'))}>Top</a>
           <a href="/submit" className={linkCls(isActive('/submit'))}>Soumettre</a>
           {session ? (

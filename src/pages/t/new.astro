@@ -1,0 +1,11 @@
+---
+import SiteLayout from '../../layouts/SiteLayout.astro'
+import TournamentNewIsland from '../../components/TournamentNewIsland'
+---
+
+<SiteLayout title="New Tournament">
+  <section class="mx-auto max-w-5xl px-4 py-8">
+    <h1 class="text-2xl font-semibold mb-6">Create Tournament</h1>
+    <TournamentNewIsland client:only="react" />
+  </section>
+</SiteLayout>

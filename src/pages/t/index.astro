@@ -1,0 +1,24 @@
+---
+import SiteLayout from '../../layouts/SiteLayout.astro'
+import { listTournaments } from '../../lib/tournaments'
+const tournaments = await listTournaments()
+---
+
+<SiteLayout title="Tournaments">
+  <section class="mx-auto max-w-5xl px-4 py-8">
+    <h1 class="text-2xl font-semibold mb-4">Tournaments</h1>
+    <ul class="divide-y divide-gray-200">
+      {tournaments.map(t => (
+        <li class="py-4 flex items-center justify-between" key={t.id}>
+          <a href={`/t/${t.id}`} class="font-medium hover:underline">{t.name}</a>
+          <span class="text-sm text-gray-500">{t.status}</span>
+        </li>
+      ))}
+    </ul>
+    <div class="mt-6">
+      <a href="/t/new" class="inline-flex items-center rounded-md border px-3 py-2 text-sm hover:bg-gray-50">
+        Create new (admin)
+      </a>
+    </div>
+  </section>
+</SiteLayout>
