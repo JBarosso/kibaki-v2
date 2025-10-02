@@ -1171,5 +1171,3 @@ function ScopeSelector({ universes, value, onChange }: { universes: Universe[]; 
     </div>
   );
 }
-
-
