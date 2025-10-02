@@ -106,3 +106,24 @@ export async function isAdmin(): Promise<boolean> {
   if (error) return false
   return !!data
 }
+
+export async function finishNowTournament(tournamentId: string) {
+  const { error } = await supabase.rpc('tournament_finish_now', { p_tournament_id: tournamentId })
+  if (error) throw error
+}
+
+export async function cancelTournament(tournamentId: string) {
+  const { error } = await supabase.rpc('tournament_cancel', { p_tournament_id: tournamentId })
+  if (error) throw error
+}
+
+export async function deleteTournament(tournamentId: string) {
+  const { error } = await supabase.rpc('tournament_delete', { p_tournament_id: tournamentId })
+  if (error) throw error
+}
+
+export async function purgeOldTournaments(days = 365) {
+  const { data, error } = await supabase.rpc('tournament_purge_older_than', { p_days: days })
+  if (error) throw error
+  return data as number
+}

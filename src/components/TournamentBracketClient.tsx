@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react'
 import TournamentBracket from './TournamentBracket'
-import { fetchCharacterNames, getMatches, isAdmin, tickTournament, voteMatch, type Match } from '../lib/tournaments'
+import {
+  fetchCharacterNames, getMatches, isAdmin, tickTournament, voteMatch, type Match,
+  finishNowTournament, cancelTournament, deleteTournament
+} from '../lib/tournaments'
 
 const LS_KEY = (tid: string) => `kbk_t_votes_${tid}`
 
@@ -14,6 +17,7 @@ export default function TournamentBracketClient(props: { tournamentId: string })
   const [admin, setAdmin] = useState(false)
   const [myVotes, setMyVotes] = useState<VotesMap>({})
   const [flash, setFlash] = useState<FlashMap>({})
+  const [busy, setBusy] = useState(false)
 
   // Load myVotes from localStorage
   useEffect(() => {
@@ -74,8 +78,38 @@ export default function TournamentBracketClient(props: { tournamentId: string })
     await refresh()
   }
 
+  async function doFinishNow() {
+    if (!confirm('Finish all rounds now?')) return
+    setBusy(true)
+    try { await finishNowTournament(props.tournamentId); await refresh() } finally { setBusy(false) }
+  }
+  async function doCancel() {
+    if (!confirm('Cancel this tournament?')) return
+    setBusy(true)
+    try { await cancelTournament(props.tournamentId); await refresh() } finally { setBusy(false) }
+  }
+  async function doDelete() {
+    if (!confirm('Delete this tournament and ALL its data? This cannot be undone.')) return
+    setBusy(true)
+    try { await deleteTournament(props.tournamentId); window.location.href = '/t' } finally { setBusy(false) }
+  }
+
   return (
     <div className="space-y-4">
+      {admin && (
+        <div className="flex flex-wrap items-center gap-2">
+          <button onClick={doFinishNow} disabled={busy} className="rounded-md border px-3 py-1 text-sm hover:bg-gray-50 disabled:opacity-50">
+            Finish now
+          </button>
+          <button onClick={doCancel} disabled={busy} className="rounded-md border px-3 py-1 text-sm hover:bg-gray-50 disabled:opacity-50">
+            Cancel
+          </button>
+          <button onClick={doDelete} disabled={busy} className="rounded-md border px-3 py-1 text-sm hover:bg-gray-50 disabled:opacity-50">
+            Delete
+          </button>
+        </div>
+      )}
+
       <TournamentBracket
         matches={matches}
         nameById={nameById}
