@@ -57,6 +57,7 @@ export default function AppHeader() {
         <nav className="flex items-center gap-4 text-sm">
           <a href="/duel" className={linkCls(isActive('/duel'))}>Duel</a>
           <a href="/top" className={linkCls(isActive('/top'))}>Top</a>
+          <a href="/t" className={linkCls(isActive('/t') || currentPath.startsWith('/t/'))}>Tournois</a>
           <a href="/submit" className={linkCls(isActive('/submit'))}>Soumettre</a>
           {session ? (
             <>

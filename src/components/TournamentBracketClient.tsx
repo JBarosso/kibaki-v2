@@ -74,34 +74,39 @@ export default function TournamentBracketClient({ tournamentId }: TournamentBrac
   const handleVote = async (match: TMatch, choiceId: number) => {
     if (votingStates[match.id]) return; // Already voting
 
+    // Check if voting is allowed (within time window)
+    const now = new Date();
+    const startsAt = new Date(match.opens_at);
+    const endsAt = new Date(match.closes_at);
+    
+    if (now < startsAt) {
+      showToast({ type: 'error', message: 'Le vote n\'est pas encore ouvert pour ce match' });
+      return;
+    }
+    
+    if (now > endsAt) {
+      showToast({ type: 'error', message: 'Le vote est fermé pour ce match' });
+      return;
+    }
+
     setVotingStates(prev => ({ ...prev, [match.id]: true }));
 
     try {
-      // Use the Edge Function for voting
-      const { data } = await supabase.auth.getSession();
-      const token = data.session?.access_token ?? import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
-      const url = `${import.meta.env.PUBLIC_SUPABASE_URL}/functions/v1/vote`;
+      // Use tournament-specific voting (insert into tournament_votes)
+      const { data: voteData, error: voteError } = await supabase
+        .from('tournament_votes')
+        .insert({ 
+          match_id: match.id, 
+          choice_id: choiceId 
+        })
+        .select('id')
+        .single();
 
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          winner_id: choiceId,
-          loser_id: match.char1_id === choiceId ? match.char2_id : match.char1_id,
-          nonce: `tournament_${match.id}_${Date.now()}`,
-        }),
-      });
-
-      const result = await response.json();
-
-      if (!result.ok) {
-        if (result.reason === 'rate_limited') {
-          showToast({ type: 'error', message: 'Trop de votes, attendez un peu' });
+      if (voteError) {
+        if (voteError.code === '23505') { // Unique constraint violation
+          showToast({ type: 'error', message: 'Vous avez déjà voté pour ce match' });
         } else {
-          showToast({ type: 'error', message: result.error || 'Erreur de vote' });
+          showToast({ type: 'error', message: `Erreur de vote: ${voteError.message}` });
         }
         return;
       }
@@ -238,8 +243,10 @@ function TournamentBracket({
               </div>
               
               {roundMatches.map(match => {
-                const open = new Date(match.opens_at).getTime() <= now;
-                const closed = new Date(match.closes_at).getTime() <= now || match.status === 'closed';
+                const startsAt = new Date(match.opens_at).getTime();
+                const endsAt = new Date(match.closes_at).getTime();
+                const open = startsAt <= now;
+                const closed = endsAt <= now || match.status === 'closed';
                 const char1Name = characterNameById?.(match.char1_id) ?? (match.char1_id?.toString() ?? '—');
                 const char2Name = characterNameById?.(match.char2_id) ?? (match.char2_id?.toString() ?? '—');
                 const canVote = Boolean(onVote && open && !closed && match.char1_id && match.char2_id);

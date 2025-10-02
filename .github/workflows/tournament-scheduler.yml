@@ -1,0 +1,24 @@
+# .github/workflows/tournament-scheduler.yml
+# Scheduler pour la résolution automatique des tournois
+name: Tournament Auto-Resolution
+
+on:
+  schedule:
+    # Exécute toutes les 5 minutes
+    - cron: '*/5 * * * *'
+  workflow_dispatch: # Permet l'exécution manuelle
+
+jobs:
+  tick-tournaments:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call Tournament Tick Edge Function
+        run: |
+          curl -X POST \
+            -H "Content-Type: application/json" \
+            -H "Authorization: Bearer ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" \
+            "${{ secrets.SUPABASE_URL }}/functions/v1/tournament-tick" \
+            -d '{}'
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}

@@ -10,8 +10,8 @@ if (!t) {
   return new Response('Not found', { status: 404 });
 }
 ---
-<SiteLayout>
-  <head><Seo title={`Tournoi • ${t.name}`} /></head>
+<SiteLayout title={`Tournoi • ${t.name}`}>
+  <Seo slot="head" title={`Tournoi • ${t.name}`} />
   
   <div class="container mx-auto px-4 py-6 max-w-7xl">
     <TournamentBracketClient tournamentId={id} client:load />
