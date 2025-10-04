@@ -36,8 +36,16 @@ export default function TournamentsListIsland() {
     [items]
   )
   const completed = useMemo(
-    () => items.filter(t => t.status === 'completed' || t.status === 'canceled'),
-    [items]
+    () => {
+      if (admin) {
+        // Admin sees both completed and canceled tournaments
+        return items.filter(t => t.status === 'completed' || t.status === 'canceled')
+      } else {
+        // Non-admin only sees completed tournaments (canceled are hidden by RLS)
+        return items.filter(t => t.status === 'completed')
+      }
+    },
+    [items, admin]
   )
 
   async function onPurge() {
@@ -86,7 +94,14 @@ export default function TournamentsListIsland() {
         {list.map(t => (
           <li className="py-4 flex items-center justify-between" key={t.id}>
             <a href={`/t/${t.id}`} className="font-medium hover:underline">{t.name}</a>
-            <span className="text-sm text-gray-500">{t.status}</span>
+            <div className="flex items-center gap-2">
+              {admin && t.status === 'canceled' && (
+                <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-600">
+                  Canceled
+                </span>
+              )}
+              <span className="text-sm text-gray-500">{t.status}</span>
+            </div>
           </li>
         ))}
         {list.length === 0 && (
