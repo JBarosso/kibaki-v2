@@ -1,0 +1,41 @@
+---
+import Base from '@/layouts/Base.astro';
+const YEAR = new Date().getFullYear();
+---
+<Base title="Mentions légales — Kibaki">
+  <section class="max-w-3xl mx-auto p-6 space-y-4">
+    <h1 class="text-3xl font-bold">Mentions légales</h1>
+    <p><strong>Kibaki</strong> — "Who Beats Who?"</p>
+
+    <section class="space-y-2">
+      <h2 class="text-xl font-semibold">Éditeur</h2>
+      <p><strong>Propriétaire :</strong> Jordan BAROSSO</p>
+      <p><strong>Adresse :</strong> [non publiée – hébergée chez Vercel, informations disponibles sur demande des autorités]</p>
+      <p><strong>Contact :</strong> <a class="underline" href="mailto:barossojordan@gmail.com">barossojordan@gmail.com</a></p>
+    </section>
+
+    <section class="space-y-2">
+      <h2 class="text-xl font-semibold">Hébergeur</h2>
+      <p><strong>Nom :</strong> Vercel Inc.</p>
+      <p><strong>Adresse :</strong> 340 S Lemon Ave #4133, Walnut, CA 91789, United States</p>
+    </section>
+
+    <section class="space-y-2">
+      <h2 class="text-xl font-semibold">Avertissement</h2>
+      <p><strong>Tous les personnages présents sur Kibaki appartiennent au domaine public.</strong></p>
+      <p>Les informations sont fournies à titre indicatif. L'éditeur ne saurait être tenu responsable des erreurs, omissions ou indisponibilités du service.</p>
+    </section>
+
+    <section class="space-y-2">
+      <h2 class="text-xl font-semibold">Propriété intellectuelle</h2>
+      <p>Le code, le design et les éléments non-PD de Kibaki sont la propriété de Jordan BAROSSO, sauf mention contraire.</p>
+    </section>
+
+    <section class="space-y-2">
+      <h2 class="text-xl font-semibold">Limitation de responsabilité</h2>
+      <p>Kibaki est fourni "en l'état". L'éditeur décline toute responsabilité pour tout dommage direct ou indirect résultant de l'utilisation du site.</p>
+    </section>
+
+    <p class="text-sm text-zinc-600 pt-4">© {YEAR} Jordan BAROSSO — Tous droits réservés.</p>
+  </section>
+</Base>

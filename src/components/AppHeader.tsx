@@ -72,6 +72,23 @@ export default function AppHeader() {
           ) : (
             <a href="/account" className={linkCls(isActive('/account'))}>Se connecter</a>
           )}
+          
+          {/* Info dropdown */}
+          <div className="relative">
+            <details className="group">
+              <summary className="cursor-pointer select-none text-sm text-gray-600 hover:text-gray-900 inline-flex items-center gap-1">
+                <span aria-hidden="true">ⓘ</span> <span>Info</span>
+              </summary>
+              <div className="absolute right-0 mt-2 w-56 rounded-xl border border-gray-200 bg-white shadow-lg p-3 text-sm space-y-2">
+                <ul className="space-y-1">
+                  <li><a className="block rounded px-2 py-1 hover:bg-gray-50" href="/legal">Mentions légales</a></li>
+                  <li><a className="block rounded px-2 py-1 hover:bg-gray-50" href="/privacy">Confidentialité</a></li>
+                  <li><a className="block rounded px-2 py-1 hover:bg-gray-50" href="/terms">Conditions d'utilisation</a></li>
+                </ul>
+                <p className="text-xs text-gray-600 pt-1">All characters are in the public domain.</p>
+              </div>
+            </details>
+          </div>
         </nav>
       </div>
     </header>

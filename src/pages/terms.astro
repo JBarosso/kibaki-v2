@@ -1,0 +1,39 @@
+---
+import Base from '@/layouts/Base.astro';
+const YEAR = new Date().getFullYear();
+---
+<Base title="Conditions d'utilisation — Kibaki">
+  <section class="max-w-3xl mx-auto p-6 space-y-4">
+    <h1 class="text-3xl font-bold">Conditions d'utilisation</h1>
+    <section class="space-y-2">
+      <h2 class="text-xl font-semibold">Service</h2>
+      <p>Kibaki permet de voter sur des affrontements entre personnages du <strong>domaine public</strong> et de consulter leurs classements (Elo).</p>
+    </section>
+    <section class="space-y-2">
+      <h2 class="text-xl font-semibold">Utilisation acceptable</h2>
+      <ul class="list-disc pl-6 space-y-1">
+        <li>Pas de bots ou d'automatisation de vote</li>
+        <li>Pas de spam, d'abus ou de manipulation des résultats</li>
+        <li>Respect de la loi et des autres utilisateurs</li>
+      </ul>
+    </section>
+    <section class="space-y-2">
+      <h2 class="text-xl font-semibold">Propriété</h2>
+      <p>Les personnages listés sont dans le domaine public. Le code, le design et les éléments propres au service restent la propriété de Jordan BAROSSO.</p>
+    </section>
+    <section class="space-y-2">
+      <h2 class="text-xl font-semibold">Limitation de responsabilité</h2>
+      <p>Le service est fourni "en l'état", sans garantie. Nous ne sommes pas responsables des dommages directs ou indirects liés à son usage.</p>
+    </section>
+    <section class="space-y-2">
+      <h2 class="text-xl font-semibold">Modifications</h2>
+      <p>Nous pouvons modifier, suspendre ou interrompre le service à tout moment.</p>
+    </section>
+    <section class="space-y-2">
+      <h2 class="text-xl font-semibold">Droit applicable</h2>
+      <p><strong>Droit applicable :</strong> Droit français</p>
+      <p><strong>Juridiction compétente :</strong> Tribunaux de Paris</p>
+    </section>
+    <p class="text-sm text-zinc-600 pt-4">© {YEAR} Jordan BAROSSO</p>
+  </section>
+</Base>
