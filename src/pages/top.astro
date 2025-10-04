@@ -2,12 +2,20 @@
 import SiteLayout from '@/layouts/SiteLayout.astro';
 import Seo from '@/components/Seo.astro';
 import LeaderboardIsland from '@/components/LeaderboardIsland';
+import { getLangCookie, resolveLang, setLangCookie, tServer } from '@/i18n';
+import type { Lang } from '@/i18n';
+
+const existingCookie = getLangCookie(Astro);
+const lang: Lang = resolveLang({ url: Astro.url, req: Astro.request, cookie: existingCookie ?? undefined });
+if (existingCookie !== lang) {
+  setLangCookie(Astro, lang);
+}
+
+const pageTitle = tServer(lang, 'top.pageTitle');
+const subtitle = tServer(lang, 'top.subtitle');
+const heading = tServer(lang, 'top.heading');
 ---
-
-<SiteLayout title="Kibaki — Top">
-  <Seo slot="head" title="Kibaki — Top" description="Classement ELO des personnages." />
-  <LeaderboardIsland client:load />
-  
+<SiteLayout title={pageTitle}>
+  <Seo slot="head" title={pageTitle} description={subtitle} />
+  <LeaderboardIsland client:load lang={lang} heading={heading} subtitle={subtitle} />
 </SiteLayout>
-
-

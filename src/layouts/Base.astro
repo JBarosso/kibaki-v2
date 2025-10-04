@@ -1,9 +1,17 @@
 ---
 import '@/styles/tailwind.css';
 import SiteNav from '@/components/SiteNav.astro';
+import { getLangCookie, resolveLang, setLangCookie } from '@/i18n';
+import type { Lang } from '@/i18n';
+
 const { title = 'Kibaki' } = Astro.props;
+const existingCookie = getLangCookie(Astro);
+const lang: Lang = resolveLang({ url: Astro.url, req: Astro.request, cookie: existingCookie ?? undefined });
+if (existingCookie !== lang) {
+  setLangCookie(Astro, lang);
+}
 ---
-<html lang="fr">
+<html lang={lang}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />

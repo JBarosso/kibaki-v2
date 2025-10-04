@@ -1,16 +1,35 @@
 ---
 import Base from '@/layouts/Base.astro';
+import { getLangCookie, resolveLang, setLangCookie, tServer } from '@/i18n';
+import type { Lang } from '@/i18n';
+
 const YEAR = new Date().getFullYear();
+const existingCookie = getLangCookie(Astro);
+const lang: Lang = resolveLang({ url: Astro.url, req: Astro.request, cookie: existingCookie ?? undefined });
+if (existingCookie !== lang) {
+  setLangCookie(Astro, lang);
+}
+
+const pageTitle = tServer(lang, 'legal.termsTitle');
+const headings = {
+  h1: tServer(lang, 'legal.termsHeading'),
+  service: tServer(lang, 'legal.serviceHeading'),
+  acceptableUse: tServer(lang, 'legal.acceptableUseHeading'),
+  ownership: tServer(lang, 'legal.ownershipHeading'),
+  limitation: tServer(lang, 'legal.limitationHeading'),
+  modifications: tServer(lang, 'legal.modificationsHeading'),
+  law: tServer(lang, 'legal.lawHeading'),
+};
 ---
-<Base title="Conditions d'utilisation — Kibaki">
+<Base title={pageTitle}>
   <section class="max-w-3xl mx-auto p-6 space-y-4">
-    <h1 class="text-3xl font-bold">Conditions d'utilisation</h1>
+    <h1 class="text-3xl font-bold">{headings.h1}</h1>
     <section class="space-y-2">
-      <h2 class="text-xl font-semibold">Service</h2>
+      <h2 class="text-xl font-semibold">{headings.service}</h2>
       <p>Kibaki permet de voter sur des affrontements entre personnages du <strong>domaine public</strong> et de consulter leurs classements (Elo).</p>
     </section>
     <section class="space-y-2">
-      <h2 class="text-xl font-semibold">Utilisation acceptable</h2>
+      <h2 class="text-xl font-semibold">{headings.acceptableUse}</h2>
       <ul class="list-disc pl-6 space-y-1">
         <li>Pas de bots ou d'automatisation de vote</li>
         <li>Pas de spam, d'abus ou de manipulation des résultats</li>
@@ -18,19 +37,19 @@ const YEAR = new Date().getFullYear();
       </ul>
     </section>
     <section class="space-y-2">
-      <h2 class="text-xl font-semibold">Propriété</h2>
+      <h2 class="text-xl font-semibold">{headings.ownership}</h2>
       <p>Les personnages listés sont dans le domaine public. Le code, le design et les éléments propres au service restent la propriété de Jordan BAROSSO.</p>
     </section>
     <section class="space-y-2">
-      <h2 class="text-xl font-semibold">Limitation de responsabilité</h2>
+      <h2 class="text-xl font-semibold">{headings.limitation}</h2>
       <p>Le service est fourni "en l'état", sans garantie. Nous ne sommes pas responsables des dommages directs ou indirects liés à son usage.</p>
     </section>
     <section class="space-y-2">
-      <h2 class="text-xl font-semibold">Modifications</h2>
+      <h2 class="text-xl font-semibold">{headings.modifications}</h2>
       <p>Nous pouvons modifier, suspendre ou interrompre le service à tout moment.</p>
     </section>
     <section class="space-y-2">
-      <h2 class="text-xl font-semibold">Droit applicable</h2>
+      <h2 class="text-xl font-semibold">{headings.law}</h2>
       <p><strong>Droit applicable :</strong> Droit français</p>
       <p><strong>Juridiction compétente :</strong> Tribunaux de Paris</p>
     </section>

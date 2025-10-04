@@ -1,0 +1,39 @@
+{
+  "_comment": "TODO : compléter les traductions restantes en utilisant scripts/build-translation-skeleton.ts comme référence.",
+  "achilles": {
+    "name": "Achille",
+    "description": "Héros de la guerre de Troie, presque invincible."
+  },
+  "medusa": {
+    "name": "Méduse",
+    "description": "Gorgone dont le regard change les curieux en pierre."
+  },
+  "robin-hood": {
+    "name": "Robin des Bois",
+    "description": "Hors-la-loi archer qui vole aux riches pour aider les pauvres."
+  },
+  "king-arthur": {
+    "name": "Roi Arthur",
+    "description": "Souverain légendaire de Camelot et chef des chevaliers de la Table ronde."
+  },
+  "merlin": {
+    "name": "Merlin",
+    "description": "Mage énigmatique et conseiller du roi Arthur."
+  },
+  "joan-of-arc": {
+    "name": "Jeanne d'Arc",
+    "description": "Héroïne française qui mena les troupes pendant la guerre de Cent Ans."
+  },
+  "sherlock-holmes": {
+    "name": "Sherlock Holmes",
+    "description": "Détective brillant connu pour ses déductions et son sens de l'observation."
+  },
+  "little-red-riding-hood": {
+    "name": "Le Petit Chaperon rouge",
+    "description": "Fillette qui rencontre un loup rusé en chemin vers sa grand-mère."
+  },
+  "dracula": {
+    "name": "Comte Dracula",
+    "description": "Seigneur vampire de Transylvanie issu du roman de Bram Stoker."
+  }
+}

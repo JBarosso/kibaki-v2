@@ -1,0 +1,7 @@
+{
+  "mythology": { "name": "Mythologie" },
+  "literature-folklore": { "name": "Littérature & folklore" },
+  "historical-figures": { "name": "Figures historiques" },
+  "legendary-creatures": { "name": "Créatures légendaires" },
+  "archetypes": { "name": "Archétypes" }
+}

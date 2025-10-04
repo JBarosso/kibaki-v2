@@ -1,6 +1,29 @@
 ---
 // Composant de navigation statique pour les pages légales
 // Basé sur AppHeader.tsx mais sans interactivité côté client
+import LanguageSwitcher from '@/components/LanguageSwitcher';
+import { getLangCookie, resolveLang, setLangCookie, tServer } from '@/i18n';
+import type { Lang } from '@/i18n';
+
+const existingCookie = getLangCookie(Astro);
+const lang: Lang = resolveLang({ url: Astro.url, req: Astro.request, cookie: existingCookie ?? undefined });
+if (existingCookie !== lang) {
+  setLangCookie(Astro, lang);
+}
+
+const nav = {
+  duel: tServer(lang, 'nav.duel'),
+  tournaments: tServer(lang, 'nav.tournaments'),
+  top: tServer(lang, 'nav.top'),
+  submit: tServer(lang, 'nav.submit'),
+  account: tServer(lang, 'nav.account'),
+  info: tServer(lang, 'nav.info'),
+  legal: tServer(lang, 'nav.legal'),
+  privacy: tServer(lang, 'nav.privacy'),
+  terms: tServer(lang, 'nav.terms'),
+};
+
+const infoText = tServer(lang, 'info.publicDomain');
 ---
 
 <header class="border-b bg-white/80 backdrop-blur supports-[backdrop-filter]:bg-white/60">
@@ -8,28 +31,30 @@
     <a href="/" class="font-semibold tracking-tight">Kibaki</a>
 
     <nav class="flex items-center gap-4 text-sm">
-      <a href="/duel" class="rounded px-2 py-1 hover:bg-gray-100 transition-colors text-gray-600">Duel</a>
-      <a href="/t" class="rounded px-2 py-1 hover:bg-gray-100 transition-colors text-gray-600">Tournois</a>
-      <a href="/top" class="rounded px-2 py-1 hover:bg-gray-100 transition-colors text-gray-600">Top</a>
-      <a href="/submit" class="rounded px-2 py-1 hover:bg-gray-100 transition-colors text-gray-600">Soumettre</a>
-      <a href="/account" class="rounded px-2 py-1 hover:bg-gray-100 transition-colors text-gray-600">Se connecter</a>
-      
+      <a href="/duel" class="rounded px-2 py-1 hover:bg-gray-100 transition-colors text-gray-600">{nav.duel}</a>
+      <a href="/t" class="rounded px-2 py-1 hover:bg-gray-100 transition-colors text-gray-600">{nav.tournaments}</a>
+      <a href="/top" class="rounded px-2 py-1 hover:bg-gray-100 transition-colors text-gray-600">{nav.top}</a>
+      <a href="/submit" class="rounded px-2 py-1 hover:bg-gray-100 transition-colors text-gray-600">{nav.submit}</a>
+      <a href="/account" class="rounded px-2 py-1 hover:bg-gray-100 transition-colors text-gray-600">{nav.account}</a>
+
       {/* Info dropdown */}
       <div class="relative">
         <details class="group">
           <summary class="cursor-pointer select-none text-sm text-gray-600 hover:text-gray-900 inline-flex items-center gap-1">
-            <span aria-hidden="true">ⓘ</span> <span>Info</span>
+            <span aria-hidden="true">ⓘ</span> <span>{nav.info}</span>
           </summary>
           <div class="absolute right-0 mt-2 w-56 rounded-xl border border-gray-200 bg-white shadow-lg p-3 text-sm space-y-2">
             <ul class="space-y-1">
-              <li><a class="block rounded px-2 py-1 hover:bg-gray-50" href="/legal">Mentions légales</a></li>
-              <li><a class="block rounded px-2 py-1 hover:bg-gray-50" href="/privacy">Confidentialité</a></li>
-              <li><a class="block rounded px-2 py-1 hover:bg-gray-50" href="/terms">Conditions d'utilisation</a></li>
+              <li><a class="block rounded px-2 py-1 hover:bg-gray-50" href="/legal">{nav.legal}</a></li>
+              <li><a class="block rounded px-2 py-1 hover:bg-gray-50" href="/privacy">{nav.privacy}</a></li>
+              <li><a class="block rounded px-2 py-1 hover:bg-gray-50" href="/terms">{nav.terms}</a></li>
             </ul>
-            <p class="text-xs text-gray-600 pt-1">All characters are in the public domain.</p>
+            <p class="text-xs text-gray-600 pt-1">{infoText}</p>
           </div>
         </details>
       </div>
+
+      <LanguageSwitcher client:only="react" lang={lang} />
     </nav>
   </div>
 </header>

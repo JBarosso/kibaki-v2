@@ -23,6 +23,7 @@ import { FadeTransition, TransitionWrapper } from '@/components/TransitionWrappe
 import { SkeletonDuel } from '@/components/SkeletonCard';
 import { useLoadingState } from '@/hooks/useLoadingState';
 import { animationClasses, getPrefersReducedMotion } from '@/lib/animations';
+import { I18nProvider, useI18n, type Lang } from '@/i18n';
 
 type LoadState = 'idle' | 'loading' | 'ready' | 'error';
 
@@ -53,7 +54,16 @@ const PREFETCH_CONFIG = {
   maxAge: 60000, // 1 minute max age for prefetched duels
 };
 
-export default function DuelContainer() {
+export default function DuelContainer({ lang }: { lang: Lang }) {
+  return (
+    <I18nProvider lang={lang}>
+      <DuelContainerInner lang={lang} />
+    </I18nProvider>
+  );
+}
+
+function DuelContainerInner(_: { lang: Lang }) {
+  const { t, getCharacterText, getUniverseLabel } = useI18n();
   const [state, setState] = useState<LoadState>('idle');
   const [error, setError] = useState<string | null>(null);
   const [ids, setIds] = useState<number[]>([]);
@@ -865,7 +875,7 @@ export default function DuelContainer() {
         // Rollback with shake animation
         setOptimisticVote({ winnerId, status: 'error' });
         setRateLimitedAt(Date.now());
-        showToast({ type: 'error', message: 'Trop de votes, réessayez dans un instant.' });
+        showToast({ type: 'error', message: t('duel.rateLimited') });
         // Reset UI state after shake animation
         setTimeout(() => {
           setOptimisticVote({ winnerId: null, status: 'idle' });
@@ -876,7 +886,7 @@ export default function DuelContainer() {
       } else if (!voteResult.ok) {
         // Network/server error - rollback
         setOptimisticVote({ winnerId, status: 'error' });
-        showToast({ type: 'error', message: 'Une erreur est survenue lors du vote.' });
+        showToast({ type: 'error', message: t('duel.voteError') });
         setTimeout(() => {
           setOptimisticVote({ winnerId: null, status: 'idle' });
           setIsTransitioning(false);
@@ -886,7 +896,7 @@ export default function DuelContainer() {
       } else {
         // Success path
         setOptimisticVote({ winnerId, status: 'success' });
-        showToast({ type: 'info', message: 'Vote pris en compte' });
+        showToast({ type: 'info', message: t('actions.voteTaken') });
 
         // Update state and load next duel during success animation
         setLastVoteAt(Date.now());
@@ -905,7 +915,7 @@ export default function DuelContainer() {
     } catch (e: any) {
       // Network error - rollback
       setOptimisticVote({ winnerId, status: 'error' });
-      showToast({ type: 'error', message: 'Impossible d\'envoyer votre vote.' });
+      showToast({ type: 'error', message: t('duel.voteImpossible') });
       setTimeout(() => {
         setOptimisticVote({ winnerId: null, status: 'idle' });
         setIsTransitioning(false);
@@ -966,7 +976,7 @@ export default function DuelContainer() {
         <div className={`rounded-2xl border bg-white p-6 text-sm text-red-600 ${animationClasses.error}`}>
           <div className="flex items-center space-x-2">
             <span className="text-red-500">⚠️</span>
-            <span>{error ?? 'An error occurred.'}</span>
+            <span>{error ?? t('duel.error')}</span>
           </div>
           {loadingState.error && (
             <div className="mt-2 text-xs text-red-500">
@@ -985,7 +995,7 @@ export default function DuelContainer() {
           <ScopeSelector universes={universes} value={scope} onChange={setScope} />
         </div>
         <div className="rounded-2xl border bg-white p-6 text-sm text-gray-600">
-          Pas assez de personnages dans cet univers pour lancer un duel.
+          {t('duel.notEnough')}
         </div>
       </div>
     );
@@ -998,13 +1008,15 @@ export default function DuelContainer() {
           <ScopeSelector universes={universes} value={scope} onChange={(s) => setScope(s)} />
         </div>
         <div className="rounded-2xl border bg-white p-6 text-sm text-gray-600">
-          Chargement d'une paire...
+          {t('duel.loading')}
         </div>
       </div>
     );
   }
 
   const { left, right, hash } = pair;
+  const leftView = getCharacterText(left);
+  const rightView = getCharacterText(right);
 
   // Animation classes for character cards (respects reduced motion)
   const getCardAnimationClasses = (characterId: number) => {
@@ -1072,13 +1084,14 @@ export default function DuelContainer() {
                 side="left"
                 onMore={() => setOpenLeft(true)}
                 className={getCardAnimationClasses(left.id)}
+                display={leftView}
               />
               <button
                 onClick={() => vote('left')}
                 disabled={isVoting || isTransitioning}
                 className={getButtonClasses(left.id, "mt-3 rounded-lg bg-black px-4 py-2 text-white hover:bg-black/90 disabled:opacity-60 disabled:cursor-not-allowed")}
               >
-                Voter à gauche
+                {t('duel.leftVote')}
               </button>
             </div>
 
@@ -1088,13 +1101,14 @@ export default function DuelContainer() {
                 side="right"
                 onMore={() => setOpenRight(true)}
                 className={getCardAnimationClasses(right.id)}
+                display={rightView}
               />
               <button
                 onClick={() => vote('right')}
                 disabled={isVoting || isTransitioning}
                 className={getButtonClasses(right.id, "mt-3 rounded-lg bg-black px-4 py-2 text-white hover:bg-black/90 disabled:opacity-60 disabled:cursor-not-allowed")}
               >
-                Voter à droite
+                {t('duel.rightVote')}
               </button>
             </div>
           </div>
@@ -1108,7 +1122,7 @@ export default function DuelContainer() {
                 reducedMotion ? '' : 'hover:scale-105'
               }`}
             >
-              Passer
+              {t('duel.skip')}
             </button>
             <button
               onClick={resetPairs}
@@ -1116,56 +1130,58 @@ export default function DuelContainer() {
                 reducedMotion ? '' : 'hover:scale-105'
               }`}
             >
-              Réinitialiser les paires
+              {t('duel.resetPairs')}
             </button>
             {import.meta.env.DEV ? (
               <span className="text-xs text-gray-500">hash: {hash}</span>
             ) : null}
             {lastVote ? (
-              <span className="ml-auto text-xs text-gray-500">Sauvegardé localement.</span>
+              <span className="ml-auto text-xs text-gray-500">{t('duel.savedLocally')}</span>
             ) : null}
           </div>
         </FadeTransition>
       </div>
 
       {/* Modals */}
-      <Modal open={openLeft} onClose={() => setOpenLeft(false)} title={left.name}>
-        <CharacterDetails character={left} />
+      <Modal open={openLeft} onClose={() => setOpenLeft(false)} title={leftView.name}>
+        <CharacterDetails character={left} display={leftView} />
       </Modal>
-      <Modal open={openRight} onClose={() => setOpenRight(false)} title={right.name}>
-        <CharacterDetails character={right} />
+      <Modal open={openRight} onClose={() => setOpenRight(false)} title={rightView.name}>
+        <CharacterDetails character={right} display={rightView} />
       </Modal>
     </TransitionWrapper>
   );
 }
 
-function CharacterDetails({ character }: { character: CharacterRow }) {
+function CharacterDetails({ character, display }: { character: CharacterRow; display: { name: string; description?: string } }) {
+  const { t } = useI18n();
   return (
     <div className="space-y-2 text-sm text-gray-700">
       <div className="text-gray-900">ELO: <strong>{character.elo}</strong></div>
-      <div>Wins: <strong>{character.wins}</strong></div>
-      <div>Losses: <strong>{character.losses}</strong></div>
-      {character.description ? (
-        <p className="pt-2 text-gray-700">{character.description}</p>
+      <div>{t('duel.modalWins')}: <strong>{character.wins}</strong></div>
+      <div>{t('duel.modalLosses')}: <strong>{character.losses}</strong></div>
+      {display.description ? (
+        <p className="pt-2 text-gray-700">{display.description}</p>
       ) : (
-        <p className="pt-2 text-gray-400">No description.</p>
+        <p className="pt-2 text-gray-400">{t('duel.noDescription')}</p>
       )}
     </div>
   );
 }
 
 function ScopeSelector({ universes, value, onChange }: { universes: Universe[]; value: string; onChange: (v: string) => void }) {
+  const { t, getUniverseLabel } = useI18n();
   return (
     <div className="flex items-center gap-2">
-      <label className="text-sm text-gray-600">Univers:</label>
+      <label className="text-sm text-gray-600">{t('duel.scopeLabel')}</label>
       <select
         className="rounded border px-2 py-1 text-sm"
         value={value}
         onChange={(e) => onChange(e.target.value)}
       >
-        <option value="global">Global</option>
+        <option value="global">{t('duel.globalScope')}</option>
         {universes.map((u) => (
-          <option key={u.id} value={u.slug}>{u.name}</option>
+          <option key={u.id} value={u.slug}>{getUniverseLabel(u.slug)}</option>
         ))}
       </select>
     </div>
