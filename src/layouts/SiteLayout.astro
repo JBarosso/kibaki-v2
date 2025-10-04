@@ -1,13 +1,13 @@
 ---
-import AppHeader from "@/components/AppHeader";
+import SiteNav from '@/components/SiteNav.astro';
 import ToastProvider from "@/components/ToastProvider";
 import "../styles/tailwind.css";
 
-const { title = "Kibaki" } = Astro.props;
+const { title = "Kibaki", lang = 'fr' } = Astro.props;
 const hasHead = Astro.slots?.has?.("head") ?? false;
 ---
 
-<html lang="en">
+<html lang={lang}>
   <head>
     <meta charset="utf-8" />
     {!hasHead && <title>{title}</title>}
@@ -20,7 +20,7 @@ const hasHead = Astro.slots?.has?.("head") ?? false;
     <meta name="theme-color" content="#ffffff" /> -->
   </head>
   <body class="min-h-screen bg-gray-50">
-    <AppHeader client:load />
+    <SiteNav />
     <ToastProvider client:load />
     <main class="mx-auto max-w-5xl px-4 py-8">
       <slot />

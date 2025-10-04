@@ -1,6 +1,7 @@
 ---
 // Composant de navigation statique pour les pages légales
 // Basé sur AppHeader.tsx mais sans interactivité côté client
+import AuthMenu from '@/components/AuthMenu';
 ---
 
 <header class="border-b bg-white/80 backdrop-blur supports-[backdrop-filter]:bg-white/60">
@@ -12,7 +13,7 @@
       <a href="/t" class="rounded px-2 py-1 hover:bg-gray-100 transition-colors text-gray-600">Tournois</a>
       <a href="/top" class="rounded px-2 py-1 hover:bg-gray-100 transition-colors text-gray-600">Top</a>
       <a href="/submit" class="rounded px-2 py-1 hover:bg-gray-100 transition-colors text-gray-600">Soumettre</a>
-      <a href="/account" class="rounded px-2 py-1 hover:bg-gray-100 transition-colors text-gray-600">Se connecter</a>
+      <AuthMenu client:load />
       
       {/* Info dropdown */}
       <div class="relative">

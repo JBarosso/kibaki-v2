@@ -23,6 +23,7 @@ import { FadeTransition, TransitionWrapper } from '@/components/TransitionWrappe
 import { SkeletonDuel } from '@/components/SkeletonCard';
 import { useLoadingState } from '@/hooks/useLoadingState';
 import { animationClasses, getPrefersReducedMotion } from '@/lib/animations';
+import { useI18n, type Lang } from '@/i18n';
 
 type LoadState = 'idle' | 'loading' | 'ready' | 'error';
 
@@ -53,7 +54,12 @@ const PREFETCH_CONFIG = {
   maxAge: 60000, // 1 minute max age for prefetched duels
 };
 
-export default function DuelContainer() {
+type DuelContainerProps = {
+  lang?: Lang;
+};
+
+export default function DuelContainer({ lang: initialLang }: DuelContainerProps = {}) {
+  const { lang, getCharacterText } = useI18n(initialLang);
   const [state, setState] = useState<LoadState>('idle');
   const [error, setError] = useState<string | null>(null);
   const [ids, setIds] = useState<number[]>([]);
@@ -403,6 +409,7 @@ export default function DuelContainer() {
       } catch (e: any) {
         if (!mountedRef.current) return;
         const errorMessage = e?.message ?? String(e);
+        console.error('[duel] load failed:', errorMessage);
         setError(errorMessage);
         setState('error');
         loadingState.setError(errorMessage);
@@ -473,7 +480,9 @@ export default function DuelContainer() {
         setTimeout(() => prefetchNextDuels(), PREFETCH_CONFIG.prefetchDelay);
       } catch (e: any) {
         if (!mountedRef.current) return;
-        setError(e?.message ?? String(e));
+        const message = e?.message ?? String(e);
+        console.error('[duel] load failed:', message);
+        setError(message);
         setState('error');
       }
     };
@@ -771,8 +780,13 @@ export default function DuelContainer() {
     }
 
     const [leftId, rightId, hash] = pickRandomDistinctPair(allIds, avoid);
-    const { left, right } = await loadPairDetails(leftId, rightId);
-    setPair({ left, right, hash });
+    try {
+      const { left, right } = await loadPairDetails(leftId, rightId);
+      setPair({ left, right, hash });
+    } catch (e: any) {
+      console.error('[duel] load failed:', e?.message ?? e);
+      throw e;
+    }
 
     // Start prefetching for future after loading current pair
     setTimeout(() => prefetchNextDuels(), PREFETCH_CONFIG.prefetchDelay);
@@ -922,7 +936,9 @@ export default function DuelContainer() {
     try {
       await loadFreshPair(ids, getUsedPairs(scope));
     } catch (e: any) {
-      setError(e?.message ?? String(e));
+      const message = e?.message ?? String(e);
+      console.error('[duel] load failed:', message);
+      setError(message);
       setState('error');
     }
   };
@@ -932,7 +948,9 @@ export default function DuelContainer() {
     try {
       await loadFreshPair(ids, getUsedPairs(scope));
     } catch (e: any) {
-      setError(e?.message ?? String(e));
+      const message = e?.message ?? String(e);
+      console.error('[duel] load failed:', message);
+      setError(message);
       setState('error');
     }
   };
@@ -1005,6 +1023,18 @@ export default function DuelContainer() {
   }
 
   const { left, right, hash } = pair;
+  const leftView = getCharacterText(left, lang);
+  const rightView = getCharacterText(right, lang);
+  const leftCharacter = {
+    ...left,
+    name: leftView.name || left.name,
+    description: leftView.description || left.description,
+  };
+  const rightCharacter = {
+    ...right,
+    name: rightView.name || right.name,
+    description: rightView.description || right.description,
+  };
 
   // Animation classes for character cards (respects reduced motion)
   const getCardAnimationClasses = (characterId: number) => {
@@ -1068,7 +1098,7 @@ export default function DuelContainer() {
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="flex flex-col">
               <CharacterCard
-                character={left}
+                character={leftCharacter}
                 side="left"
                 onMore={() => setOpenLeft(true)}
                 className={getCardAnimationClasses(left.id)}
@@ -1084,7 +1114,7 @@ export default function DuelContainer() {
 
             <div className="flex flex-col">
               <CharacterCard
-                character={right}
+                character={rightCharacter}
                 side="right"
                 onMore={() => setOpenRight(true)}
                 className={getCardAnimationClasses(right.id)}
@@ -1129,24 +1159,26 @@ export default function DuelContainer() {
       </div>
 
       {/* Modals */}
-      <Modal open={openLeft} onClose={() => setOpenLeft(false)} title={left.name}>
-        <CharacterDetails character={left} />
+      <Modal open={openLeft} onClose={() => setOpenLeft(false)} title={leftView.name || left.name}>
+        <CharacterDetails character={leftCharacter} view={leftView} />
       </Modal>
-      <Modal open={openRight} onClose={() => setOpenRight(false)} title={right.name}>
-        <CharacterDetails character={right} />
+      <Modal open={openRight} onClose={() => setOpenRight(false)} title={rightView.name || right.name}>
+        <CharacterDetails character={rightCharacter} view={rightView} />
       </Modal>
     </TransitionWrapper>
   );
 }
 
-function CharacterDetails({ character }: { character: CharacterRow }) {
+function CharacterDetails({ character, view }: { character: CharacterRow; view: { name: string; description: string } }) {
+  const safeDescription = view.description || character.description || '';
+
   return (
     <div className="space-y-2 text-sm text-gray-700">
       <div className="text-gray-900">ELO: <strong>{character.elo}</strong></div>
       <div>Wins: <strong>{character.wins}</strong></div>
       <div>Losses: <strong>{character.losses}</strong></div>
-      {character.description ? (
-        <p className="pt-2 text-gray-700">{character.description}</p>
+      {safeDescription ? (
+        <p className="pt-2 text-gray-700">{safeDescription}</p>
       ) : (
         <p className="pt-2 text-gray-400">No description.</p>
       )}
@@ -1155,6 +1187,8 @@ function CharacterDetails({ character }: { character: CharacterRow }) {
 }
 
 function ScopeSelector({ universes, value, onChange }: { universes: Universe[]; value: string; onChange: (v: string) => void }) {
+  const { getUniverseLabel } = useI18n();
+
   return (
     <div className="flex items-center gap-2">
       <label className="text-sm text-gray-600">Univers:</label>
@@ -1165,7 +1199,7 @@ function ScopeSelector({ universes, value, onChange }: { universes: Universe[]; 
       >
         <option value="global">Global</option>
         {universes.map((u) => (
-          <option key={u.id} value={u.slug}>{u.name}</option>
+          <option key={u.id} value={u.slug}>{getUniverseLabel(u.slug, undefined) || u.name || u.slug || ''}</option>
         ))}
       </select>
     </div>
