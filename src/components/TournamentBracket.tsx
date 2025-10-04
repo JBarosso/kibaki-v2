@@ -10,6 +10,18 @@ export function groupByRound(matches: Match[]) {
   return Array.from(map.entries()).sort((a,b)=>a[0]-b[0])
 }
 
+function formatDuration(ms: number): string {
+  if (ms <= 0) return '00:00'
+  const sec = Math.floor(ms / 1000)
+  const d = Math.floor(sec / 86400)
+  const h = Math.floor((sec % 86400) / 3600)
+  const m = Math.floor((sec % 3600) / 60)
+  const s = sec % 60
+  if (d > 0) return `${d}d ${h}h ${m}m ${s}s`
+  const pad = (n: number) => String(n).padStart(2, '0')
+  return `${pad(h)}:${pad(m)}:${pad(s)}`
+}
+
 export default function TournamentBracket(props: {
   matches: Match[]
   nameById: Record<number, string>
@@ -34,19 +46,30 @@ export default function TournamentBracket(props: {
             {ms.map(m => {
               const opens = new Date(m.opens_at).getTime()
               const closes = new Date(m.closes_at).getTime()
-              const isOpen = m.status === 'open' && now >= opens && now < closes
+              const before = now < opens
+              const during = now >= opens && now < closes
               const c1 = m.char1_id ? props.nameById[m.char1_id] ?? `#${m.char1_id}` : '— bye —'
               const c2 = m.char2_id ? props.nameById[m.char2_id] ?? `#${m.char2_id}` : '— bye —'
               const userChoice = myVotes[m.id]
               const userChoseC1 = !!userChoice && m.char1_id === userChoice
               const userChoseC2 = !!userChoice && m.char2_id === userChoice
-              const canVote = isOpen && !!m.char1_id && !!m.char2_id && props.onVote && !userChoice
+              const canVote = during && !!m.char1_id && !!m.char2_id && props.onVote && !userChoice && m.status === 'open'
+
+              const countdown =
+                before ? `Starts in ${formatDuration(opens - now)}`
+                : during ? `Ends in ${formatDuration(closes - now)}`
+                : null
 
               return (
                 <div key={m.id} className="rounded border p-3">
                   <div className="text-xs text-gray-500 mb-1">
                     {new Date(m.opens_at).toLocaleString()} → {new Date(m.closes_at).toLocaleString()}
                   </div>
+
+                  {/* Per-match countdown */}
+                  {countdown && (
+                    <div className="mb-2 text-xs text-gray-700" aria-live="polite">⏳ {countdown}</div>
+                  )}
 
                   <div className="space-y-2">
                     <div className="flex items-center justify-between gap-2">
