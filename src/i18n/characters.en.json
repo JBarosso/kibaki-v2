@@ -1,0 +1,39 @@
+{
+  "_comment": "TODO: Fill in the remaining character translations using scripts/build-translation-skeleton.ts as a reference.",
+  "achilles": {
+    "name": "Achilles",
+    "description": "Hero of the Trojan War, famed for his near invincibility."
+  },
+  "medusa": {
+    "name": "Medusa",
+    "description": "Gorgon whose gaze turns onlookers to stone."
+  },
+  "robin-hood": {
+    "name": "Robin Hood",
+    "description": "Outlaw archer who steals from the rich to aid the poor."
+  },
+  "king-arthur": {
+    "name": "King Arthur",
+    "description": "Legendary ruler of Camelot and leader of the Knights of the Round Table."
+  },
+  "merlin": {
+    "name": "Merlin",
+    "description": "Enigmatic wizard and counselor to King Arthur."
+  },
+  "joan-of-arc": {
+    "name": "Joan of Arc",
+    "description": "French heroine who led troops during the Hundred Years' War."
+  },
+  "sherlock-holmes": {
+    "name": "Sherlock Holmes",
+    "description": "Brilliant detective known for deduction and keen observation."
+  },
+  "little-red-riding-hood": {
+    "name": "Little Red Riding Hood",
+    "description": "Young girl who meets a cunning wolf on the way to her grandmother."
+  },
+  "dracula": {
+    "name": "Count Dracula",
+    "description": "Transylvanian vampire lord from Bram Stoker's novel."
+  }
+}

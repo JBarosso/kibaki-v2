@@ -2,8 +2,24 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import type { TopCharacter, Universe } from '@/lib/top';
 import { fetchTopCharacters, fetchUniverses, fetchRankMap } from '@/lib/top';
 import LeaderboardList from '@/components/LeaderboardList';
+import { I18nProvider, useI18n, type Lang } from '@/i18n';
 
-export default function LeaderboardIsland() {
+type LeaderboardIslandProps = {
+  lang: Lang;
+  heading: string;
+  subtitle: string;
+};
+
+export default function LeaderboardIsland(props: LeaderboardIslandProps) {
+  return (
+    <I18nProvider lang={props.lang}>
+      <LeaderboardIslandInner {...props} />
+    </I18nProvider>
+  );
+}
+
+function LeaderboardIslandInner({ heading, subtitle }: LeaderboardIslandProps) {
+  const { t, getUniverseLabel } = useI18n();
   const [universes, setUniverses] = useState<Universe[]>([]);
   const [active, setActive] = useState<string>('global');
   const [search, setSearch] = useState('');
@@ -60,7 +76,6 @@ export default function LeaderboardIsland() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Reload when tab/search changes, but skip very first render (handled by mount effect)
   useEffect(() => {
     if (!mountedRef.current) return; // skip first render
     setItems([]);
@@ -71,7 +86,6 @@ export default function LeaderboardIsland() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [active, search]);
 
-  // Ensure initial mount loads first page deterministically
   useEffect(() => {
     mountedRef.current = true;
     setItems([]);
@@ -90,8 +104,6 @@ export default function LeaderboardIsland() {
     setSearch(value);
   };
 
-
-  // Load rank map when scope changes (global vs universe). Do not depend on search.
   useEffect(() => {
     let cancelled = false;
     (async () => {
@@ -110,29 +122,33 @@ export default function LeaderboardIsland() {
   }, [active]);
 
   const tabs = useMemo(() => {
-    return [{ slug: 'global', name: 'Global' }, ...universes.map((u) => ({ slug: u.slug, name: u.name }))];
-  }, [universes]);
+    return [{ slug: 'global', name: t('top.globalTab') }, ...universes.map((u) => ({ slug: u.slug, name: getUniverseLabel(u.slug) }))];
+  }, [universes, getUniverseLabel, t]);
+
+  const searchPlaceholder = t('actions.searchPlaceholder');
+  const loadingLabel = t('top.loading');
+  const loadMoreLabel = t('top.loadMore');
 
   return (
     <div className="space-y-4">
       <div>
-        <h1 className="mb-2 text-2xl font-bold text-gray-900">Leaderboards</h1>
-        <p className="text-sm text-gray-600">Top personnages, classés par ELO.</p>
+        <h1 className="mb-2 text-2xl font-bold text-gray-900">{heading}</h1>
+        <p className="text-sm text-gray-600">{subtitle}</p>
       </div>
 
       <div className="flex items-center justify-between gap-3">
         <div className="no-scrollbar -mx-1 flex min-w-0 gap-2 overflow-x-auto px-1">
-          {tabs.map((t) => (
+          {tabs.map((tItem) => (
             <button
-              key={t.slug}
+              key={tItem.slug}
               type="button"
-              onClick={() => onTabClick(t.slug)}
+              onClick={() => onTabClick(tItem.slug)}
               className={`shrink-0 rounded-full px-3 py-1 text-sm ${
-                active === t.slug ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                active === tItem.slug ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
-              title={t.name}
+              title={tItem.name}
             >
-              {t.slug === 'global' ? 'Global' : t.slug}
+              {tItem.name}
             </button>
           ))}
         </div>
@@ -142,7 +158,7 @@ export default function LeaderboardIsland() {
             type="text"
             value={search}
             onChange={onChangeSearch}
-            placeholder="Rechercher un personnage…"
+            placeholder={searchPlaceholder}
             className="w-full rounded-full border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
           />
           <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-gray-400">
@@ -174,7 +190,7 @@ export default function LeaderboardIsland() {
                   loading ? 'cursor-not-allowed bg-gray-100 text-gray-400' : 'bg-white text-gray-700 hover:bg-gray-50'
                 }`}
               >
-                {loading ? 'Chargement…' : 'Charger plus'}
+                {loading ? loadingLabel : loadMoreLabel}
               </button>
             </div>
           )}
@@ -183,5 +199,3 @@ export default function LeaderboardIsland() {
     </div>
   );
 }
-
-

@@ -1,12 +1,14 @@
 import React from 'react';
 import type { TopCharacter } from '@/lib/top';
 import LeaderboardRow from '@/components/LeaderboardRow';
+import { useI18n } from '@/i18n';
 
 export default function LeaderboardList({ items, rankMap }: { items: TopCharacter[]; rankMap?: Map<number, number> }) {
+  const { t } = useI18n();
   if (!items || items.length === 0) {
     return (
       <div className="rounded-2xl border bg-white p-6 text-center text-sm text-gray-600">
-        No characters match your filters.
+        {t('top.empty')}
       </div>
     );
   }
