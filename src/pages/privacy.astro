@@ -1,13 +1,32 @@
 ---
 import Base from '@/layouts/Base.astro';
+import { getLangCookie, resolveLang, setLangCookie, tServer } from '@/i18n';
+import type { Lang } from '@/i18n';
+
 const YEAR = new Date().getFullYear();
+const existingCookie = getLangCookie(Astro);
+const lang: Lang = resolveLang({ url: Astro.url, req: Astro.request, cookie: existingCookie ?? undefined });
+if (existingCookie !== lang) {
+  setLangCookie(Astro, lang);
+}
+
+const pageTitle = tServer(lang, 'legal.privacyTitle');
+const headings = {
+  h1: tServer(lang, 'legal.privacyHeading'),
+  data: tServer(lang, 'legal.dataHeading'),
+  purposes: tServer(lang, 'legal.purposesHeading'),
+  legalBasis: tServer(lang, 'legal.legalBasisHeading'),
+  retention: tServer(lang, 'legal.retentionHeading'),
+  rights: tServer(lang, 'legal.rightsHeading'),
+  cookies: tServer(lang, 'legal.cookiesHeading'),
+};
 ---
-<Base title="Confidentialité — Kibaki">
+<Base title={pageTitle}>
   <section class="max-w-3xl mx-auto p-6 space-y-4">
-    <h1 class="text-3xl font-bold">Politique de confidentialité</h1>
+    <h1 class="text-3xl font-bold">{headings.h1}</h1>
     <p>Cette politique décrit la manière dont Kibaki traite vos données personnelles.</p>
     <section class="space-y-2">
-      <h2 class="text-xl font-semibold">Données collectées</h2>
+      <h2 class="text-xl font-semibold">{headings.data}</h2>
       <ul class="list-disc pl-6 space-y-1">
         <li>Votes (choix effectués, horodatage)</li>
         <li>Adresse IP (anti-fraude, limitation de débit)</li>
@@ -16,7 +35,7 @@ const YEAR = new Date().getFullYear();
       </ul>
     </section>
     <section class="space-y-2">
-      <h2 class="text-xl font-semibold">Finalités</h2>
+      <h2 class="text-xl font-semibold">{headings.purposes}</h2>
       <ul class="list-disc pl-6 space-y-1">
         <li>Calcul Elo et affichage des résultats</li>
         <li>Amélioration du service et correction des bugs</li>
@@ -24,11 +43,11 @@ const YEAR = new Date().getFullYear();
       </ul>
     </section>
     <section class="space-y-2">
-      <h2 class="text-xl font-semibold">Base légale</h2>
+      <h2 class="text-xl font-semibold">{headings.legalBasis}</h2>
       <p>Intérêt légitime pour l'exploitation du service et la prévention des abus. Consentement lorsqu'exigé (par ex. cookies analytiques selon votre région).</p>
     </section>
     <section class="space-y-2">
-      <h2 class="text-xl font-semibold">Conservation</h2>
+      <h2 class="text-xl font-semibold">{headings.retention}</h2>
       <ul class="list-disc pl-6 space-y-1">
         <li>Votes : durée nécessaire à l'affichage des classements (jusqu'à suppression du compte si applicable)</li>
         <li>IP / logs anti-fraude : 6 à 12 mois</li>
@@ -37,7 +56,7 @@ const YEAR = new Date().getFullYear();
       </ul>
     </section>
     <section class="space-y-2">
-      <h2 class="text-xl font-semibold">Vos droits (RGPD)</h2>
+      <h2 class="text-xl font-semibold">{headings.rights}</h2>
       <ul class="list-disc pl-6 space-y-1">
         <li>Accès, rectification, effacement</li>
         <li>Opposition et limitation</li>
@@ -46,7 +65,7 @@ const YEAR = new Date().getFullYear();
       <p>Pour exercer vos droits : <a class="underline" href="mailto:barossojordan@gmail.com">barossojordan@gmail.com</a></p>
     </section>
     <section class="space-y-2">
-      <h2 class="text-xl font-semibold">Cookies & analytics</h2>
+      <h2 class="text-xl font-semibold">{headings.cookies}</h2>
       <p>Nous utilisons des cookies techniques indispensables. Les cookies analytiques sont optionnels selon votre région. Vous pouvez les refuser via les paramètres du navigateur ou un bandeau dédié si activé.</p>
     </section>
     <p class="text-sm text-zinc-600 pt-4">© {YEAR} Jordan BAROSSO</p>

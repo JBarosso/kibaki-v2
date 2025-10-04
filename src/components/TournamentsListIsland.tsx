@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { isAdmin } from '../lib/tournaments'
 import { supabase } from '../lib/supabaseClient'
 import { purgeOldTournaments } from '../lib/tournaments'
+import { I18nProvider, useI18n, type Lang } from '@/i18n'
 
 type Tournament = {
   id: string
@@ -11,7 +12,20 @@ type Tournament = {
   completed_at: string | null
 }
 
-export default function TournamentsListIsland() {
+type Props = {
+  lang: Lang
+}
+
+export default function TournamentsListIsland(props: Props) {
+  return (
+    <I18nProvider lang={props.lang}>
+      <TournamentsListInner {...props} />
+    </I18nProvider>
+  )
+}
+
+function TournamentsListInner(_: Props) {
+  const { t } = useI18n()
   const [items, setItems] = useState<Tournament[]>([])
   const [tab, setTab] = useState<'active'|'completed'>('active')
   const [admin, setAdmin] = useState(false)
@@ -50,11 +64,11 @@ export default function TournamentsListIsland() {
 
   async function onPurge() {
     if (!admin) return
-    if (!confirm('Delete tournaments older than 1 year? This is irreversible.')) return
+    if (!confirm(t('tournaments.confirmPurge'))) return
     setBusy(true)
     try {
       const n = await purgeOldTournaments(365)
-      setMessage(`${n} tournament(s) purged.`)
+      setMessage(t('tournaments.purgeResult', { count: n }))
       await load()
       setTimeout(()=>setMessage(null), 3000)
     } finally {
@@ -71,11 +85,11 @@ export default function TournamentsListIsland() {
           <button
             className={`px-3 py-1 text-sm ${tab==='active'?'bg-black text-white':'bg-white'}`}
             onClick={()=>setTab('active')}
-          >Active</button>
+          >{t('tournaments.activeTab')}</button>
           <button
             className={`px-3 py-1 text-sm ${tab==='completed'?'bg-black text-white':'bg-white'}`}
             onClick={()=>setTab('completed')}
-          >Completed</button>
+          >{t('tournaments.completedTab')}</button>
         </div>
         {admin && (
           <button
@@ -83,7 +97,7 @@ export default function TournamentsListIsland() {
             disabled={busy}
             className="rounded-md border px-3 py-1 text-sm hover:bg-gray-50 disabled:opacity-50"
           >
-            Purge &gt; 1 year
+            {t('tournaments.purge')}
           </button>
         )}
       </div>
@@ -97,7 +111,7 @@ export default function TournamentsListIsland() {
             <div className="flex items-center gap-2">
               {admin && t.status === 'canceled' && (
                 <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-600">
-                  Canceled
+                  {t('tournaments.canceled')}
                 </span>
               )}
               <span className="text-sm text-gray-500">{t.status}</span>
@@ -105,7 +119,7 @@ export default function TournamentsListIsland() {
           </li>
         ))}
         {list.length === 0 && (
-          <li className="py-6 text-sm text-gray-500">No tournaments.</li>
+          <li className="py-6 text-sm text-gray-500">{t('tournaments.noTournaments')}</li>
         )}
       </ul>
     </div>

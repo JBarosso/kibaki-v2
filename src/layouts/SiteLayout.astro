@@ -2,12 +2,40 @@
 import AppHeader from "@/components/AppHeader";
 import ToastProvider from "@/components/ToastProvider";
 import "../styles/tailwind.css";
+import { getLangCookie, resolveLang, setLangCookie, tServer } from "@/i18n";
+import type { Lang } from "@/i18n";
 
 const { title = "Kibaki" } = Astro.props;
 const hasHead = Astro.slots?.has?.("head") ?? false;
+
+const existingCookie = getLangCookie(Astro);
+const lang: Lang = resolveLang({ url: Astro.url, req: Astro.request, cookie: existingCookie ?? undefined });
+if (existingCookie !== lang) {
+  setLangCookie(Astro, lang);
+}
+
+const navLabels = {
+  duel: tServer(lang, "nav.duel"),
+  tournaments: tServer(lang, "nav.tournaments"),
+  top: tServer(lang, "nav.top"),
+  submit: tServer(lang, "nav.submit"),
+  account: tServer(lang, "nav.account"),
+  profile: tServer(lang, "nav.profile"),
+  info: tServer(lang, "nav.info"),
+  legal: tServer(lang, "nav.legal"),
+  privacy: tServer(lang, "nav.privacy"),
+  terms: tServer(lang, "nav.terms"),
+};
+
+const actionLabels = {
+  signIn: tServer(lang, "actions.signIn"),
+  signOut: tServer(lang, "actions.signOut"),
+};
+
+const infoText = tServer(lang, "info.publicDomain");
 ---
 
-<html lang="en">
+<html lang={lang}>
   <head>
     <meta charset="utf-8" />
     {!hasHead && <title>{title}</title>}
@@ -20,7 +48,7 @@ const hasHead = Astro.slots?.has?.("head") ?? false;
     <meta name="theme-color" content="#ffffff" /> -->
   </head>
   <body class="min-h-screen bg-gray-50">
-    <AppHeader client:load />
+    <AppHeader client:load lang={lang} navLabels={navLabels} actionLabels={actionLabels} infoText={infoText} />
     <ToastProvider client:load />
     <main class="mx-auto max-w-5xl px-4 py-8">
       <slot />

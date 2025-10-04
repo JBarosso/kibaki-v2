@@ -1,5 +1,32 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabaseClient';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
+import { I18nProvider, type Lang } from '@/i18n';
+
+type NavLabels = {
+  duel: string;
+  tournaments: string;
+  top: string;
+  submit: string;
+  account: string;
+  profile: string;
+  info: string;
+  legal: string;
+  privacy: string;
+  terms: string;
+};
+
+type ActionLabels = {
+  signIn: string;
+  signOut: string;
+};
+
+type AppHeaderProps = {
+  lang: Lang;
+  navLabels: NavLabels;
+  actionLabels: ActionLabels;
+  infoText: string;
+};
 
 type Profile = {
   id: string;
@@ -9,7 +36,15 @@ type Profile = {
 
 type Session = Awaited<ReturnType<typeof supabase.auth.getSession>>['data']['session'];
 
-export default function AppHeader() {
+export default function AppHeader(props: AppHeaderProps) {
+  return (
+    <I18nProvider lang={props.lang}>
+      <HeaderInner {...props} />
+    </I18nProvider>
+  );
+}
+
+function HeaderInner({ lang, navLabels, actionLabels, infoText }: AppHeaderProps) {
   const [session, setSession] = useState<Session>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
 
@@ -55,40 +90,42 @@ export default function AppHeader() {
         <a href="/" className="font-semibold tracking-tight">Kibaki</a>
 
         <nav className="flex items-center gap-4 text-sm">
-          <a href="/duel" className={linkCls(isActive('/duel'))}>Duel</a>
-          <a href="/t" className={linkCls(isActive('/t'))}>Tournois</a>
-          <a href="/top" className={linkCls(isActive('/top'))}>Top</a>
-          <a href="/submit" className={linkCls(isActive('/submit'))}>Soumettre</a>
+          <a href="/duel" className={linkCls(isActive('/duel'))}>{navLabels.duel}</a>
+          <a href="/t" className={linkCls(isActive('/t'))}>{navLabels.tournaments}</a>
+          <a href="/top" className={linkCls(isActive('/top'))}>{navLabels.top}</a>
+          <a href="/submit" className={linkCls(isActive('/submit'))}>{navLabels.submit}</a>
           {session ? (
             <>
-              <a href="/account" className={linkCls(isActive('/account'))}>Mon compte</a>
+              <a href="/account" className={linkCls(isActive('/account'))}>{navLabels.account}</a>
               {username && (
-                <a href={`/u/${username}`} className={linkCls(isActive(`/u/${username}`))}>Profil</a>
+                <a href={`/u/${username}`} className={linkCls(isActive(`/u/${username}`))}>{navLabels.profile}</a>
               )}
               {isAdmin && (
                 <a href="/admin/submissions" className={linkCls(isActive('/admin/submissions'))}>Admin</a>
               )}
             </>
           ) : (
-            <a href="/account" className={linkCls(isActive('/account'))}>Se connecter</a>
+            <a href="/account" className={linkCls(isActive('/account'))}>{actionLabels.signIn}</a>
           )}
-          
+
           {/* Info dropdown */}
           <div className="relative">
             <details className="group">
               <summary className="cursor-pointer select-none text-sm text-gray-600 hover:text-gray-900 inline-flex items-center gap-1">
-                <span aria-hidden="true">ⓘ</span> <span>Info</span>
+                <span aria-hidden="true">ⓘ</span> <span>{navLabels.info}</span>
               </summary>
               <div className="absolute right-0 mt-2 w-56 rounded-xl border border-gray-200 bg-white shadow-lg p-3 text-sm space-y-2">
                 <ul className="space-y-1">
-                  <li><a className="block rounded px-2 py-1 hover:bg-gray-50" href="/legal">Mentions légales</a></li>
-                  <li><a className="block rounded px-2 py-1 hover:bg-gray-50" href="/privacy">Confidentialité</a></li>
-                  <li><a className="block rounded px-2 py-1 hover:bg-gray-50" href="/terms">Conditions d'utilisation</a></li>
+                  <li><a className="block rounded px-2 py-1 hover:bg-gray-50" href="/legal">{navLabels.legal}</a></li>
+                  <li><a className="block rounded px-2 py-1 hover:bg-gray-50" href="/privacy">{navLabels.privacy}</a></li>
+                  <li><a className="block rounded px-2 py-1 hover:bg-gray-50" href="/terms">{navLabels.terms}</a></li>
                 </ul>
-                <p className="text-xs text-gray-600 pt-1">All characters are in the public domain.</p>
+                <p className="text-xs text-gray-600 pt-1">{infoText}</p>
               </div>
             </details>
           </div>
+
+          <LanguageSwitcher lang={lang} />
         </nav>
       </div>
     </header>
@@ -101,5 +138,3 @@ function linkCls(active: boolean) {
     active ? 'text-gray-900 font-medium' : 'text-gray-600'
   ].join(' ');
 }
-
-

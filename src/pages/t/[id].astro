@@ -2,13 +2,20 @@
 import SiteLayout from '../../layouts/SiteLayout.astro'
 import { getTournament } from '../../lib/tournaments'
 import TournamentBracketClient from '../../components/TournamentBracketClient'
+import { getLangCookie, resolveLang, setLangCookie } from '@/i18n'
+import type { Lang } from '@/i18n'
 
 const { id } = Astro.params
 if (!id) throw new Error('Missing tournament id')
 
+const existingCookie = getLangCookie(Astro)
+const lang: Lang = resolveLang({ url: Astro.url, req: Astro.request, cookie: existingCookie ?? undefined })
+if (existingCookie !== lang) {
+  setLangCookie(Astro, lang)
+}
+
 const tournament = await getTournament(id)
 ---
-
 <SiteLayout title={tournament.name}>
   <section class="mx-auto max-w-6xl px-4 py-8">
     <header class="mb-6 flex items-center justify-between">
@@ -16,6 +23,6 @@ const tournament = await getTournament(id)
       <span class="text-sm text-gray-600">{tournament.status}</span>
     </header>
 
-    <TournamentBracketClient tournamentId={id} client:only="react" />
+    <TournamentBracketClient tournamentId={id} lang={lang} client:only="react" />
   </section>
 </SiteLayout>
