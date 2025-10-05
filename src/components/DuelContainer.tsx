@@ -54,6 +54,12 @@ const PREFETCH_CONFIG = {
   maxAge: 60000, // 1 minute max age for prefetched duels
 };
 
+// 🔧 NEW: Auth sync configuration
+const AUTH_SYNC_CONFIG = {
+  timeout: 3000, // Max 3s to wait for server pairs
+  debounceDelay: 1000, // Debounce auth sync calls
+};
+
 export default function DuelContainer({ lang }: { lang: Lang }) {
   return (
     <I18nProvider lang={lang}>
@@ -98,6 +104,11 @@ function DuelContainerInner(_: { lang: Lang }) {
   const mountedRef = useRef<boolean>(false);
   const bootstrappedRef = useRef<boolean>(false);
 
+  // 🔧 NEW: Auth sync state management
+  const [authSyncComplete, setAuthSyncComplete] = useState(false);
+  const authSyncTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const lastAuthSyncRef = useRef<number>(0);
+
   const usedPairs = useMemo(() => getUsedPairs(scope), [scope]);
 
   // Initialize storage adapter
@@ -106,8 +117,6 @@ function DuelContainerInner(_: { lang: Lang }) {
       try {
         const adapter = await getStorageAdapter();
         setStorage(adapter);
-
-        // Run initial cleanup
         await adapter.cleanup();
       } catch (error) {
         console.error('Failed to initialize storage:', error);
@@ -137,7 +146,7 @@ function DuelContainerInner(_: { lang: Lang }) {
           img.onerror = () => {
             clearTimeout(timeout);
             if (DEBUG_PREFETCH) console.warn('Image preload failed:', char.name);
-            resolve(false); // Don't fail entire prefetch on image error
+            resolve(false);
           };
 
           img.src = char.image_url!;
@@ -152,7 +161,7 @@ function DuelContainerInner(_: { lang: Lang }) {
       }
       return allLoaded;
     } catch {
-      return false; // Partial load is still acceptable
+      return false;
     }
   };
 
@@ -164,14 +173,12 @@ function DuelContainerInner(_: { lang: Lang }) {
       .filter(char => char.image_url)
       .map(async char => {
         try {
-          // Check if image is already cached
           const cachedBlob = await storage.getImageBlob(char.id);
           if (cachedBlob) {
             if (DEBUG_PREFETCH) console.log('Image found in cache:', char.name);
             return true;
           }
 
-          // Download and cache image
           return new Promise<boolean>((resolve) => {
             const img = new Image();
             const timeout = setTimeout(() => {
@@ -182,7 +189,6 @@ function DuelContainerInner(_: { lang: Lang }) {
             img.onload = async () => {
               clearTimeout(timeout);
               try {
-                // Convert to blob and cache
                 const canvas = document.createElement('canvas');
                 const ctx = canvas.getContext('2d');
                 if (ctx) {
@@ -247,16 +253,67 @@ function DuelContainerInner(_: { lang: Lang }) {
     }
   };
 
+  // 🔧 NEW: Debounced auth sync with timeout protection
+  const syncServerSeenPairs = async (currentScope: string): Promise<void> => {
+    const now = Date.now();
+
+    // Debounce: avoid calling too frequently
+    if (now - lastAuthSyncRef.current < AUTH_SYNC_CONFIG.debounceDelay) {
+      if (DEBUG_MODE) console.log('🔧 Auth sync debounced');
+      return;
+    }
+
+    lastAuthSyncRef.current = now;
+
+    try {
+      if (DEBUG_MODE) console.log('🔧 Starting auth sync for scope:', currentScope);
+
+      // Race between timeout and actual fetch
+      const timeoutPromise = new Promise<Set<string>>((resolve) => {
+        authSyncTimeoutRef.current = setTimeout(() => {
+          if (DEBUG_MODE) console.warn('🔧 Auth sync timeout reached');
+          resolve(new Set());
+        }, AUTH_SYNC_CONFIG.timeout);
+      });
+
+      const fetchPromise = getRecentSeenPairs(500);
+
+      const serverPairs = await Promise.race([fetchPromise, timeoutPromise]);
+
+      // Clear timeout if fetch completed first
+      if (authSyncTimeoutRef.current) {
+        clearTimeout(authSyncTimeoutRef.current);
+        authSyncTimeoutRef.current = null;
+      }
+
+      if (!mountedRef.current) return;
+
+      // Merge server pairs into current scope
+      serverPairs.forEach((k) => addUsedPair(k, currentScope));
+
+      if (DEBUG_MODE) {
+        console.log('🔧 Auth sync complete:', {
+          scope: currentScope,
+          pairsLoaded: serverPairs.size
+        });
+      }
+
+      setAuthSyncComplete(true);
+    } catch (error) {
+      if (DEBUG_MODE) console.warn('🔧 Auth sync failed:', error);
+      setAuthSyncComplete(true); // Mark complete even on failure to unblock UI
+    }
+  };
+
   // Enhanced prefetch logic with storage adapter
   const prefetchNextDuels = async () => {
-    if (prefetchingRef.current) return; // Prevent concurrent prefetching
+    if (prefetchingRef.current) return;
     if (prefetchQueue.length >= PREFETCH_CONFIG.maxQueueSize) return;
     if (!ids.length || ids.length < 2 || !storage) return;
 
     prefetchingRef.current = true;
 
     try {
-      // Calculate how many to prefetch
       const toPrefetch = PREFETCH_CONFIG.maxQueueSize - prefetchQueue.length;
       const currentUsedPairs = getUsedPairs(scope);
       const cachedPairs = await storage.getPairHashes(scope);
@@ -272,12 +329,10 @@ function DuelContainerInner(_: { lang: Lang }) {
 
       for (let i = 0; i < toPrefetch; i++) {
         try {
-          // Try to get pair from cache first
           let left: CharacterRow | null = null;
           let right: CharacterRow | null = null;
           let hash: string = '';
 
-          // Attempt to build pair from cached characters
           const cachedIds = await storage.getCharacterIds(scope);
           if (cachedIds.length >= 2) {
             for (let attempt = 0; attempt < 10; attempt++) {
@@ -300,7 +355,6 @@ function DuelContainerInner(_: { lang: Lang }) {
             }
           }
 
-          // Fallback to API if cache miss
           if (!left || !right) {
             const [leftId, rightId, newHash] = pickRandomDistinctPair(ids, currentUsedPairs);
             const { left: apiLeft, right: apiRight } = await loadPairDetails(leftId, rightId);
@@ -308,17 +362,14 @@ function DuelContainerInner(_: { lang: Lang }) {
             right = apiRight;
             hash = newHash;
 
-            // Cache the newly fetched characters
             if (storage) {
               await storage.setCharacter(left);
               await storage.setCharacter(right);
             }
           }
 
-          // Enhanced image preloading with caching
           const imagesLoaded = await preloadImagesWithCache([left, right]);
 
-          // Add to queue
           const prefetchedDuel: PrefetchedDuel = {
             left,
             right,
@@ -329,7 +380,6 @@ function DuelContainerInner(_: { lang: Lang }) {
           };
 
           setPrefetchQueue(prev => {
-            // Check if this pair is already in queue
             if (prev.some(d => d.hash === hash)) {
               if (DEBUG_PREFETCH) console.log('Duplicate pair in prefetch, skipping:', hash);
               return prev;
@@ -341,14 +391,12 @@ function DuelContainerInner(_: { lang: Lang }) {
             return newQueue;
           });
 
-          // Add to used pairs cache
           addUsedPair(hash, scope);
           if (storage) {
             await storage.addPairHash(scope, hash);
           }
         } catch (error) {
           if (DEBUG_PREFETCH) console.warn('Individual prefetch failed:', error);
-          // Continue prefetching others
         }
       }
     } catch (error) {
@@ -359,7 +407,7 @@ function DuelContainerInner(_: { lang: Lang }) {
     }
   };
 
-  // bootstrap
+  // 🔧 IMPROVED: Bootstrap with optimized auth sync
   useEffect(() => {
     if (bootstrappedRef.current) return;
     bootstrappedRef.current = true;
@@ -395,7 +443,7 @@ function DuelContainerInner(_: { lang: Lang }) {
         if (!mountedRef.current) return;
         setIds(fetchedIds);
 
-        // (A) Immediately load a local pair without waiting for any auth/server merge
+        // 🔧 CRITICAL: Load pair IMMEDIATELY without waiting for auth
         loadingState.updateProgress(80, 'Preparing duel...');
         if (fetchedIds.length >= 2) {
           await loadFreshPair(fetchedIds, getUsedPairs(savedScope));
@@ -408,8 +456,14 @@ function DuelContainerInner(_: { lang: Lang }) {
         setState('ready');
         loadingState.stopLoading();
 
-        // (C) Start initial prefetching after first duel is loaded
+        // Start initial prefetching after first duel is loaded
         setTimeout(() => prefetchNextDuels(), PREFETCH_CONFIG.prefetchDelay);
+
+        // 🔧 NEW: Lazy load auth sync in background AFTER UI is ready
+        setTimeout(() => {
+          syncServerSeenPairs(savedScope);
+        }, 1000); // Wait 1s after UI is ready
+
       } catch (e: any) {
         if (!mountedRef.current) return;
         const errorMessage = e?.message ?? String(e);
@@ -419,24 +473,18 @@ function DuelContainerInner(_: { lang: Lang }) {
       }
     })();
 
-    // (B) In parallel, non-blocking: merge server seen pairs if user is logged-in
-    (async () => {
-      try {
-        const server = await getRecentSeenPairs(500);
-        if (!mountedRef.current) return;
-        const currentScope = scopeRef.current || 'global';
-        server.forEach((k) => addUsedPair(k, currentScope));
-      } catch {}
-    })();
-
-    return () => { mountedRef.current = false; };
+    return () => {
+      mountedRef.current = false;
+      if (authSyncTimeoutRef.current) {
+        clearTimeout(authSyncTimeoutRef.current);
+      }
+    };
   }, []);
 
-  // When scope changes (via UI), reload ids and reset pair memory for that scope
+  // 🔧 IMPROVED: Scope change handler
   useEffect(() => {
     scopeRef.current = scope;
 
-    // Clear prefetch queue for scope changes (keep only matching scope)
     setPrefetchQueue(prev => {
       const filtered = prev.filter(d => d.scope === scope);
       if (DEBUG_PREFETCH && filtered.length !== prev.length) {
@@ -450,19 +498,18 @@ function DuelContainerInner(_: { lang: Lang }) {
     });
 
     const run = async () => {
-      // Skip first pass if state is still idle/loading from init; init handles first fetch
       if (state === 'idle') return;
       setState('loading');
       setError(null);
+      setAuthSyncComplete(false); // Reset auth sync status
+
       try {
-        // Persist scope
         try {
           if (typeof window !== 'undefined' && 'localStorage' in window) {
             window.localStorage.setItem(SCOPE_KEY, scope);
           }
         } catch {}
 
-        // Reset pair memory only for the selected scope
         clearUsedPairs(scope);
         setPair(null);
 
@@ -470,7 +517,7 @@ function DuelContainerInner(_: { lang: Lang }) {
         if (!mountedRef.current) return;
         setIds(fetchedIds);
 
-        // Immediately load a local pair for the new scope
+        // 🔧 CRITICAL: Load pair immediately
         if (fetchedIds.length >= 2) {
           await loadFreshPair(fetchedIds, getUsedPairs(scope));
         } else {
@@ -479,8 +526,13 @@ function DuelContainerInner(_: { lang: Lang }) {
 
         setState('ready');
 
-        // Start prefetching for new scope after initial load
         setTimeout(() => prefetchNextDuels(), PREFETCH_CONFIG.prefetchDelay);
+
+        // 🔧 NEW: Lazy auth sync
+        setTimeout(() => {
+          syncServerSeenPairs(scope);
+        }, 500);
+
       } catch (e: any) {
         if (!mountedRef.current) return;
         setError(e?.message ?? String(e));
@@ -488,34 +540,24 @@ function DuelContainerInner(_: { lang: Lang }) {
       }
     };
     run();
-
-    // Non-blocking merge of server-seen pairs for this scope
-    (async () => {
-      try {
-        const server = await getRecentSeenPairs(500);
-        if (!mountedRef.current) return;
-        server.forEach((k) => addUsedPair(k, scope));
-      } catch {}
-    })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [scope]);
 
-  // When user logs in during the session, merge server-seen pairs into current scope
+  // 🔧 IMPROVED: Auth state change listener
   useEffect(() => {
     const { data: listener } = supabase.auth.onAuthStateChange(async (event) => {
       if (event === 'SIGNED_IN') {
-        try {
-          const server = await getRecentSeenPairs(500);
-          const currentScope = scopeRef.current;
-          server.forEach((k) => addUsedPair(k, currentScope));
-        } catch {}
+        const currentScope = scopeRef.current;
+        if (DEBUG_MODE) console.log('🔧 User signed in, syncing pairs for scope:', currentScope);
+
+        // Trigger auth sync with debouncing
+        setTimeout(() => {
+          syncServerSeenPairs(currentScope);
+        }, 500);
       }
     });
     return () => {
       listener.subscription.unsubscribe();
     };
-    // We intentionally don't include scope to avoid re-subscribing; scope value is captured
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Migration from localStorage to IndexedDB
@@ -524,7 +566,6 @@ function DuelContainerInner(_: { lang: Lang }) {
       if (!storage) return;
 
       try {
-        // Check if migration needed
         const migrated = localStorage.getItem('kibaki_migrated_to_idb');
         if (migrated === 'true') return;
 
@@ -532,7 +573,6 @@ function DuelContainerInner(_: { lang: Lang }) {
           console.log('🔄 Starting migration from localStorage to IndexedDB...');
         }
 
-        // Migrate character IDs and universe data if available
         const keys = Object.keys(localStorage).filter(k =>
           k.startsWith('kibaki_char_ids_v1::') || k.startsWith('kibaki_pair_hashes_v1::')
         );
@@ -549,8 +589,6 @@ function DuelContainerInner(_: { lang: Lang }) {
                 if (DEBUG_PREFETCH) {
                   console.log(`Migrating ${ids.length} character IDs from scope ${scopeName}`);
                 }
-                // Note: We can't migrate full character data from localStorage
-                // This will be populated on-demand
               } else if (key.includes('pair_hashes')) {
                 const pairs = JSON.parse(data);
                 const scopeName = key.split('::')[1];
@@ -570,7 +608,6 @@ function DuelContainerInner(_: { lang: Lang }) {
           }
         }
 
-        // Mark as migrated
         localStorage.setItem('kibaki_migrated_to_idb', 'true');
 
         if (DEBUG_PREFETCH && migrationCount > 0) {
@@ -591,7 +628,6 @@ function DuelContainerInner(_: { lang: Lang }) {
     const cleanup = setInterval(async () => {
       const now = Date.now();
 
-      // Clean prefetch queue
       setPrefetchQueue(prev => {
         const filtered = prev.filter(d =>
           (now - d.timestamp) < PREFETCH_CONFIG.maxAge && d.scope === scope
@@ -607,17 +643,14 @@ function DuelContainerInner(_: { lang: Lang }) {
         return filtered;
       });
 
-      // Clean storage
       if (storage) {
         try {
           await storage.cleanup();
 
-          // Monitor storage quota
           if (storage instanceof Promise || 'getStorageInfo' in storage) {
             const storageInfo = await db.getStorageInfo();
             if (storageInfo && storageInfo.percent > 80) {
               console.warn('Storage quota high:', storageInfo.percent + '%');
-              // Could trigger more aggressive cleanup if needed
             }
           }
         } catch (error) {
@@ -632,7 +665,6 @@ function DuelContainerInner(_: { lang: Lang }) {
   // Cleanup on unmount
   useEffect(() => {
     return () => {
-      // Clear prefetch queue to free memory
       setPrefetchQueue([]);
       prefetchingRef.current = false;
       if (DEBUG_PREFETCH) {
@@ -665,10 +697,18 @@ function DuelContainerInner(_: { lang: Lang }) {
         memoryStatus: () => {
           monitorMemory();
         },
-        simulateSlowNetwork: () => {
-          console.log('Use ?debug=slow-network in URL to simulate slow network');
+        authSyncStatus: () => {
+          console.log('Auth sync:', {
+            complete: authSyncComplete,
+            lastSync: lastAuthSyncRef.current,
+            timeSinceLastSync: Date.now() - lastAuthSyncRef.current
+          });
+          return authSyncComplete;
         },
-        // New storage-related debug helpers
+        forceAuthSync: () => {
+          syncServerSeenPairs(scope);
+          console.log('Forced auth sync triggered');
+        },
         storageInfo: async () => {
           if (storage) {
             const stats = await db.getCacheStats();
@@ -678,69 +718,12 @@ function DuelContainerInner(_: { lang: Lang }) {
             return { stats, info };
           }
           console.log('No storage adapter available');
-        },
-        cacheCharacter: async (id: number) => {
-          if (storage) {
-            const char = await storage.getCharacter(id);
-            console.log('Character cache lookup:', char);
-            return char;
-          }
-        },
-        migrationStatus: () => {
-          const migrated = localStorage.getItem('kibaki_migrated_to_idb');
-          console.log('Migration status:', migrated === 'true' ? 'Completed' : 'Pending');
-          return migrated;
-        },
-        testStorageAdapter: async () => {
-          if (storage) {
-            const available = await storage.isAvailable();
-            console.log('Storage adapter available:', available);
-
-            // Test character caching
-            const testChar = {
-              id: 999999,
-              name: 'Test Character',
-              slug: 'test-char',
-              description: 'Test character for debugging',
-              image_url: null,
-              elo: 1000,
-              wins: 0,
-              losses: 0
-            };
-
-            await storage.setCharacter(testChar);
-            const retrieved = await storage.getCharacter(999999);
-            console.log('Character cache test:', retrieved);
-
-            return { available, cacheTest: !!retrieved };
-          }
-        },
-        // Animation performance monitoring
-        startAnimationMonitoring: () => {
-          (window as any).animationDebug?.startMonitoring();
-        },
-        stopAnimationMonitoring: () => {
-          (window as any).animationDebug?.stopMonitoring();
-        },
-        testReducedMotion: () => {
-          const prefers = getPrefersReducedMotion();
-          console.log('User prefers reduced motion:', prefers);
-          return prefers;
-        },
-        simulateSlowAnimations: (enabled: boolean) => {
-          if (enabled) {
-            document.documentElement.style.setProperty('--animation-multiplier', '3');
-            console.log('🐌 Slow animations enabled');
-          } else {
-            document.documentElement.style.removeProperty('--animation-multiplier');
-            console.log('⚡ Normal animation speed restored');
-          }
         }
       };
 
       console.log('🔧 Kibaki Debug helpers available on window.kibakiDebug');
     }
-  }, [prefetchQueue]);
+  }, [prefetchQueue, authSyncComplete]);
 
   const loadFreshPair = async (allIds: number[], avoid: Set<string>) => {
     if (!Array.isArray(allIds) || allIds.length < 2) {
@@ -748,7 +731,6 @@ function DuelContainerInner(_: { lang: Lang }) {
       return;
     }
 
-    // Try to use prefetched duel first
     const validPrefetch = prefetchQueue.find(d =>
       d.scope === scope &&
       !avoid.has(d.hash) &&
@@ -756,10 +738,7 @@ function DuelContainerInner(_: { lang: Lang }) {
     );
 
     if (validPrefetch) {
-      // Use prefetched duel immediately
       setPair({ left: validPrefetch.left, right: validPrefetch.right, hash: validPrefetch.hash });
-
-      // Remove used duel from queue
       setPrefetchQueue(prev => prev.filter(d => d !== validPrefetch));
 
       if (DEBUG_PREFETCH) {
@@ -770,12 +749,10 @@ function DuelContainerInner(_: { lang: Lang }) {
         });
       }
 
-      // Start prefetching more in background
       setTimeout(() => prefetchNextDuels(), PREFETCH_CONFIG.prefetchDelay);
       return;
     }
 
-    // Fallback to normal loading
     if (DEBUG_PREFETCH) {
       console.log('No valid prefetch available, using normal loading');
     }
@@ -784,25 +761,22 @@ function DuelContainerInner(_: { lang: Lang }) {
     const { left, right } = await loadPairDetails(leftId, rightId);
     setPair({ left, right, hash });
 
-    // Start prefetching for future after loading current pair
     setTimeout(() => prefetchNextDuels(), PREFETCH_CONFIG.prefetchDelay);
   };
 
   const postVote = async (winnerId: number, loserId: number) => {
     const nonce = crypto.randomUUID();
 
-    // Debug mode: simulate different scenarios
     if (DEBUG_MODE) {
       console.log('🔧 DEBUG: Vote initiated', { winnerId, loserId, nonce });
 
-      // Check URL params for debug scenarios
       const urlParams = new URLSearchParams(window.location.search);
       const debugScenario = urlParams.get('debug');
 
       switch (debugScenario) {
         case 'rate-limit':
           console.log('🔧 DEBUG: Simulating rate limit');
-          await new Promise(resolve => setTimeout(resolve, 300)); // Simulate network delay
+          await new Promise(resolve => setTimeout(resolve, 300));
           return { ok: false, reason: 'rate_limited', duplicate: false, result: {} };
 
         case 'server-error':
@@ -818,7 +792,7 @@ function DuelContainerInner(_: { lang: Lang }) {
         case 'slow-network':
           console.log('🔧 DEBUG: Simulating slow network');
           await new Promise(resolve => setTimeout(resolve, 2000));
-          break; // Continue to normal flow
+          break;
 
         default:
           console.log('🔧 DEBUG: Normal flow - Add ?debug=rate-limit|server-error|network-error|slow-network to test scenarios');
@@ -854,29 +828,25 @@ function DuelContainerInner(_: { lang: Lang }) {
 
   const vote = async (side: 'left' | 'right') => {
     if (!pair) return;
-    if (isVoting || isTransitioning) return; // ignore if already voting or transitioning
+    if (isVoting || isTransitioning) return;
     const now = Date.now();
-    if (now - (lastVoteAt ?? 0) < 700) return; // throttle rapid clicks
+    if (now - (lastVoteAt ?? 0) < 700) return;
 
     const currentPair = pair;
     const winnerId = side === 'left' ? currentPair.left.id : currentPair.right.id;
     const loserId = side === 'left' ? currentPair.right.id : currentPair.left.id;
 
-    // Optimistic UI: Immediate visual feedback
     setOptimisticVote({ winnerId, status: 'pending' });
     setIsTransitioning(true);
     setIsVoting(true);
 
     try {
-      // API call in background
       const voteResult = await postVote(winnerId, loserId);
 
       if (!voteResult.ok && voteResult.reason === 'rate_limited') {
-        // Rollback with shake animation
         setOptimisticVote({ winnerId, status: 'error' });
         setRateLimitedAt(Date.now());
         showToast({ type: 'error', message: t('duel.rateLimited') });
-        // Reset UI state after shake animation
         setTimeout(() => {
           setOptimisticVote({ winnerId: null, status: 'idle' });
           setIsTransitioning(false);
@@ -884,7 +854,6 @@ function DuelContainerInner(_: { lang: Lang }) {
         }, 600);
         return;
       } else if (!voteResult.ok) {
-        // Network/server error - rollback
         setOptimisticVote({ winnerId, status: 'error' });
         showToast({ type: 'error', message: t('duel.voteError') });
         setTimeout(() => {
@@ -894,17 +863,14 @@ function DuelContainerInner(_: { lang: Lang }) {
         }, 600);
         return;
       } else {
-        // Success path
         setOptimisticVote({ winnerId, status: 'success' });
         showToast({ type: 'info', message: t('actions.voteTaken') });
 
-        // Update state and load next duel during success animation
         setLastVoteAt(Date.now());
         addUsedPair(currentPair.hash, scope);
         try { void markPairSeen(currentPair.hash).catch(() => {}); } catch {}
         setLastVote(side);
 
-        // Load next duel after brief success animation
         setTimeout(async () => {
           await loadFreshPair(ids, getUsedPairs(scope));
           setOptimisticVote({ winnerId: null, status: 'idle' });
@@ -913,7 +879,6 @@ function DuelContainerInner(_: { lang: Lang }) {
         }, 400);
       }
     } catch (e: any) {
-      // Network error - rollback
       setOptimisticVote({ winnerId, status: 'error' });
       showToast({ type: 'error', message: t('duel.voteImpossible') });
       setTimeout(() => {
@@ -927,7 +892,6 @@ function DuelContainerInner(_: { lang: Lang }) {
   const skip = async () => {
     if (!pair) return;
     addUsedPair(pair.hash, scope);
-    // Fire-and-forget server write for logged-in users
     try { void markPairSeen(pair.hash).catch(() => {}); } catch {}
     try {
       await loadFreshPair(ids, getUsedPairs(scope));
@@ -1018,7 +982,6 @@ function DuelContainerInner(_: { lang: Lang }) {
   const leftView = getCharacterText(left);
   const rightView = getCharacterText(right);
 
-  // Animation classes for character cards (respects reduced motion)
   const getCardAnimationClasses = (characterId: number) => {
     const baseTransition = reducedMotion ? '' : 'transform transition-all duration-300';
 
@@ -1039,7 +1002,6 @@ function DuelContainerInner(_: { lang: Lang }) {
     return '';
   };
 
-  // Button classes for animation states
   const getButtonClasses = (characterId: number, baseClasses: string) => {
     const disabled = isVoting || isTransitioning;
     const isWinner = optimisticVote.winnerId === characterId;
@@ -1069,6 +1031,10 @@ function DuelContainerInner(_: { lang: Lang }) {
         <FadeTransition show={true} duration="fast">
           <div className="flex items-center gap-3">
             <ScopeSelector universes={universes} value={scope} onChange={(s) => setScope(s)} />
+            {/* 🔧 NEW: Auth sync indicator */}
+            {!authSyncComplete && DEBUG_MODE && (
+              <span className="text-xs text-gray-400 italic">Syncing...</span>
+            )}
           </div>
         </FadeTransition>
 
