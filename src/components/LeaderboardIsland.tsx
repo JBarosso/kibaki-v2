@@ -130,21 +130,21 @@ function LeaderboardIslandInner({ heading, subtitle }: LeaderboardIslandProps) {
   const loadMoreLabel = t('top.loadMore');
 
   return (
-    <div className="space-y-4">
+    <div className="leaderboard-island">
       <div>
-        <h1 className="mb-2 text-2xl font-bold text-gray-900">{heading}</h1>
-        <p className="text-sm text-gray-600">{subtitle}</p>
+        <h1 className="leaderboard-island__heading">{heading}</h1>
+        <p className="leaderboard-island__subtitle">{subtitle}</p>
       </div>
 
-      <div className="flex items-center justify-between gap-3">
-        <div className="no-scrollbar -mx-1 flex min-w-0 gap-2 overflow-x-auto px-1">
+      <div className="leaderboard-island__controls">
+        <div className="leaderboard-island__tabs">
           {tabs.map((tItem) => (
             <button
               key={tItem.slug}
               type="button"
               onClick={() => onTabClick(tItem.slug)}
-              className={`shrink-0 rounded-full px-3 py-1 text-sm ${
-                active === tItem.slug ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              className={`leaderboard-island__tab ${
+                active === tItem.slug ? 'leaderboard-island__tab--active' : ''
               }`}
               title={tItem.name}
             >
@@ -153,16 +153,16 @@ function LeaderboardIslandInner({ heading, subtitle }: LeaderboardIslandProps) {
           ))}
         </div>
 
-        <div className="relative w-64 max-w-full">
+        <div className="leaderboard-island__search-wrapper">
           <input
             type="text"
             value={search}
             onChange={onChangeSearch}
             placeholder={searchPlaceholder}
-            className="w-full rounded-full border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+            className="leaderboard-island__search-input"
           />
-          <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-gray-400">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4">
+          <div className="leaderboard-island__search-icon-wrapper">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="leaderboard-island__search-icon">
               <path fillRule="evenodd" d="M10.5 3.75a6.75 6.75 0 1 0 4.243 11.957l3.775 3.775a.75.75 0 1 0 1.06-1.06l-3.775-3.776A6.75 6.75 0 0 0 10.5 3.75Zm-5.25 6.75a5.25 5.25 0 1 1 10.5 0 5.25 5.25 0 0 1-10.5 0Z" clipRule="evenodd" />
             </svg>
           </div>
@@ -170,24 +170,24 @@ function LeaderboardIslandInner({ heading, subtitle }: LeaderboardIslandProps) {
       </div>
 
       {loading && items.length === 0 ? (
-        <div className="space-y-2">
+        <div className="leaderboard-island__skeleton">
           {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="h-16 animate-pulse rounded-2xl bg-gray-200" />
+            <div key={i} className="leaderboard-island__skeleton-item" />
           ))}
         </div>
       ) : error ? (
-        <div className="rounded-2xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">{error}</div>
+        <div className="leaderboard-island__error">{error}</div>
       ) : (
         <>
           <LeaderboardList items={items} rankMap={rankMap} />
           {hasMore && (
-            <div className="pt-2">
+            <div className="leaderboard-island__load-more">
               <button
                 type="button"
                 onClick={() => loadTop()}
                 disabled={loading}
-                className={`w-full rounded-2xl border px-4 py-2 text-sm ${
-                  loading ? 'cursor-not-allowed bg-gray-100 text-gray-400' : 'bg-white text-gray-700 hover:bg-gray-50'
+                className={`leaderboard-island__load-more-button ${
+                  loading ? 'leaderboard-island__load-more-button--disabled' : ''
                 }`}
               >
                 {loading ? loadingLabel : loadMoreLabel}

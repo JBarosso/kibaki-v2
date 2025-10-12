@@ -8,8 +8,8 @@ export default function LeaderboardRow({ rank, c }: { rank: number; c: TopCharac
   const universeLabel = getUniverseLabel(c.universe.slug);
 
   return (
-    <div className="flex items-center gap-3 rounded-2xl border bg-white p-3 shadow-sm">
-      <div className="w-8 shrink-0 text-center text-sm font-semibold text-gray-700">#{rank}</div>
+    <div className="leaderboard-row">
+      <div className="leaderboard-row__rank">#{rank}</div>
 
       {rank <= 10 ? (
         c.image_url ? (
@@ -18,29 +18,29 @@ export default function LeaderboardRow({ rank, c }: { rank: number; c: TopCharac
             src={c.image_url}
             alt={characterView.name}
             loading="lazy"
-            className="h-12 w-12 shrink-0 rounded-full object-cover"
+            className="leaderboard-row__avatar"
           />
         ) : (
-          <div className="h-12 w-12 shrink-0 rounded-full bg-gray-200" />
+          <div className="leaderboard-row__avatar leaderboard-row__avatar--placeholder" />
         )
       ) : (
-        <div className="h-12 w-12 shrink-0" />
+        <div className="leaderboard-row__avatar leaderboard-row__avatar--hidden" />
       )}
 
-      <div className="min-w-0 flex-1">
-        <div className="flex min-w-0 items-center gap-2">
-          <div className="truncate text-sm font-medium text-gray-900" title={characterView.name}>
+      <div className="leaderboard-row__content">
+        <div className="leaderboard-row__header">
+          <div className="leaderboard-row__name" title={characterView.name}>
             {characterView.name}
           </div>
-          <span className="whitespace-nowrap rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-600" title={universeLabel}>
+          <span className="leaderboard-row__universe" title={universeLabel}>
             {universeLabel}
           </span>
         </div>
       </div>
 
-      <div className="ml-auto text-right">
-        <div className="font-mono text-xs text-gray-700">ELO {c.elo}</div>
-        <div className="font-mono text-[11px] text-gray-500">W-L {c.wins}-{c.losses}</div>
+      <div className="leaderboard-row__stats">
+        <div className="leaderboard-row__elo">ELO {c.elo}</div>
+        <div className="leaderboard-row__record">W-L {c.wins}-{c.losses}</div>
       </div>
     </div>
   );

@@ -133,58 +133,58 @@ export default function AccountIsland() {
     }
   };
 
-  if (loading) return <div className="p-6 text-sm text-gray-500">Chargement…</div>;
+  if (loading) return <div className="account-island__loading">Chargement…</div>;
 
   if (!session) {
     return (
-      <div className="max-w-md mx-auto p-6 rounded-2xl shadow border mt-8 bg-white">
-        <div className="flex gap-3 mb-4">
-          <button className={`px-3 py-1 rounded ${mode==='signin'?'bg-black text-white':'bg-gray-100'}`} onClick={()=>setMode('signin')}>Se connecter</button>
-          <button className={`px-3 py-1 rounded ${mode==='signup'?'bg-black text-white':'bg-gray-100'}`} onClick={()=>setMode('signup')}>Créer un compte</button>
+      <div className="account-island__signin-wrapper">
+        <div className="account-island__mode-tabs">
+          <button className={`account-island__mode-tab ${mode==='signin'?'account-island__mode-tab--active':''}`} onClick={()=>setMode('signin')}>Se connecter</button>
+          <button className={`account-island__mode-tab ${mode==='signup'?'account-island__mode-tab--active':''}`} onClick={()=>setMode('signup')}>Créer un compte</button>
         </div>
 
         {mode==='signin' ? (
-          <form onSubmit={doSignIn} className="space-y-3">
-            <input className="w-full border rounded px-3 py-2" type="email" placeholder="Email" value={email} onChange={e=>setEmail(e.target.value)} required />
-            <input className="w-full border rounded px-3 py-2" type="password" placeholder="Mot de passe" value={password} onChange={e=>setPassword(e.target.value)} required />
-            <div className="text-right">
-              <a href="/forgot" className="text-xs text-gray-500 hover:underline">Mot de passe oublié ?</a>
+          <form onSubmit={doSignIn} className="account-island__form">
+            <input className="account-island__input" type="email" placeholder="Email" value={email} onChange={e=>setEmail(e.target.value)} required />
+            <input className="account-island__input" type="password" placeholder="Mot de passe" value={password} onChange={e=>setPassword(e.target.value)} required />
+            <div className="account-island__forgot-link">
+              <a href="/forgot">Mot de passe oublié ?</a>
             </div>
-            <button className="w-full bg-black text-white rounded px-3 py-2">Se connecter</button>
+            <button className="account-island__submit-button">Se connecter</button>
           </form>
         ) : (
-          <form onSubmit={doSignUp} className="space-y-3">
-            <input className="w-full border rounded px-3 py-2" type="email" placeholder="Email" value={email} onChange={e=>setEmail(e.target.value)} required />
-            <input className="w-full border rounded px-3 py-2" type="password" placeholder="Mot de passe" value={password} onChange={e=>setPassword(e.target.value)} required />
-            <input className="w-full border rounded px-3 py-2" type="text" placeholder="Pseudo (optionnel)" value={username} onChange={e=>setUsername(e.target.value)} />
-            <button className="w-full bg-black text-white rounded px-3 py-2">Créer un compte</button>
+          <form onSubmit={doSignUp} className="account-island__form">
+            <input className="account-island__input" type="email" placeholder="Email" value={email} onChange={e=>setEmail(e.target.value)} required />
+            <input className="account-island__input" type="password" placeholder="Mot de passe" value={password} onChange={e=>setPassword(e.target.value)} required />
+            <input className="account-island__input" type="text" placeholder="Pseudo (optionnel)" value={username} onChange={e=>setUsername(e.target.value)} />
+            <button className="account-island__submit-button">Créer un compte</button>
           </form>
         )}
 
-        {errorMsg && <p className="mt-3 text-sm text-red-600">{errorMsg}</p>}
-        <p className="mt-3 text-xs text-gray-500">Note: profiles are auto-created by a DB trigger; we also ensure it client-side.</p>
+        {errorMsg && <p className="account-island__error">{errorMsg}</p>}
+        <p className="account-island__note">Note: profiles are auto-created by a DB trigger; we also ensure it client-side.</p>
       </div>
     );
   }
 
   return (
-    <div className="max-w-md mx-auto p-6 rounded-2xl shadow border mt-8 bg-white">
-      <div className="mb-3 text-sm text-gray-600">Connecté en tant que <strong>{session.user?.email}</strong></div>
-      <div className="mb-4">
-        <div className="text-xs text-gray-500">Pseudo actuel</div>
-        <div className="text-lg font-semibold">{profile?.username ?? '—'}</div>
+    <div className="account-island__profile-wrapper">
+      <div className="account-island__profile-info">Connecté en tant que <strong>{session.user?.email}</strong></div>
+      <div>
+        <div className="account-island__profile-label">Pseudo actuel</div>
+        <div className="account-island__profile-username">{profile?.username ?? '—'}</div>
       </div>
 
-      <form onSubmit={doUpdateUsername} className="space-y-3">
-        <input className="w-full border rounded px-3 py-2" type="text" placeholder="Nouveau pseudo" value={username} onChange={e=>setUsername(e.target.value)} required />
-        <button className="w-full bg-black text-white rounded px-3 py-2">Mettre à jour le pseudo</button>
+      <form onSubmit={doUpdateUsername} className="account-island__update-form">
+        <input className="account-island__input" type="text" placeholder="Nouveau pseudo" value={username} onChange={e=>setUsername(e.target.value)} required />
+        <button className="account-island__submit-button">Mettre à jour le pseudo</button>
       </form>
 
-      <div className="mt-6 pt-6 border-t">
-        <h2 className="text-lg font-semibold mb-3">Changer le mot de passe</h2>
-        <form onSubmit={doChangePassword} className="space-y-3">
+      <div className="account-island__password-section">
+        <h2 className="account-island__password-title">Changer le mot de passe</h2>
+        <form onSubmit={doChangePassword} className="account-island__password-form">
           <input
-            className="w-full border rounded px-3 py-2"
+            className="account-island__input"
             type="password"
             placeholder="Mot de passe actuel"
             value={currentPassword}
@@ -192,7 +192,7 @@ export default function AccountIsland() {
             required
           />
           <input
-            className="w-full border rounded px-3 py-2"
+            className="account-island__input"
             type="password"
             placeholder="Nouveau mot de passe"
             value={newPassword}
@@ -200,23 +200,23 @@ export default function AccountIsland() {
             required
           />
           <input
-            className="w-full border rounded px-3 py-2"
+            className="account-island__input"
             type="password"
             placeholder="Confirmer le mot de passe"
             value={confirmPassword}
             onChange={(e)=>setConfirmPassword(e.target.value)}
             required
           />
-          <button className="w-full bg-black text-white rounded px-3 py-2 disabled:opacity-60" disabled={pwSubmitting}>
+          <button className="account-island__submit-button" disabled={pwSubmitting}>
             {pwSubmitting ? 'Mise à jour…' : 'Mettre à jour le mot de passe'}
           </button>
         </form>
-        {pwSuccessMsg && <p className="mt-3 text-sm text-green-700">{pwSuccessMsg}</p>}
-        {pwErrorMsg && <p className="mt-3 text-sm text-red-600">{pwErrorMsg}</p>}
+        {pwSuccessMsg && <p className="account-island__password-success">{pwSuccessMsg}</p>}
+        {pwErrorMsg && <p className="account-island__password-error">{pwErrorMsg}</p>}
       </div>
 
-      <button onClick={doSignOut} className="w-full mt-4 border rounded px-3 py-2">Se déconnecter</button>
-      {errorMsg && <p className="mt-3 text-sm text-red-600">{errorMsg}</p>}
+      <button onClick={doSignOut} className="account-island__signout-button">Se déconnecter</button>
+      {errorMsg && <p className="account-island__error">{errorMsg}</p>}
     </div>
   );
 }

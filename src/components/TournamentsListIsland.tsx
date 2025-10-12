@@ -79,15 +79,15 @@ function TournamentsListInner(_: Props) {
   const list = tab === 'active' ? active : completed
 
   return (
-    <div>
-      <div className="mb-4 flex items-center justify-between">
-        <div className="inline-flex rounded-lg border overflow-hidden">
+    <div className="tournaments-list">
+      <div className="tournaments-list__header">
+        <div className="tournaments-list__tabs">
           <button
-            className={`px-3 py-1 text-sm ${tab==='active'?'bg-black text-white':'bg-white'}`}
+            className={`tournaments-list__tab ${tab==='active'?'tournaments-list__tab--active':''}`}
             onClick={()=>setTab('active')}
           >{t('tournaments.activeTab')}</button>
           <button
-            className={`px-3 py-1 text-sm ${tab==='completed'?'bg-black text-white':'bg-white'}`}
+            className={`tournaments-list__tab ${tab==='completed'?'tournaments-list__tab--active':''}`}
             onClick={()=>setTab('completed')}
           >{t('tournaments.completedTab')}</button>
         </div>
@@ -95,31 +95,31 @@ function TournamentsListInner(_: Props) {
           <button
             onClick={onPurge}
             disabled={busy}
-            className="rounded-md border px-3 py-1 text-sm hover:bg-gray-50 disabled:opacity-50"
+            className={`tournaments-list__purge-button ${busy ? 'tournaments-list__purge-button--disabled' : ''}`}
           >
             {t('tournaments.purge')}
           </button>
         )}
       </div>
 
-      {message && <div className="mb-3 text-sm text-green-700">{message}</div>}
+      {message && <div className="tournaments-list__message">{message}</div>}
 
-      <ul className="divide-y divide-gray-200">
+      <ul className="tournaments-list__list">
         {list.map(t => (
-          <li className="py-4 flex items-center justify-between" key={t.id}>
-            <a href={`/t/${t.id}`} className="font-medium hover:underline">{t.name}</a>
-            <div className="flex items-center gap-2">
+          <li className="tournaments-list__item" key={t.id}>
+            <a href={`/t/${t.id}`} className="tournaments-list__item-link">{t.name}</a>
+            <div className="tournaments-list__item-info">
               {admin && t.status === 'canceled' && (
-                <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-600">
+                <span className="tournaments-list__canceled-badge">
                   {t('tournaments.canceled')}
                 </span>
               )}
-              <span className="text-sm text-gray-500">{t.status}</span>
+              <span className="tournaments-list__item-status">{t.status}</span>
             </div>
           </li>
         ))}
         {list.length === 0 && (
-          <li className="py-6 text-sm text-gray-500">{t('tournaments.noTournaments')}</li>
+          <li className="tournaments-list__empty">{t('tournaments.noTournaments')}</li>
         )}
       </ul>
     </div>

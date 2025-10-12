@@ -143,14 +143,14 @@ export default function SubmitIsland() {
   };
 
   if (sessionLoading) {
-    return <div className="p-6 text-sm text-gray-500">Chargement…</div>;
+    return <div className="submit-island__loading">Chargement…</div>;
   }
 
   if (!isSignedIn) {
     return (
-      <div className="max-w-md mx-auto p-6 rounded-2xl shadow border mt-8 bg-white">
-        <div className="text-sm text-gray-700">Vous devez être connecté pour soumettre un personnage.</div>
-        <a href="/account" className="mt-4 inline-flex items-center justify-center rounded bg-black px-4 py-2 text-white">
+      <div className="submit-island__signin-prompt">
+        <div className="submit-island__signin-message">Vous devez être connecté pour soumettre un personnage.</div>
+        <a href="/account" className="submit-island__signin-button">
           Se connecter / Créer un compte
         </a>
       </div>
@@ -159,27 +159,27 @@ export default function SubmitIsland() {
 
   if (success) {
     return (
-      <div className="max-w-md mx-auto p-6 rounded-2xl shadow border mt-8 bg-white">
-        <h2 className="text-lg font-semibold">Merci !</h2>
-        <p className="mt-2 text-sm text-gray-700">Votre soumission a été enregistrée et sera examinée.</p>
-        <div className="mt-4 flex gap-3">
-          <button type="button" className="rounded border px-3 py-2" onClick={resetForm}>
+      <div className="submit-island__success">
+        <h2 className="submit-island__success-title">Merci !</h2>
+        <p className="submit-island__success-message">Votre soumission a été enregistrée et sera examinée.</p>
+        <div className="submit-island__success-actions">
+          <button type="button" className="submit-island__success-button" onClick={resetForm}>
             Nouvelle soumission
           </button>
-          <a className="rounded bg-black px-3 py-2 text-white" href="/duel">Retourner aux duels</a>
+          <a className="submit-island__success-link" href="/duel">Retourner aux duels</a>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="max-w-xl mx-auto p-6 rounded-2xl shadow border mt-8 bg-white">
-      <h2 className="mb-4 text-xl font-bold">Soumettre un personnage</h2>
-      <form onSubmit={onSubmit} className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Univers</label>
+    <div className="submit-island__form-wrapper">
+      <h2 className="submit-island__title">Soumettre un personnage</h2>
+      <form onSubmit={onSubmit} className="submit-island__form">
+        <div className="submit-island__field">
+          <label className="submit-island__label">Univers</label>
           <select
-            className="mt-1 w-full rounded border px-3 py-2 bg-white"
+            className={`submit-island__select ${universesLoading ? 'submit-island__select--disabled' : ''}`}
             value={selectValue}
             onChange={(e) => setSelectValue(e.target.value)}
             disabled={universesLoading}
@@ -192,16 +192,16 @@ export default function SubmitIsland() {
             <option value="other">Other…</option>
           </select>
           {universesError && (
-            <p className="mt-1 text-xs text-red-600">{universesError}</p>
+            <p className="submit-island__error">{universesError}</p>
           )}
         </div>
 
         {canShowProposed && (
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Proposer un univers</label>
+          <div className="submit-island__field">
+            <label className="submit-island__label">Proposer un univers</label>
             <input
               type="text"
-              className="mt-1 w-full rounded border px-3 py-2"
+              className="submit-island__input"
               placeholder="Nom de l'univers"
               value={proposedUniverse}
               onChange={(e) => setProposedUniverse(e.target.value)}
@@ -209,11 +209,11 @@ export default function SubmitIsland() {
           </div>
         )}
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Nom du personnage</label>
+        <div className="submit-island__field">
+          <label className="submit-island__label">Nom du personnage</label>
           <input
             type="text"
-            className="mt-1 w-full rounded border px-3 py-2"
+            className="submit-island__input"
             placeholder="Ex. Naruto Uzumaki"
             value={characterName}
             onChange={(e) => setCharacterName(e.target.value)}
@@ -221,10 +221,10 @@ export default function SubmitIsland() {
           />
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Description</label>
+        <div className="submit-island__field">
+          <label className="submit-island__label">Description</label>
           <textarea
-            className="mt-1 w-full rounded border px-3 py-2"
+            className="submit-island__textarea"
             rows={4}
             placeholder="Brève description du personnage"
             value={description}
@@ -232,11 +232,11 @@ export default function SubmitIsland() {
           />
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Image URL (optionnel)</label>
+        <div className="submit-island__field">
+          <label className="submit-island__label">Image URL (optionnel)</label>
           <input
             type="url"
-            className="mt-1 w-full rounded border px-3 py-2"
+            className="submit-island__input"
             placeholder="https://…"
             value={imageUrl}
             onChange={(e) => setImageUrl(e.target.value)}
@@ -244,12 +244,12 @@ export default function SubmitIsland() {
         </div>
 
         {submitError && (
-          <p className="text-sm text-red-600">{submitError}</p>
+          <p className="submit-island__error">{submitError}</p>
         )}
 
         <button
           type="submit"
-          className="w-full rounded bg-black px-4 py-2 text-white disabled:opacity-60"
+          className={`submit-island__submit-button ${submitting ? 'submit-island__submit-button--disabled' : ''}`}
           disabled={submitting}
         >
           {submitting ? 'Envoi…' : 'Soumettre'}

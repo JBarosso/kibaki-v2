@@ -5,7 +5,7 @@ import UserVoteItem from '@/components/UserVoteItem';
 export default function UserVotesList({ votes, username }: { votes: UserVote[]; username: string }) {
   if (!votes || votes.length === 0) {
     return (
-      <div className="rounded-2xl border bg-white p-6 text-center text-sm text-gray-600">
+      <div className="user-votes-list user-votes-list--empty">
         No votes yet.
       </div>
     );
@@ -17,7 +17,7 @@ export default function UserVotesList({ votes, username }: { votes: UserVote[]; 
     .slice(0, 20);
 
   return (
-    <div className="space-y-4">
+    <div className="user-votes-list">
       {normalized.map((v) => (
         <UserVoteItem key={v.id} vote={v} />
       ))}

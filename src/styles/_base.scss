@@ -1,0 +1,70 @@
+// Base styles and resets
+// This file contains global resets, variables, and base element styles
+
+// ============================================
+// CSS Reset & Base Styles
+// ============================================
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  min-height: 100vh;
+  line-height: 1.5;
+}
+
+img,
+picture,
+video,
+canvas,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+input,
+button,
+textarea,
+select {
+  font: inherit;
+}
+
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  overflow-wrap: break-word;
+}
+
+// ============================================
+// CSS Variables (Design Tokens)
+// ============================================
+
+:root {
+  // Colors
+
+  // Typography
+
+  // Spacing
+
+  // Border radius
+
+  // Shadows
+
+  // Transitions
+
+  // Breakpoints (for reference in media queries)
+}

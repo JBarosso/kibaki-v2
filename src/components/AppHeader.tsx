@@ -85,11 +85,11 @@ function HeaderInner({ lang, navLabels, actionLabels, infoText }: AppHeaderProps
   const isAdmin = profile?.is_admin === true;
 
   return (
-    <header className="border-b bg-white/80 backdrop-blur supports-[backdrop-filter]:bg-white/60">
-      <div className="mx-auto max-w-5xl px-4 py-3 flex items-center justify-between">
-        <a href="/" className="font-semibold tracking-tight">Kibaki</a>
+    <header className="app-header">
+      <div className="app-header__container">
+        <a href="/" className="app-header__logo">Kibaki</a>
 
-        <nav className="flex items-center gap-4 text-sm">
+        <nav className="app-header__nav">
           <a href="/duel" className={linkCls(isActive('/duel'))}>{navLabels.duel}</a>
           <a href="/t" className={linkCls(isActive('/t'))}>{navLabels.tournaments}</a>
           <a href="/top" className={linkCls(isActive('/top'))}>{navLabels.top}</a>
@@ -109,18 +109,18 @@ function HeaderInner({ lang, navLabels, actionLabels, infoText }: AppHeaderProps
           )}
 
           {/* Info dropdown */}
-          <div className="relative">
+          <div className="app-header__info-dropdown">
             <details className="group">
-              <summary className="cursor-pointer select-none text-sm text-gray-600 hover:text-gray-900 inline-flex items-center gap-1">
-                <span aria-hidden="true">ⓘ</span> <span>{navLabels.info}</span>
+              <summary className="app-header__info-summary">
+                <span className="app-header__info-icon" aria-hidden="true">ⓘ</span> <span>{navLabels.info}</span>
               </summary>
-              <div className="absolute right-0 mt-2 w-56 rounded-xl border border-gray-200 bg-white shadow-lg p-3 text-sm space-y-2">
-                <ul className="space-y-1">
-                  <li><a className="block rounded px-2 py-1 hover:bg-gray-50" href="/legal">{navLabels.legal}</a></li>
-                  <li><a className="block rounded px-2 py-1 hover:bg-gray-50" href="/privacy">{navLabels.privacy}</a></li>
-                  <li><a className="block rounded px-2 py-1 hover:bg-gray-50" href="/terms">{navLabels.terms}</a></li>
+              <div className="app-header__info-content">
+                <ul className="app-header__info-list">
+                  <li className="app-header__info-item"><a className="app-header__info-link" href="/legal">{navLabels.legal}</a></li>
+                  <li className="app-header__info-item"><a className="app-header__info-link" href="/privacy">{navLabels.privacy}</a></li>
+                  <li className="app-header__info-item"><a className="app-header__info-link" href="/terms">{navLabels.terms}</a></li>
                 </ul>
-                <p className="text-xs text-gray-600 pt-1">{infoText}</p>
+                <p className="app-header__info-text">{infoText}</p>
               </div>
             </details>
           </div>
@@ -133,8 +133,5 @@ function HeaderInner({ lang, navLabels, actionLabels, infoText }: AppHeaderProps
 }
 
 function linkCls(active: boolean) {
-  return [
-    'rounded px-2 py-1 hover:bg-gray-100 transition-colors',
-    active ? 'text-gray-900 font-medium' : 'text-gray-600'
-  ].join(' ');
+  return `app-header__link ${active ? 'app-header__link--active' : ''}`;
 }

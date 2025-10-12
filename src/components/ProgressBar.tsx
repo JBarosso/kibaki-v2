@@ -53,43 +53,29 @@ export function ProgressBar({
     requestAnimationFrame(animateProgress);
   }, [progress, reducedMotion, displayProgress]);
 
-  const colorClasses = {
-    blue: 'bg-blue-500',
-    green: 'bg-green-500',
-    red: 'bg-red-500',
-    yellow: 'bg-yellow-500',
-    purple: 'bg-purple-500'
-  };
-
-  const sizeClasses = {
-    sm: 'h-1',
-    md: 'h-2',
-    lg: 'h-3'
-  };
-
   const safeProgress = Math.max(0, Math.min(100, displayProgress));
   const progressStyle = !indeterminate ? { width: `${safeProgress}%` } : {};
 
   const barClass = `
-    ${sizeClasses[size]} ${colorClasses[color]} rounded-full
+    progress-bar__fill progress-bar__fill--${color} progress-bar--${size}
     ${reducedMotion ? '' : 'transition-all duration-300 ease-out'}
-    ${indeterminate && !reducedMotion ? 'animate-indeterminate' : ''}
+    ${indeterminate && !reducedMotion ? 'progress-bar__fill--indeterminate' : ''}
   `;
 
   return (
-    <div className={className}>
+    <div className={`progress-bar ${className}`}>
       {/* Label and percentage */}
       {(label || showPercentage) && (
-        <div className="flex justify-between items-center mb-2 text-sm text-gray-600">
-          {label && <span>{label}</span>}
+        <div className="progress-bar__header">
+          {label && <span className="progress-bar__label">{label}</span>}
           {showPercentage && !indeterminate && (
-            <span>{Math.round(safeProgress)}%</span>
+            <span className="progress-bar__percentage">{Math.round(safeProgress)}%</span>
           )}
         </div>
       )}
 
       {/* Progress track */}
-      <div className={`${sizeClasses[size]} bg-gray-200 rounded-full overflow-hidden`}>
+      <div className={`progress-bar__track progress-bar--${size}`}>
         {/* Progress fill */}
         <div
           className={barClass}

@@ -12,32 +12,32 @@ export function SkeletonCard({ className }: SkeletonCardProps) {
   const skeletonClass = reducedMotion ? animationClasses.skeleton : animationClasses.skeletonAnimated;
 
   return (
-    <div className={`flex h-full flex-col rounded-2xl border bg-white shadow-sm ${className || ''}`}>
+    <div className={`skeleton-card ${className || ''}`}>
       {/* Character image skeleton */}
-      <div className="flex items-center justify-center p-4">
-        <div className={`w-32 h-32 rounded-xl ${skeletonClass}`} />
+      <div className="skeleton-card__image-wrapper">
+        <div className={`skeleton-card__image ${skeletonClass}`} />
       </div>
 
-      <div className="flex flex-1 flex-col p-4">
+      <div className="skeleton-card__content">
         {/* Character name and ELO skeleton */}
-        <div className="mb-1 flex items-center justify-between gap-2">
-          <div className={`h-6 rounded w-24 ${skeletonClass}`} />
-          <div className={`h-4 rounded w-16 ${skeletonClass}`} />
+        <div className="skeleton-card__header">
+          <div className={`skeleton-card__name ${skeletonClass}`} />
+          <div className={`skeleton-card__elo ${skeletonClass}`} />
         </div>
 
         {/* Win-Loss record skeleton */}
-        <div className={`mb-2 h-3 rounded w-20 ${skeletonClass}`} />
+        <div className={`skeleton-card__stats ${skeletonClass}`} />
 
         {/* Description skeleton */}
-        <div className="mb-3 space-y-2">
-          <div className={`h-4 rounded w-full ${skeletonClass}`} />
-          <div className={`h-4 rounded w-3/4 ${skeletonClass}`} />
-          <div className={`h-4 rounded w-1/2 ${skeletonClass}`} />
+        <div className="skeleton-card__description">
+          <div className={`skeleton-card__description-line ${skeletonClass}`} />
+          <div className={`skeleton-card__description-line ${skeletonClass}`} />
+          <div className={`skeleton-card__description-line ${skeletonClass}`} />
         </div>
 
         {/* More button skeleton */}
-        <div className="mt-auto flex items-center justify-between">
-          <div className={`h-4 rounded w-12 ${skeletonClass}`} />
+        <div className="skeleton-card__footer">
+          <div className={`skeleton-card__more ${skeletonClass}`} />
         </div>
       </div>
     </div>
@@ -53,30 +53,30 @@ export function SkeletonDuel({ className }: SkeletonDuelProps) {
   const skeletonClass = reducedMotion ? animationClasses.skeleton : animationClasses.skeletonAnimated;
 
   return (
-    <div className={`space-y-4 ${className || ''}`}>
+    <div className={`skeleton-duel ${className || ''}`}>
       {/* Scope selector skeleton */}
-      <div className="flex items-center gap-3">
-        <div className={`h-4 rounded w-16 ${skeletonClass}`} />
-        <div className={`h-8 rounded w-32 ${skeletonClass}`} />
+      <div className="skeleton-duel__scope">
+        <div className={`skeleton-duel__scope-label ${skeletonClass}`} />
+        <div className={`skeleton-duel__scope-select ${skeletonClass}`} />
       </div>
 
       {/* Character cards skeleton */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <div className="flex flex-col">
+      <div className="skeleton-duel__cards-grid">
+        <div className="skeleton-duel__card-column">
           <SkeletonCard />
-          <div className={`mt-3 h-10 rounded-lg ${skeletonClass}`} />
+          <div className={`skeleton-duel__button ${skeletonClass}`} />
         </div>
 
-        <div className="flex flex-col">
+        <div className="skeleton-duel__card-column">
           <SkeletonCard />
-          <div className={`mt-3 h-10 rounded-lg ${skeletonClass}`} />
+          <div className={`skeleton-duel__button ${skeletonClass}`} />
         </div>
       </div>
 
       {/* Action buttons skeleton */}
-      <div className="flex flex-wrap items-center gap-3">
-        <div className={`h-8 rounded w-16 ${skeletonClass}`} />
-        <div className={`h-8 rounded w-40 ${skeletonClass}`} />
+      <div className="skeleton-duel__actions">
+        <div className={`skeleton-duel__action-button ${skeletonClass}`} />
+        <div className={`skeleton-duel__action-button ${skeletonClass}`} />
       </div>
     </div>
   );
@@ -92,20 +92,20 @@ export function SkeletonList({ count = 5, className }: SkeletonListProps) {
   const skeletonClass = reducedMotion ? animationClasses.skeleton : animationClasses.skeletonAnimated;
 
   return (
-    <div className={`space-y-4 ${className || ''}`}>
+    <div className={`skeleton-list ${className || ''}`}>
       {Array.from({ length: count }, (_, index) => (
-        <div key={index} className="flex items-center space-x-4 p-4 border rounded-lg">
+        <div key={index} className="skeleton-list__item">
           {/* Avatar skeleton */}
-          <div className={`w-12 h-12 rounded-full ${skeletonClass}`} />
+          <div className={`skeleton-list__avatar ${skeletonClass}`} />
 
           {/* Content skeleton */}
-          <div className="flex-1 space-y-2">
-            <div className={`h-4 rounded w-1/3 ${skeletonClass}`} />
-            <div className={`h-3 rounded w-1/2 ${skeletonClass}`} />
+          <div className="skeleton-list__content">
+            <div className={`skeleton-list__title ${skeletonClass}`} />
+            <div className={`skeleton-list__subtitle ${skeletonClass}`} />
           </div>
 
           {/* Action skeleton */}
-          <div className={`h-4 rounded w-16 ${skeletonClass}`} />
+          <div className={`skeleton-list__action ${skeletonClass}`} />
         </div>
       ))}
     </div>
@@ -120,7 +120,7 @@ export function SkeletonButton({ className }: SkeletonButtonProps) {
   const reducedMotion = getPrefersReducedMotion();
   const skeletonClass = reducedMotion ? animationClasses.skeleton : animationClasses.skeletonAnimated;
 
-  return <div className={`h-10 rounded-lg ${skeletonClass} ${className || ''}`} />;
+  return <div className={`skeleton-button ${skeletonClass} ${className || ''}`} />;
 }
 
 export interface SkeletonTextProps {
@@ -133,16 +133,12 @@ export function SkeletonText({ lines = 3, className }: SkeletonTextProps) {
   const skeletonClass = reducedMotion ? animationClasses.skeleton : animationClasses.skeletonAnimated;
 
   return (
-    <div className={`space-y-2 ${className || ''}`}>
+    <div className={`skeleton-text ${className || ''}`}>
       {Array.from({ length: lines }, (_, index) => {
-        // Vary the width for more natural appearance
-        const widths = ['w-full', 'w-4/5', 'w-3/5', 'w-2/3', 'w-5/6'];
-        const width = widths[index % widths.length];
-
         return (
           <div
             key={index}
-            className={`h-4 rounded ${width} ${skeletonClass}`}
+            className={`skeleton-text__line ${skeletonClass}`}
           />
         );
       })}

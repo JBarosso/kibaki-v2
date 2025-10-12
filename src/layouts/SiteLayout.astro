@@ -1,7 +1,7 @@
 ---
 import AppHeader from "@/components/AppHeader";
 import ToastProvider from "@/components/ToastProvider";
-import "../styles/tailwind.css";
+import "../styles/style.scss";
 import { getLangCookie, resolveLang, setLangCookie, tServer } from "@/i18n";
 import type { Lang } from "@/i18n";
 
@@ -47,10 +47,10 @@ const infoText = tServer(lang, "info.publicDomain");
     <link rel="manifest" href="/site.webmanifest" />
     <meta name="theme-color" content="#ffffff" /> -->
   </head>
-  <body class="min-h-screen bg-gray-50">
+  <body class="site-layout__body">
     <AppHeader client:load lang={lang} navLabels={navLabels} actionLabels={actionLabels} infoText={infoText} />
     <ToastProvider client:load />
-    <main class="mx-auto max-w-5xl px-4 py-8">
+    <main class="site-layout__main">
       <slot />
     </main>
   </body>

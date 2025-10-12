@@ -101,21 +101,21 @@ export default function TournamentNewIsland() {
     window.location.href = `/t/${tId}`
   }
 
-  if (ok === null) return <div className="text-sm text-gray-500">Checking permissions…</div>
-  if (!ok) return <div className="text-red-600">Forbidden: admin only.</div>
+  if (ok === null) return <div className="tournament-new__loading">Checking permissions…</div>
+  if (!ok) return <div className="tournament-new__forbidden">Forbidden: admin only.</div>
 
   return (
-    <form onSubmit={onSubmit} className="space-y-6">
-      <div className="grid gap-4 md:grid-cols-2">
-        <label className="block">
-          <span className="text-sm font-medium">Name</span>
-          <input className="mt-1 w-full rounded border px-3 py-2"
+    <form onSubmit={onSubmit} className="tournament-new__form">
+      <div className="tournament-new__form-grid">
+        <label className="tournament-new__field">
+          <span className="tournament-new__label">Name</span>
+          <input className="tournament-new__input"
                  value={name} onChange={e=>setName(e.target.value)} required />
         </label>
 
-        <label className="block">
-          <span className="text-sm font-medium">Universe (optional)</span>
-          <select className="mt-1 w-full rounded border px-3 py-2"
+        <label className="tournament-new__field">
+          <span className="tournament-new__label">Universe (optional)</span>
+          <select className="tournament-new__select"
                   value={universeId === '' ? '' : Number(universeId)}
                   onChange={e => setUniverseId(e.target.value === '' ? '' : Number(e.target.value))}>
             <option value="">All universes</option>
@@ -125,10 +125,10 @@ export default function TournamentNewIsland() {
           </select>
         </label>
 
-        <div className="block">
-          <span className="text-sm font-medium">Round duration</span>
-          <div className="mt-1 grid grid-cols-2 gap-2">
-            <select className="rounded border px-3 py-2"
+        <div className="tournament-new__field">
+          <span className="tournament-new__label">Round duration</span>
+          <div className="tournament-new__duration-grid">
+            <select className="tournament-new__select"
                     value={preset}
                     onChange={e => setPreset(e.target.value as any)}>
               <option value="1d">1 day</option>
@@ -136,21 +136,21 @@ export default function TournamentNewIsland() {
               <option value="1m">1 month (30d)</option>
               <option value="custom">Custom (minutes)</option>
             </select>
-            <input className="rounded border px-3 py-2 disabled:opacity-50"
+            <input className="tournament-new__input"
                    type="number" min={1}
                    value={customMinutes}
                    onChange={e=>setCustomMinutes(Number(e.target.value))}
                    disabled={preset !== 'custom'}
                    placeholder="Minutes" />
           </div>
-          <div className="mt-1 text-xs text-gray-500">
+          <div className="tournament-new__duration-note">
             Will use <b>{resolvedMinutes}</b> minutes per round.
           </div>
         </div>
 
-        <label className="block">
-          <span className="text-sm font-medium">Start time (local)</span>
-          <input className="mt-1 w-full rounded border px-3 py-2"
+        <label className="tournament-new__field">
+          <span className="tournament-new__label">Start time (local)</span>
+          <input className="tournament-new__input"
                  type="datetime-local"
                  value={startLocal}
                  onChange={e=>setStartLocal(e.target.value)}
@@ -158,27 +158,27 @@ export default function TournamentNewIsland() {
         </label>
       </div>
 
-      <div className="rounded border p-4">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <span className="font-medium">Participants (click to add/remove, order = seed)</span>
-          <div className="flex items-center gap-2">
+      <div className="tournament-new__participants-section">
+        <div className="tournament-new__participants-header">
+          <span className="tournament-new__participants-title">Participants (click to add/remove, order = seed)</span>
+          <div className="tournament-new__participants-controls">
             <button type="button" onClick={selectAll}
-                    className="rounded border px-2 py-1 text-sm hover:bg-gray-50">Select all</button>
+                    className="tournament-new__participants-button">Select all</button>
             <button type="button" onClick={clearAll}
-                    className="rounded border px-2 py-1 text-sm hover:bg-gray-50">Clear</button>
-            <input className="rounded border px-3 py-1 text-sm"
+                    className="tournament-new__participants-button">Clear</button>
+            <input className="tournament-new__participants-search"
                    placeholder="Search…"
                    value={filter} onChange={e=>setFilter(e.target.value)} />
           </div>
         </div>
 
-        <div className="mt-3 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 max-h-72 overflow-auto">
+        <div className="tournament-new__participants-grid">
           {filtered.map(c => {
             const active = selected.includes(c.id)
             return (
               <button type="button" key={c.id}
                 onClick={() => toggle(c.id)}
-                className={`truncate rounded border px-2 py-1 text-left ${active ? 'bg-black text-white' : 'bg-white'}`}>
+                className={`tournament-new__participant-button ${active ? 'tournament-new__participant-button--active' : ''}`}>
                 {c.name}
               </button>
             )
@@ -186,19 +186,19 @@ export default function TournamentNewIsland() {
         </div>
 
         {selected.length > 0 && (
-          <div className="mt-4">
-            <div className="text-sm text-gray-600 mb-1">Seed order:</div>
-            <ol className="list-decimal ml-5 space-y-1">
+          <div className="tournament-new__seed-order">
+            <div className="tournament-new__seed-title">Seed order:</div>
+            <ol className="tournament-new__seed-list">
               {selected.map((id) => {
                 const c = characters.find(x => x.id === id)
-                return <li key={id} className="text-sm">{c?.name ?? `#${id}`}</li>
+                return <li key={id} className="tournament-new__seed-item">{c?.name ?? `#${id}`}</li>
               })}
             </ol>
           </div>
         )}
       </div>
 
-      <button type="submit" className="rounded-md bg-black px-4 py-2 text-white hover:opacity-90">
+      <button type="submit" className="tournament-new__submit-button">
         Create tournament
       </button>
     </form>

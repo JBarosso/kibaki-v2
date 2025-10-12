@@ -39,15 +39,15 @@ export default function LanguageSwitcher({ lang }: Props) {
   };
 
   return (
-    <div className="flex items-center">
-      <label htmlFor="language-switcher" className="sr-only">
+    <div className="language-switcher">
+      <label htmlFor="language-switcher" className="language-switcher__label">
         Language
       </label>
       <select
         id="language-switcher"
         value={current}
         onChange={onChange}
-        className="rounded border border-gray-300 bg-white px-2 py-1 text-xs text-gray-700 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+        className="language-switcher__select"
       >
         {OPTIONS.map((option) => (
           <option key={option.value} value={option.value}>

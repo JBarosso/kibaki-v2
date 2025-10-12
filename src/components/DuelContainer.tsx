@@ -913,15 +913,15 @@ function DuelContainerInner(_: { lang: Lang }) {
 
   if (state === 'loading' || state === 'idle') {
     return (
-      <FadeTransition show={true} className="mx-auto max-w-5xl">
+      <FadeTransition show={true} className="duel-container">
         <SkeletonDuel />
         {loadingState.isLoading && loadingState.message && (
-          <div className="mt-4 text-center">
-            <div className="text-sm text-gray-600 mb-2">{loadingState.message}</div>
+          <div className="duel-container__loading">
+            <div className="duel-container__loading">{loadingState.message}</div>
             {loadingState.progress !== undefined && (
-              <div className="w-full bg-gray-200 rounded-full h-1">
+              <div className="duel-container__progress">
                 <div
-                  className={`h-1 bg-blue-500 rounded-full transition-all duration-300 ${
+                  className={`duel-container__progress-bar ${
                     reducedMotion ? '' : 'ease-out'
                   }`}
                   style={{ width: `${loadingState.progress}%` }}
@@ -937,13 +937,13 @@ function DuelContainerInner(_: { lang: Lang }) {
   if (state === 'error') {
     return (
       <FadeTransition show={true}>
-        <div className={`rounded-2xl border bg-white p-6 text-sm text-red-600 ${animationClasses.error}`}>
-          <div className="flex items-center space-x-2">
-            <span className="text-red-500">⚠️</span>
+        <div className={`duel-container__error ${animationClasses.error}`}>
+          <div className="duel-container__error">
+            <span className="duel-container__error-icon">⚠️</span>
             <span>{error ?? t('duel.error')}</span>
           </div>
           {loadingState.error && (
-            <div className="mt-2 text-xs text-red-500">
+            <div className="duel-container__error">
               {loadingState.error}
             </div>
           )}
@@ -954,11 +954,11 @@ function DuelContainerInner(_: { lang: Lang }) {
 
   if (ids.length < 2) {
     return (
-      <div className="space-y-4">
-        <div className="flex items-center gap-3">
+      <div className="duel-container">
+        <div className="duel-container__header">
           <ScopeSelector universes={universes} value={scope} onChange={setScope} />
         </div>
-        <div className="rounded-2xl border bg-white p-6 text-sm text-gray-600">
+        <div className="duel-container__empty">
           {t('duel.notEnough')}
         </div>
       </div>
@@ -967,11 +967,11 @@ function DuelContainerInner(_: { lang: Lang }) {
 
   if (!pair) {
     return (
-      <div className="space-y-4">
-        <div className="flex items-center gap-3">
+      <div className="duel-container">
+        <div className="duel-container__header">
           <ScopeSelector universes={universes} value={scope} onChange={(s) => setScope(s)} />
         </div>
-        <div className="rounded-2xl border bg-white p-6 text-sm text-gray-600">
+        <div className="duel-container__loading">
           {t('duel.loading')}
         </div>
       </div>
@@ -1002,38 +1002,34 @@ function DuelContainerInner(_: { lang: Lang }) {
     return '';
   };
 
-  const getButtonClasses = (characterId: number, baseClasses: string) => {
+  const getButtonClasses = (characterId: number) => {
     const disabled = isVoting || isTransitioning;
     const isWinner = optimisticVote.winnerId === characterId;
 
-    let classes = baseClasses;
+    let classes = 'duel-container__vote-button';
 
     if (disabled) {
-      classes += ' cursor-not-allowed opacity-50';
-    } else {
-      classes += ' hover:scale-105';
+      classes += ' duel-container__vote-button--disabled';
     }
 
     if (isWinner && optimisticVote.status === 'success') {
-      classes += ' bg-green-600';
+      classes += ' duel-container__vote-button--success';
     } else if (isWinner && optimisticVote.status === 'error') {
-      classes += ' bg-red-600';
+      classes += ' duel-container__vote-button--error';
     }
-
-    classes += ' transition-all duration-200';
 
     return classes;
   };
 
   return (
     <TransitionWrapper show={state === 'ready'} duration="fast">
-      <div className="space-y-4">
+      <div className="duel-container">
         <FadeTransition show={true} duration="fast">
-          <div className="flex items-center gap-3">
+          <div className="duel-container__header">
             <ScopeSelector universes={universes} value={scope} onChange={(s) => setScope(s)} />
             {/* 🔧 NEW: Auth sync indicator */}
             {!authSyncComplete && DEBUG_MODE && (
-              <span className="text-xs text-gray-400 italic">Syncing...</span>
+              <span className="duel-container__sync-indicator">Syncing...</span>
             )}
           </div>
         </FadeTransition>
@@ -1043,8 +1039,8 @@ function DuelContainerInner(_: { lang: Lang }) {
           duration="normal"
           className={reducedMotion ? '' : 'transform transition-all duration-300'}
         >
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <div className="flex flex-col">
+          <div className="duel-container__cards-grid">
+            <div className="duel-container__card-column">
               <CharacterCard
                 character={left}
                 side="left"
@@ -1055,13 +1051,13 @@ function DuelContainerInner(_: { lang: Lang }) {
               <button
                 onClick={() => vote('left')}
                 disabled={isVoting || isTransitioning}
-                className={getButtonClasses(left.id, "mt-3 rounded-lg bg-black px-4 py-2 text-white hover:bg-black/90 disabled:opacity-60 disabled:cursor-not-allowed")}
+                className={getButtonClasses(left.id)}
               >
                 {t('duel.leftVote')}
               </button>
             </div>
 
-            <div className="flex flex-col">
+            <div className="duel-container__card-column">
               <CharacterCard
                 character={right}
                 side="right"
@@ -1072,7 +1068,7 @@ function DuelContainerInner(_: { lang: Lang }) {
               <button
                 onClick={() => vote('right')}
                 disabled={isVoting || isTransitioning}
-                className={getButtonClasses(right.id, "mt-3 rounded-lg bg-black px-4 py-2 text-white hover:bg-black/90 disabled:opacity-60 disabled:cursor-not-allowed")}
+                className={getButtonClasses(right.id)}
               >
                 {t('duel.rightVote')}
               </button>
@@ -1081,10 +1077,10 @@ function DuelContainerInner(_: { lang: Lang }) {
         </TransitionWrapper>
 
         <FadeTransition show={true} duration="fast">
-          <div className="flex flex-wrap items-center gap-3">
+          <div className="duel-container__actions">
             <button
               onClick={skip}
-              className={`rounded border px-3 py-1.5 ${animationClasses.interactive} ${
+              className={`duel-container__action-button ${animationClasses.interactive} ${
                 reducedMotion ? '' : 'hover:scale-105'
               }`}
             >
@@ -1092,17 +1088,17 @@ function DuelContainerInner(_: { lang: Lang }) {
             </button>
             <button
               onClick={resetPairs}
-              className={`rounded border px-3 py-1.5 ${animationClasses.interactive} ${
+              className={`duel-container__action-button ${animationClasses.interactive} ${
                 reducedMotion ? '' : 'hover:scale-105'
               }`}
             >
               {t('duel.resetPairs')}
             </button>
             {import.meta.env.DEV ? (
-              <span className="text-xs text-gray-500">hash: {hash}</span>
+              <span className="duel-container__hash">hash: {hash}</span>
             ) : null}
             {lastVote ? (
-              <span className="ml-auto text-xs text-gray-500">{t('duel.savedLocally')}</span>
+              <span className="duel-container__saved-label">{t('duel.savedLocally')}</span>
             ) : null}
           </div>
         </FadeTransition>
@@ -1122,14 +1118,14 @@ function DuelContainerInner(_: { lang: Lang }) {
 function CharacterDetails({ character, display }: { character: CharacterRow; display: { name: string; description?: string } }) {
   const { t } = useI18n();
   return (
-    <div className="space-y-2 text-sm text-gray-700">
-      <div className="text-gray-900">ELO: <strong>{character.elo}</strong></div>
-      <div>{t('duel.modalWins')}: <strong>{character.wins}</strong></div>
-      <div>{t('duel.modalLosses')}: <strong>{character.losses}</strong></div>
+    <div className="character-details">
+      <div className="character-details__elo">ELO: <strong>{character.elo}</strong></div>
+      <div className="character-details__wins">{t('duel.modalWins')}: <strong>{character.wins}</strong></div>
+      <div className="character-details__losses">{t('duel.modalLosses')}: <strong>{character.losses}</strong></div>
       {display.description ? (
-        <p className="pt-2 text-gray-700">{display.description}</p>
+        <p className="character-details__description">{display.description}</p>
       ) : (
-        <p className="pt-2 text-gray-400">{t('duel.noDescription')}</p>
+        <p className="character-details__description character-details__description--empty">{t('duel.noDescription')}</p>
       )}
     </div>
   );
@@ -1138,10 +1134,10 @@ function CharacterDetails({ character, display }: { character: CharacterRow; dis
 function ScopeSelector({ universes, value, onChange }: { universes: Universe[]; value: string; onChange: (v: string) => void }) {
   const { t, getUniverseLabel } = useI18n();
   return (
-    <div className="flex items-center gap-2">
-      <label className="text-sm text-gray-600">{t('duel.scopeLabel')}</label>
+    <div className="scope-selector">
+      <label className="scope-selector__label">{t('duel.scopeLabel')}</label>
       <select
-        className="rounded border px-2 py-1 text-sm"
+        className="scope-selector__select"
         value={value}
         onChange={(e) => onChange(e.target.value)}
       >

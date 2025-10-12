@@ -52,11 +52,11 @@ export default function TournamentBracket(props: Props) {
   }
 
   return (
-    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+    <div className="tournament-bracket">
       {rounds.map(([round, ms]) => (
-        <div key={round} className="rounded-2xl border p-3">
-          <div className="mb-2 text-sm font-semibold">{t('tournaments.roundLabel', { round })}</div>
-          <div className="space-y-3">
+        <div key={round} className="tournament-bracket__round">
+          <div className="tournament-bracket__round-title">{t('tournaments.roundLabel', { round })}</div>
+          <div className="tournament-bracket__matches">
             {ms.map(m => {
               const opens = new Date(m.opens_at).getTime()
               const closes = new Date(m.closes_at).getTime()
@@ -77,51 +77,51 @@ export default function TournamentBracket(props: Props) {
                   : null
 
               return (
-                <div key={m.id} className="rounded border p-3">
-                  <div className="text-xs text-gray-500 mb-1">
+                <div key={m.id} className="tournament-bracket__match">
+                  <div className="tournament-bracket__match-time">
                     {new Date(m.opens_at).toLocaleString()} → {new Date(m.closes_at).toLocaleString()}
                   </div>
 
                   {countdown && (
-                    <div className="mb-2 text-xs text-gray-700" aria-live="polite">⏳ {countdown}</div>
+                    <div className="tournament-bracket__countdown" aria-live="polite">⏳ {countdown}</div>
                   )}
 
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between gap-2">
-                      <span className={`truncate ${userChoseC1 ? 'font-semibold' : ''}`}>{c1.name}</span>
+                  <div className="tournament-bracket__competitors">
+                    <div className="tournament-bracket__competitor">
+                      <span className={`tournament-bracket__competitor-name ${userChoseC1 ? 'tournament-bracket__competitor-name--selected' : ''}`}>{c1.name}</span>
                       {canVote ? (
-                        <button className="rounded border px-2 py-1 text-xs hover:bg-gray-50"
+                        <button className="tournament-bracket__vote-button"
                                 onClick={()=>props.onVote!(m.id, m.char1_id!)}>{t('tournaments.vote')}</button>
                       ) : (
-                        <span className="text-xs text-gray-500">{m.char1_votes}</span>
+                        <span className="tournament-bracket__votes">{m.char1_votes}</span>
                       )}
                     </div>
-                    <div className="flex items-center justify-between gap-2">
-                      <span className={`truncate ${userChoseC2 ? 'font-semibold' : ''}`}>{c2.name}</span>
+                    <div className="tournament-bracket__competitor">
+                      <span className={`tournament-bracket__competitor-name ${userChoseC2 ? 'tournament-bracket__competitor-name--selected' : ''}`}>{c2.name}</span>
                       {canVote ? (
-                        <button className="rounded border px-2 py-1 text-xs hover:bg-gray-50"
+                        <button className="tournament-bracket__vote-button"
                                 onClick={()=>props.onVote!(m.id, m.char2_id!)}>{t('tournaments.vote')}</button>
                       ) : (
-                        <span className="text-xs text-gray-500">{m.char2_votes}</span>
+                        <span className="tournament-bracket__votes">{m.char2_votes}</span>
                       )}
                     </div>
 
                     {userChoice && (
-                      <div className="text-xs text-green-700">
+                      <div className="tournament-bracket__user-vote">
                         {t('tournaments.youVoted', { name: userChoseC1 ? c1.name : userChoseC2 ? c2.name : `#${userChoice}` })}
                       </div>
                     )}
 
                     {flash[m.id] && (
-                      <div className="text-xs text-green-700">{flash[m.id]}</div>
+                      <div className="tournament-bracket__flash">{flash[m.id]}</div>
                     )}
 
-                    <div className="mt-2 flex items-center justify-between">
-                      <span className={`text-xs ${m.status === 'closed' ? 'text-green-700' : 'text-gray-600'}`}>
+                    <div className="tournament-bracket__footer">
+                      <span className={`tournament-bracket__status ${m.status === 'closed' ? 'tournament-bracket__status--closed' : ''}`}>
                         {m.status.toUpperCase()}
                       </span>
                       {m.winner_id && (
-                        <span className="text-xs font-medium">
+                        <span className="tournament-bracket__winner">
                           {t('tournaments.winner', { name: winner.name })}
                         </span>
                       )}
@@ -133,8 +133,8 @@ export default function TournamentBracket(props: Props) {
           </div>
 
           {props.isAdmin && props.onTick && round === rounds[rounds.length-1][0] && (
-            <div className="pt-2">
-              <button onClick={props.onTick} className="rounded-md bg-black px-4 py-2 text-white hover:opacity-90">
+            <div className="tournament-bracket__admin">
+              <button onClick={props.onTick} className="tournament-bracket__update-button">
                 {t('tournaments.update')}
               </button>
             </div>

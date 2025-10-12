@@ -13,28 +13,28 @@ export function Modal({ open, onClose, title, children }: ModalProps) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center"
+      className="modal__overlay"
       aria-modal="true"
       role="dialog"
       aria-labelledby={titleId}
     >
       <button
         aria-label="Fermer"
-        className="absolute inset-0 bg-black/40"
+        className="modal__backdrop"
         onClick={onClose}
       />
 
-      <div className="relative mx-4 w-full max-w-lg rounded-2xl bg-white p-6 shadow-xl">
+      <div className="modal__content">
         <button
           aria-label="Fermer le modal"
           onClick={onClose}
-          className="absolute right-3 top-3 inline-flex h-9 w-9 items-center justify-center rounded-full text-gray-500 hover:bg-gray-100 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          className="modal__close-button"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
             fill="currentColor"
-            className="h-5 w-5"
+            className="modal__close-icon"
           >
             <path
               fillRule="evenodd"
@@ -45,9 +45,9 @@ export function Modal({ open, onClose, title, children }: ModalProps) {
         </button>
 
         {title ? (
-          <h3 id={titleId} className="mb-4 text-lg font-semibold text-gray-900">{title}</h3>
+          <h3 id={titleId} className="modal__title">{title}</h3>
         ) : null}
-        <div>{children}</div>
+        <div className="modal__body">{children}</div>
       </div>
     </div>
   );

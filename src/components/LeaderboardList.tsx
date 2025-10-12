@@ -7,14 +7,14 @@ export default function LeaderboardList({ items, rankMap }: { items: TopCharacte
   const { t } = useI18n();
   if (!items || items.length === 0) {
     return (
-      <div className="rounded-2xl border bg-white p-6 text-center text-sm text-gray-600">
+      <div className="leaderboard-list leaderboard-list--empty">
         {t('top.empty')}
       </div>
     );
   }
 
   return (
-    <div className="space-y-2">
+    <div className="leaderboard-list">
       {items.map((item, idx) => {
         const absRank = rankMap?.get(item.id) ?? idx + 1;
         return <LeaderboardRow key={item.id} rank={absRank} c={item} />;

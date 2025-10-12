@@ -1,5 +1,5 @@
 ---
-import '@/styles/tailwind.css';
+import '@/styles/style.scss';
 import SiteNav from '@/components/SiteNav.astro';
 import { getLangCookie, resolveLang, setLangCookie } from '@/i18n';
 import type { Lang } from '@/i18n';
@@ -17,9 +17,9 @@ if (existingCookie !== lang) {
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
   </head>
-  <body class="bg-white text-zinc-900">
+  <body class="base-layout__body">
     <SiteNav />
-    <main class="min-h-dvh">
+    <main class="base-layout__main">
       <slot />
     </main>
   </body>

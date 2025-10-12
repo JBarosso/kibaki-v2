@@ -37,12 +37,12 @@ function Avatar({ character }: { character: LiteCharacter }) {
         src={image_url}
         alt={name}
         loading="lazy"
-        className="h-10 w-10 shrink-0 rounded-lg object-cover"
+        className="user-vote-item__avatar"
       />
     );
   }
   return (
-    <div className="h-10 w-10 shrink-0 rounded-lg bg-gray-100 text-gray-400 grid place-items-center text-xs">
+    <div className="user-vote-item__avatar user-vote-item__avatar--placeholder">
       N/A
     </div>
   );
@@ -50,11 +50,11 @@ function Avatar({ character }: { character: LiteCharacter }) {
 
 function MiniCard({ character }: { character: LiteCharacter }) {
   return (
-    <div className="flex min-w-0 items-center gap-3 rounded-2xl border bg-white p-3 shadow-sm">
+    <div className="user-vote-item__card">
       <Avatar character={character} />
-      <div className="min-w-0">
-        <div className="truncate text-sm font-medium text-gray-900" title={character.name}>{character.name}</div>
-        <div className="text-xs text-gray-500">ELO: <span className="font-medium text-gray-700">{character.elo}</span></div>
+      <div className="user-vote-item__content">
+        <div className="user-vote-item__name" title={character.name}>{character.name}</div>
+        <div className="user-vote-item__elo">ELO: <span className="user-vote-item__elo-value">{character.elo}</span></div>
       </div>
     </div>
   );
@@ -62,13 +62,13 @@ function MiniCard({ character }: { character: LiteCharacter }) {
 
 export default function UserVoteItem({ vote }: { vote: UserVote }) {
   return (
-    <div className="flex flex-col gap-2 rounded-2xl">
-      <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3">
+    <div className="user-vote-item">
+      <div className="user-vote-item__comparison">
         <MiniCard character={vote.winner} />
-        <div className="text-xs sm:text-sm text-gray-500 px-1 select-none">defeated</div>
+        <div className="user-vote-item__vs">defeated</div>
         <MiniCard character={vote.loser} />
       </div>
-      <div className="text-[11px] sm:text-xs text-gray-400">{formatRelativeTime(vote.created_at)}</div>
+      <div className="user-vote-item__timestamp">{formatRelativeTime(vote.created_at)}</div>
     </div>
   );
 }

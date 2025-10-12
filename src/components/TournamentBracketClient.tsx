@@ -185,23 +185,23 @@ function TournamentBracketClientInner({ tournamentId }: Props) {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="tournament-bracket-client">
       {admin && (typeof finishNowTournament === 'function') && (
-        <div className="flex flex-wrap items-center gap-2">
-          <button onClick={doFinishNow} disabled={busy} className="rounded-md border px-3 py-1 text-sm hover:bg-gray-50 disabled:opacity-50">
+        <div className="tournament-bracket-client__admin-actions">
+          <button onClick={doFinishNow} disabled={busy} className={`tournament-bracket-client__action-button ${busy ? 'tournament-bracket-client__action-button--disabled' : ''}`}>
             {t('tournaments.finishNow')}
           </button>
-          <button onClick={doCancel} disabled={busy} className="rounded-md border px-3 py-1 text-sm hover:bg-gray-50 disabled:opacity-50">
+          <button onClick={doCancel} disabled={busy} className={`tournament-bracket-client__action-button ${busy ? 'tournament-bracket-client__action-button--disabled' : ''}`}>
             {t('tournaments.cancel')}
           </button>
-          <button onClick={doDelete} disabled={busy} className="rounded-md border px-3 py-1 text-sm hover:bg-gray-50 disabled:opacity-50">
+          <button onClick={doDelete} disabled={busy} className={`tournament-bracket-client__action-button ${busy ? 'tournament-bracket-client__action-button--disabled' : ''}`}>
             {t('tournaments.delete')}
           </button>
         </div>
       )}
 
       {bannerText && (
-        <div className="rounded border bg-gray-50 px-3 py-2 text-sm text-gray-800" aria-live="polite">
+        <div className="tournament-bracket-client__banner" aria-live="polite">
           {bannerText}
         </div>
       )}
