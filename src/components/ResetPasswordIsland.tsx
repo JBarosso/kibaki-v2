@@ -46,46 +46,48 @@ export default function ResetPasswordIsland() {
   };
 
   return (
-    <div className="max-w-md mx-auto p-6 rounded-2xl shadow border mt-6 bg-white">
-      {stage === 'waiting' && (
-        <p className="text-sm text-gray-600">En attente d'un lien de récupération valide…</p>
-      )}
+    <div className="reset-password">
+      <div className="reset-password__wrapper">
+        {stage === 'waiting' && (
+          <p className="reset-password__waiting">En attente d'un lien de récupération valide…</p>
+        )}
 
-      {stage === 'form' && (
-        <form onSubmit={onSubmit} className="space-y-3">
-          <input
-            className="w-full border rounded px-3 py-2"
-            type="password"
-            placeholder="Nouveau mot de passe"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-          <input
-            className="w-full border rounded px-3 py-2"
-            type="password"
-            placeholder="Confirmer le mot de passe"
-            value={confirm}
-            onChange={(e) => setConfirm(e.target.value)}
-            required
-          />
-          <button
-            className="w-full bg-black text-white rounded px-3 py-2 disabled:opacity-60"
-            disabled={submitting}
-          >
-            {submitting ? 'Mise à jour…' : 'Mettre à jour le mot de passe'}
-          </button>
-        </form>
-      )}
+        {stage === 'form' && (
+          <form onSubmit={onSubmit} className="reset-password__form">
+            <input
+              className="reset-password__input"
+              type="password"
+              placeholder="Nouveau mot de passe"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+            <input
+              className="reset-password__input"
+              type="password"
+              placeholder="Confirmer le mot de passe"
+              value={confirm}
+              onChange={(e) => setConfirm(e.target.value)}
+              required
+            />
+            <button
+              className={`reset-password__submit-button ${submitting ? 'reset-password__submit-button--disabled' : ''}`}
+              disabled={submitting}
+            >
+              {submitting ? 'Mise à jour…' : 'Mettre à jour le mot de passe'}
+            </button>
+          </form>
+        )}
 
-      {stage === 'success' && (
-        <div>
-          <p className="text-sm text-green-700">Mot de passe mis à jour avec succès.</p>
-          <a href="/account" className="inline-block mt-3 underline">Aller à mon compte</a>
-        </div>
-      )}
+        {stage === 'success' && (
+          <div className="reset-password__success">
+            <p className="reset-password__success-message">Mot de passe mis à jour avec succès.</p>
+            <a href="/account" className="reset-password__success-link">Aller à mon compte</a>
+          </div>
+        )}
 
-      {errorMsg && <p className="mt-3 text-sm text-red-600">{errorMsg}</p>}
+        {errorMsg && <p className="reset-password__error">{errorMsg}</p>}
+      </div>
     </div>
   );
 }

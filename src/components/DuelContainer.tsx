@@ -22,7 +22,7 @@ import { db } from '@/lib/kibakiDB';
 import { FadeTransition, TransitionWrapper } from '@/components/TransitionWrapper';
 import { SkeletonDuel } from '@/components/SkeletonCard';
 import { useLoadingState } from '@/hooks/useLoadingState';
-import { animationClasses, getPrefersReducedMotion } from '@/lib/animations';
+import { getPrefersReducedMotion } from '@/lib/animations';
 import { I18nProvider, useI18n, type Lang } from '@/i18n';
 
 type LoadState = 'idle' | 'loading' | 'ready' | 'error';
@@ -921,9 +921,7 @@ function DuelContainerInner(_: { lang: Lang }) {
             {loadingState.progress !== undefined && (
               <div className="duel-container__progress">
                 <div
-                  className={`duel-container__progress-bar ${
-                    reducedMotion ? '' : 'ease-out'
-                  }`}
+                  className={`duel-container__progress-bar ${reducedMotion ? '' : 'duel-container__progress-bar--animated'}`}
                   style={{ width: `${loadingState.progress}%` }}
                 />
               </div>
@@ -937,13 +935,13 @@ function DuelContainerInner(_: { lang: Lang }) {
   if (state === 'error') {
     return (
       <FadeTransition show={true}>
-        <div className={`duel-container__error ${animationClasses.error}`}>
-          <div className="duel-container__error">
+        <div className="duel-container__error">
+          <div className="duel-container__error-message">
             <span className="duel-container__error-icon">⚠️</span>
             <span>{error ?? t('duel.error')}</span>
           </div>
           {loadingState.error && (
-            <div className="duel-container__error">
+            <div className="duel-container__error-details">
               {loadingState.error}
             </div>
           )}
@@ -983,23 +981,37 @@ function DuelContainerInner(_: { lang: Lang }) {
   const rightView = getCharacterText(right);
 
   const getCardAnimationClasses = (characterId: number) => {
-    const baseTransition = reducedMotion ? '' : 'transform transition-all duration-300';
+    const classes: string[] = [];
+
+    classes.push('duel-container__card');
+
+    if (!reducedMotion) {
+      classes.push('duel-container__card-transition');
+    }
 
     if (optimisticVote.winnerId === characterId) {
       switch (optimisticVote.status) {
         case 'pending':
-          return `${baseTransition} ${reducedMotion ? 'ring-4 ring-green-500 ring-opacity-50' : 'scale-105 ring-4 ring-green-500 ring-opacity-50 animate-pulse'}`;
+          classes.push('duel-container__card--pending');
+          break;
         case 'success':
-          return `${baseTransition} ${reducedMotion ? 'ring-4 ring-green-500 ring-opacity-75' : 'scale-105 ring-4 ring-green-500 ring-opacity-75'}`;
+          classes.push('duel-container__card--success');
+          break;
         case 'error':
-          return `${baseTransition} ${reducedMotion ? 'ring-4 ring-red-500 ring-opacity-50' : 'animate-shake ring-4 ring-red-500 ring-opacity-50'}`;
+          classes.push('duel-container__card--error');
+          break;
         default:
-          return '';
+          break;
       }
-    } else if (optimisticVote.winnerId && optimisticVote.winnerId !== characterId && optimisticVote.status === 'pending') {
-      return reducedMotion ? 'opacity-50' : 'opacity-50 scale-95 transition-all duration-300';
+    } else if (
+      optimisticVote.winnerId &&
+      optimisticVote.winnerId !== characterId &&
+      optimisticVote.status === 'pending'
+    ) {
+      classes.push('duel-container__card--inactive');
     }
-    return '';
+
+    return classes.join(' ');
   };
 
   const getButtonClasses = (characterId: number) => {
@@ -1037,7 +1049,7 @@ function DuelContainerInner(_: { lang: Lang }) {
         <TransitionWrapper
           show={!isTransitioning}
           duration="normal"
-          className={reducedMotion ? '' : 'transform transition-all duration-300'}
+          className="duel-container__cards-transition"
         >
           <div className="duel-container__cards-grid">
             <div className="duel-container__card-column">
@@ -1080,17 +1092,13 @@ function DuelContainerInner(_: { lang: Lang }) {
           <div className="duel-container__actions">
             <button
               onClick={skip}
-              className={`duel-container__action-button ${animationClasses.interactive} ${
-                reducedMotion ? '' : 'hover:scale-105'
-              }`}
+              className={`duel-container__action-button ${reducedMotion ? '' : 'duel-container__action-button--animated'}`}
             >
               {t('duel.skip')}
             </button>
             <button
               onClick={resetPairs}
-              className={`duel-container__action-button ${animationClasses.interactive} ${
-                reducedMotion ? '' : 'hover:scale-105'
-              }`}
+              className={`duel-container__action-button ${reducedMotion ? '' : 'duel-container__action-button--animated'}`}
             >
               {t('duel.resetPairs')}
             </button>

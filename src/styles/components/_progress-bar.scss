@@ -41,6 +41,10 @@
     &--indeterminate {
 
     }
+
+    &--animated {
+
+    }
   }
 
   &--sm {
@@ -60,6 +64,10 @@
 
   &__svg {
 
+    &--animated {
+
+    }
+
     &--spinning {
 
     }
@@ -71,6 +79,13 @@
 
   &__circle {
 
+    &--animated {
+
+    }
+
+    &--indeterminate {
+
+    }
   }
 
   &__percentage {
@@ -82,6 +97,9 @@
 
   &__ring {
 
+    &--animated {
+
+    }
   }
 
   &--sm {
@@ -116,6 +134,10 @@
 .loading-dots {
 
   &__dot {
+
+    &--animated {
+
+    }
 
     &--1 {
 
@@ -163,6 +185,9 @@
 
   &__step {
 
+    &--animated {
+
+    }
   }
 
   &__indicator {

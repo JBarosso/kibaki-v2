@@ -21,8 +21,8 @@ export function TransitionWrapper({
   duration = 'normal',
   unmountOnExit = false,
   className = '',
-  enter = 'opacity-100',
-  exit = 'opacity-0',
+  enter = 'transition-wrapper--enter',
+  exit = 'transition-wrapper--exit',
   onEnter,
   onExit,
   onEntered,
@@ -97,11 +97,17 @@ export function TransitionWrapper({
       };
 
   const visibilityClass = isVisible ? enter : exit;
-  const pointerEvents = isVisible ? '' : 'pointer-events-none';
+  const inactiveClass = isVisible ? '' : 'transition-wrapper--inactive';
+  const combinedClassName = [
+    'transition-wrapper',
+    className,
+    visibilityClass,
+    inactiveClass
+  ].filter(Boolean).join(' ').trim();
 
   return (
     <div
-      className={`${className} ${visibilityClass} ${pointerEvents}`}
+      className={combinedClassName}
       style={transitionStyle}
     >
       {children}
@@ -130,8 +136,8 @@ export function FadeTransition({
       duration={duration}
       unmountOnExit={unmountOnExit}
       className={className}
-      enter="opacity-100"
-      exit="opacity-0"
+      enter="transition-wrapper--fade-enter"
+      exit="transition-wrapper--fade-exit"
     >
       {children}
     </TransitionWrapper>
@@ -156,10 +162,10 @@ export function SlideTransition({
   className = ''
 }: SlideTransitionProps) {
   const transforms = {
-    up: { enter: 'translate-y-0 opacity-100', exit: 'translate-y-4 opacity-0' },
-    down: { enter: 'translate-y-0 opacity-100', exit: '-translate-y-4 opacity-0' },
-    left: { enter: 'translate-x-0 opacity-100', exit: 'translate-x-4 opacity-0' },
-    right: { enter: 'translate-x-0 opacity-100', exit: '-translate-x-4 opacity-0' }
+    up: { enter: 'transition-wrapper--slide-up-enter', exit: 'transition-wrapper--slide-up-exit' },
+    down: { enter: 'transition-wrapper--slide-down-enter', exit: 'transition-wrapper--slide-down-exit' },
+    left: { enter: 'transition-wrapper--slide-left-enter', exit: 'transition-wrapper--slide-left-exit' },
+    right: { enter: 'transition-wrapper--slide-right-enter', exit: 'transition-wrapper--slide-right-exit' }
   };
 
   const { enter, exit } = transforms[direction];
@@ -199,8 +205,8 @@ export function ScaleTransition({
       duration={duration}
       unmountOnExit={unmountOnExit}
       className={className}
-      enter="scale-100 opacity-100"
-      exit="scale-95 opacity-0"
+      enter="transition-wrapper--scale-enter"
+      exit="transition-wrapper--scale-exit"
     >
       {children}
     </TransitionWrapper>
@@ -254,17 +260,18 @@ export function StaggeredTransition({
 }: StaggeredTransitionProps) {
   const reducedMotion = getPrefersReducedMotion();
   const effectiveDelay = reducedMotion ? 0 : staggerDelay;
+  const containerClassName = ['staggered-transition', className].filter(Boolean).join(' ').trim();
 
   return (
-    <div className={className}>
+    <div className={containerClassName}>
       {children.map((child, index) => (
         <TransitionWrapper
           key={index}
           show={show}
           duration={duration}
-          className="transition-all"
-          enter="opacity-100 translate-y-0"
-          exit="opacity-0 translate-y-2"
+          className="staggered-transition__item"
+          enter="transition-wrapper--slide-up-enter"
+          exit="transition-wrapper--slide-up-exit"
         >
           <div
             style={{

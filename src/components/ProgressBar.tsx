@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getPrefersReducedMotion, getAnimationDuration, animationClasses } from '@/lib/animations';
+import { getPrefersReducedMotion, getAnimationDuration } from '@/lib/animations';
 
 export interface ProgressBarProps {
   progress: number; // 0-100
@@ -56,14 +56,27 @@ export function ProgressBar({
   const safeProgress = Math.max(0, Math.min(100, displayProgress));
   const progressStyle = !indeterminate ? { width: `${safeProgress}%` } : {};
 
-  const barClass = `
-    progress-bar__fill progress-bar__fill--${color} progress-bar--${size}
-    ${reducedMotion ? '' : 'transition-all duration-300 ease-out'}
-    ${indeterminate && !reducedMotion ? 'progress-bar__fill--indeterminate' : ''}
-  `;
+  const containerClassName = [
+    'progress-bar',
+    `progress-bar--${size}`,
+    className
+  ].filter(Boolean).join(' ').trim();
+
+  const fillClasses = [
+    'progress-bar__fill',
+    `progress-bar__fill--${color}`
+  ];
+
+  if (!reducedMotion) {
+    fillClasses.push('progress-bar__fill--animated');
+  }
+
+  if (indeterminate) {
+    fillClasses.push('progress-bar__fill--indeterminate');
+  }
 
   return (
-    <div className={`progress-bar ${className}`}>
+    <div className={containerClassName}>
       {/* Label and percentage */}
       {(label || showPercentage) && (
         <div className="progress-bar__header">
@@ -75,10 +88,10 @@ export function ProgressBar({
       )}
 
       {/* Progress track */}
-      <div className={`progress-bar__track progress-bar--${size}`}>
+      <div className="progress-bar__track">
         {/* Progress fill */}
         <div
-          className={barClass}
+          className={fillClasses.join(' ')}
           style={progressStyle}
           role="progressbar"
           aria-valuenow={indeterminate ? undefined : Math.round(safeProgress)}
@@ -116,18 +129,28 @@ export function CircularProgress({
   const safeProgress = Math.max(0, Math.min(100, progress));
   const strokeDashoffset = circumference - (safeProgress / 100) * circumference;
 
+  const containerClassName = ['circular-progress', className].filter(Boolean).join(' ').trim();
+  const svgClasses = ['circular-progress__svg'];
+
+  if (!reducedMotion) {
+    svgClasses.push('circular-progress__svg--animated');
+  }
+
+  if (indeterminate && !reducedMotion) {
+    svgClasses.push('circular-progress__svg--spinning');
+  }
+
   return (
-    <div className={`relative ${className}`} style={{ width: size, height: size }}>
+    <div className={containerClassName} style={{ width: size, height: size }}>
       <svg
-        className={`${reducedMotion ? '' : 'transition-transform duration-300'} ${
-          indeterminate && !reducedMotion ? 'animate-spin' : ''
-        }`}
+        className={svgClasses.join(' ')}
         width={size}
         height={size}
         style={{ transform: 'rotate(-90deg)' }}
       >
         {/* Background circle */}
         <circle
+          className="circular-progress__background"
           cx={size / 2}
           cy={size / 2}
           r={radius}
@@ -138,6 +161,11 @@ export function CircularProgress({
 
         {/* Progress circle */}
         <circle
+          className={[
+            'circular-progress__circle',
+            !reducedMotion ? 'circular-progress__circle--animated' : '',
+            indeterminate ? 'circular-progress__circle--indeterminate' : ''
+          ].filter(Boolean).join(' ')}
           cx={size / 2}
           cy={size / 2}
           r={radius}
@@ -147,16 +175,13 @@ export function CircularProgress({
           strokeDasharray={circumference}
           strokeDashoffset={indeterminate ? circumference * 0.75 : strokeDashoffset}
           strokeLinecap="round"
-          className={reducedMotion ? '' : 'transition-all duration-300 ease-out'}
         />
       </svg>
 
       {/* Percentage display */}
       {showPercentage && !indeterminate && (
-        <div className="absolute inset-0 flex items-center justify-center">
-          <span className="text-xs font-medium text-gray-600">
-            {Math.round(safeProgress)}%
-          </span>
+        <div className="circular-progress__percentage">
+          <span>{Math.round(safeProgress)}%</span>
         </div>
       )}
     </div>
@@ -176,31 +201,21 @@ export function LoadingSpinner({
 }: LoadingSpinnerProps) {
   const reducedMotion = getPrefersReducedMotion();
 
-  const sizeClasses = {
-    sm: 'w-4 h-4',
-    md: 'w-6 h-6',
-    lg: 'w-8 h-8'
-  };
+  const spinnerClassName = [
+    'loading-spinner',
+    `loading-spinner--${size}`,
+    `loading-spinner--${color}`,
+    className
+  ].filter(Boolean).join(' ').trim();
 
-  const colorClasses = {
-    blue: 'text-blue-500',
-    green: 'text-green-500',
-    red: 'text-red-500',
-    gray: 'text-gray-500'
-  };
-
-  if (reducedMotion) {
-    // Static indicator for users who prefer reduced motion
-    return (
-      <div className={`${sizeClasses[size]} ${colorClasses[color]} ${className}`}>
-        <div className="w-full h-full rounded-full border-2 border-current border-t-transparent" />
-      </div>
-    );
-  }
+  const ringClassName = [
+    'loading-spinner__ring',
+    !reducedMotion ? 'loading-spinner__ring--animated' : ''
+  ].filter(Boolean).join(' ').trim();
 
   return (
-    <div className={`${sizeClasses[size]} ${colorClasses[color]} ${className}`}>
-      <div className="w-full h-full rounded-full border-2 border-current border-t-transparent animate-spin" />
+    <div className={spinnerClassName}>
+      <div className={ringClassName} />
     </div>
   );
 }
@@ -218,36 +233,27 @@ export function LoadingDots({
 }: LoadingDotsProps) {
   const reducedMotion = getPrefersReducedMotion();
 
-  const sizeClasses = {
-    sm: 'w-1 h-1',
-    md: 'w-2 h-2',
-    lg: 'w-3 h-3'
-  };
+  const containerClassName = [
+    'loading-dots',
+    `loading-dots--${size}`,
+    `loading-dots--${color}`,
+    className
+  ].filter(Boolean).join(' ').trim();
 
-  const colorClasses = {
-    blue: 'bg-blue-500',
-    green: 'bg-green-500',
-    red: 'bg-red-500',
-    gray: 'bg-gray-500'
-  };
-
-  const dotClass = `${sizeClasses[size]} ${colorClasses[color]} rounded-full`;
-
-  if (reducedMotion) {
-    return (
-      <div className={`flex space-x-1 ${className}`}>
-        <div className={dotClass} />
-        <div className={dotClass} />
-        <div className={dotClass} />
-      </div>
-    );
-  }
+  const baseDotClass = [
+    'loading-dots__dot',
+    !reducedMotion ? 'loading-dots__dot--animated' : ''
+  ].filter(Boolean).join(' ').trim();
 
   return (
-    <div className={`flex space-x-1 ${className}`}>
-      <div className={`${dotClass} animate-bounce`} style={{ animationDelay: '0ms' }} />
-      <div className={`${dotClass} animate-bounce`} style={{ animationDelay: '150ms' }} />
-      <div className={`${dotClass} animate-bounce`} style={{ animationDelay: '300ms' }} />
+    <div className={containerClassName}>
+      {[0, 1, 2].map((index) => (
+        <div
+          key={index}
+          className={`${baseDotClass} loading-dots__dot--${index + 1}`}
+          style={!reducedMotion ? { animationDelay: `${index * 150}ms` } : undefined}
+        />
+      ))}
     </div>
   );
 }
@@ -266,47 +272,49 @@ export function ProgressSteps({
   className = ''
 }: ProgressStepsProps) {
   const reducedMotion = getPrefersReducedMotion();
+  const containerClassName = ['progress-steps', className].filter(Boolean).join(' ').trim();
 
   return (
-    <div className={`space-y-4 ${className}`}>
+    <div className={containerClassName}>
       {steps.map((step, index) => {
         const isCompleted = completedSteps.includes(index);
         const isCurrent = index === currentStep;
         const isPending = index > currentStep && !isCompleted;
 
+        const stepClasses = [
+          'progress-steps__step',
+          !reducedMotion ? 'progress-steps__step--animated' : ''
+        ].filter(Boolean).join(' ').trim();
+
+        const indicatorClasses = ['progress-steps__indicator'];
+        if (isCompleted) {
+          indicatorClasses.push('progress-steps__indicator--completed');
+        } else if (isCurrent) {
+          indicatorClasses.push('progress-steps__indicator--current');
+        } else if (isPending) {
+          indicatorClasses.push('progress-steps__indicator--pending');
+        }
+
+        const labelClasses = ['progress-steps__label'];
+        if (isCompleted) {
+          labelClasses.push('progress-steps__label--completed');
+        }
+        if (isCurrent) {
+          labelClasses.push('progress-steps__label--current');
+        }
+        if (isPending) {
+          labelClasses.push('progress-steps__label--pending');
+        }
+
         return (
-          <div
-            key={index}
-            className={`flex items-center space-x-3 ${
-              reducedMotion ? '' : 'transition-all duration-300'
-            }`}
-          >
+          <div key={index} className={stepClasses}>
             {/* Step indicator */}
-            <div
-              className={`
-                flex items-center justify-center w-8 h-8 rounded-full text-sm font-medium
-                ${
-                  isCompleted
-                    ? 'bg-green-500 text-white'
-                    : isCurrent
-                    ? 'bg-blue-500 text-white'
-                    : 'bg-gray-200 text-gray-600'
-                }
-                ${reducedMotion ? '' : 'transition-colors duration-300'}
-              `}
-            >
+            <div className={indicatorClasses.join(' ')}>
               {isCompleted ? '✓' : index + 1}
             </div>
 
             {/* Step label */}
-            <span
-              className={`
-                ${isCurrent ? 'text-blue-600 font-medium' : ''}
-                ${isCompleted ? 'text-green-600' : ''}
-                ${isPending ? 'text-gray-500' : ''}
-                ${reducedMotion ? '' : 'transition-colors duration-300'}
-              `}
-            >
+            <span className={labelClasses.join(' ')}>
               {step}
             </span>
           </div>

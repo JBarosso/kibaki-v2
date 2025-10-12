@@ -43,10 +43,10 @@ export default function ForgotIsland() {
   };
 
   return (
-    <div className="max-w-md mx-auto p-6 rounded-2xl shadow border mt-6 bg-white">
-      <form onSubmit={onSubmit} className="space-y-3">
+    <div className="forgot-island">
+      <form onSubmit={onSubmit} className="forgot-island__form">
         <input
-          className="w-full border rounded px-3 py-2"
+          className="forgot-island__input"
           type="email"
           placeholder="Email"
           value={email}
@@ -54,14 +54,14 @@ export default function ForgotIsland() {
           required
         />
         <button
-          className="w-full bg-black text-white rounded px-3 py-2 disabled:opacity-60"
+          className={`forgot-island__submit-button ${submitting ? 'forgot-island__submit-button--disabled' : ''}`}
           disabled={submitting}
         >
           {submitting ? 'Envoi…' : 'Envoyer le lien'}
         </button>
       </form>
-      {message && <p className="mt-3 text-sm text-green-700">{message}</p>}
-      {errorMsg && <p className="mt-3 text-sm text-red-600">{errorMsg}</p>}
+      {message && <p className="forgot-island__message">{message}</p>}
+      {errorMsg && <p className="forgot-island__error">{errorMsg}</p>}
     </div>
   );
 }

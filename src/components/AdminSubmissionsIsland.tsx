@@ -160,104 +160,125 @@ export default function AdminSubmissionsIsland() {
   };
 
   if (loading) {
-    return <div className="p-6 text-sm text-gray-500">Chargement…</div>;
+    return (
+      <div className="admin-submissions">
+        <div className="admin-submissions__loading">Chargement…</div>
+      </div>
+    );
   }
 
   if (forbidden) {
     return (
-      <div className="mx-auto max-w-3xl p-6 mt-8 rounded-2xl border bg-white">
-        <h2 className="text-xl font-semibold">403 — Accès refusé</h2>
-        <p className="mt-2 text-sm text-gray-700">Cette page est réservée aux administrateurs.</p>
-        <a className="mt-4 inline-flex items-center justify-center rounded border px-3 py-2" href="/">Retour à l'accueil</a>
+      <div className="admin-submissions">
+        <div className="admin-submissions__forbidden">
+          <h2 className="admin-submissions__forbidden-title">403 — Accès refusé</h2>
+          <p className="admin-submissions__forbidden-message">Cette page est réservée aux administrateurs.</p>
+          <a className="admin-submissions__forbidden-link" href="/">Retour à l'accueil</a>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="mx-auto max-w-4xl p-4">
-      <h2 className="mb-3 text-xl font-bold">Soumissions en attente</h2>
-      {errorMsg ? (
-        <div className="mb-3 rounded border border-red-200 bg-red-50 p-3 text-sm text-red-700">{errorMsg}</div>
-      ) : null}
-      {lastSuccessMsg ? (
-        <div className="mb-3 rounded border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-800">{lastSuccessMsg}</div>
-      ) : null}
+    <div className="admin-submissions">
+      <div className="admin-submissions__wrapper">
+        <h2 className="admin-submissions__title">Soumissions en attente</h2>
+        {errorMsg ? (
+          <div className="admin-submissions__error">{errorMsg}</div>
+        ) : null}
+        {lastSuccessMsg ? (
+          <div className="admin-submissions__success">{lastSuccessMsg}</div>
+        ) : null}
 
-      {submissions.length === 0 ? (
-        <div className="rounded-2xl border bg-white p-6 text-sm text-gray-600">Aucune soumission en attente.</div>
-      ) : (
-        <div className="space-y-4">
-          {submissions.map((s) => {
-            const label = s.username ? `@${s.username}` : (s.user_id ? `${s.user_id.slice(0, 8)}…` : '—');
-            return (
-              <div key={s.id} className="rounded-2xl border bg-white p-4 shadow-sm">
-                <div className="flex flex-wrap items-start justify-between gap-3">
-                  <div className="flex items-start gap-3">
-                    {isSafeImageUrl(s.image_url) && (
-                      <img
-                        src={s.image_url!}
-                        alt={s.character_name ?? 'image'}
-                        className="h-16 w-16 rounded-md object-cover border"
-                        loading="lazy"
-                        decoding="async"
-                        referrerPolicy="no-referrer"
-                        onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
-                      />
-                    )}
-                    <div>
-                      <div className="text-sm text-gray-500">#{s.id} • {new Date(s.created_at).toLocaleString()}</div>
-                      <div className="mt-1 text-base font-semibold">{s.character_name}</div>
-                      <div className="mt-1 text-sm text-gray-700">{s.description}</div>
-                      <div className="mt-1 text-xs text-gray-500">
-                        Utilisateur: {s.username ? (
-                          <a href={`/u/${encodeURIComponent(s.username)}`} className="text-gray-600 hover:underline">{label}</a>
-                        ) : (
-                          <span className="text-gray-500">{label}</span>
-                        )}
-                        {s.universe_id ? ` • Univers #${s.universe_id}` : ''}
-                        {s.proposed_universe ? ` • Proposé: ${s.proposed_universe}` : ''}
-                      </div>
-                      {s.image_url ? (
-                        <div className="mt-2">
-                          <a className="text-xs underline" href={s.image_url} target="_blank" rel="noreferrer">Voir l'image</a>
+        {submissions.length === 0 ? (
+          <div className="admin-submissions__empty">Aucune soumission en attente.</div>
+        ) : (
+          <div className="admin-submissions__list">
+            {submissions.map((s) => {
+              const label = s.username ? `@${s.username}` : (s.user_id ? `${s.user_id.slice(0, 8)}…` : '—');
+              return (
+                <div key={s.id} className="admin-submissions__item">
+                  <div className="admin-submissions__item-content">
+                    <div className="admin-submissions__item-left">
+                      {isSafeImageUrl(s.image_url) && (
+                        <img
+                          src={s.image_url!}
+                          alt={s.character_name ?? 'image'}
+                          className="admin-submissions__item-image"
+                          loading="lazy"
+                          decoding="async"
+                          referrerPolicy="no-referrer"
+                          onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
+                        />
+                      )}
+                      <div className="admin-submissions__item-info">
+                        <div className="admin-submissions__item-id">#{s.id} • {new Date(s.created_at).toLocaleString()}</div>
+                        <div className="admin-submissions__item-name">{s.character_name}</div>
+                        <div className="admin-submissions__item-description">{s.description}</div>
+                        <div className="admin-submissions__item-meta">
+                          Utilisateur:{' '}
+                          {s.username ? (
+                            <a
+                              href={`/u/${encodeURIComponent(s.username)}`}
+                              className="admin-submissions__item-username-link"
+                            >
+                              {label}
+                            </a>
+                          ) : (
+                            <span className="admin-submissions__item-username">{label}</span>
+                          )}
+                          {s.universe_id ? ` • Univers #${s.universe_id}` : ''}
+                          {s.proposed_universe ? ` • Proposé: ${s.proposed_universe}` : ''}
                         </div>
-                      ) : null}
+                        {s.image_url ? (
+                          <div className="admin-submissions__item-image-link">
+                            <a
+                              className="admin-submissions__item-username-link"
+                              href={s.image_url}
+                              target="_blank"
+                              rel="noreferrer"
+                            >
+                              Voir l'image
+                            </a>
+                          </div>
+                        ) : null}
+                      </div>
                     </div>
-                  </div>
 
-                  <div className="w-full sm:w-64">
-                    <label className="block text-xs font-medium text-gray-600">Notes de revue (optionnel)</label>
-                    <textarea
-                      className="mt-1 w-full rounded border px-2 py-2 text-sm"
-                      rows={3}
-                      placeholder="Notes internes…"
-                      value={notesById[s.id] ?? (s.review_notes ?? '')}
-                      onChange={(e) => setNoteFor(s.id, e.target.value)}
-                      disabled={processingId === s.id}
-                    />
-                    <div className="mt-2 flex gap-2">
-                      <button
-                        className="inline-flex items-center justify-center rounded bg-black px-3 py-2 text-white disabled:opacity-60"
-                        onClick={() => onAccept(s)}
+                    <div className="admin-submissions__item-right">
+                      <label className="admin-submissions__notes-label">Notes de revue (optionnel)</label>
+                      <textarea
+                        className={`admin-submissions__notes-textarea ${processingId === s.id ? 'admin-submissions__notes-textarea--disabled' : ''}`}
+                        rows={3}
+                        placeholder="Notes internes…"
+                        value={notesById[s.id] ?? (s.review_notes ?? '')}
+                        onChange={(e) => setNoteFor(s.id, e.target.value)}
                         disabled={processingId === s.id}
-                      >
-                        {processingId === s.id ? 'Patientez…' : 'Accepter'}
-                      </button>
-                      <button
-                        className="inline-flex items-center justify-center rounded border px-3 py-2 disabled:opacity-60"
-                        onClick={() => onReject(s)}
-                        disabled={processingId === s.id}
-                      >
-                        {processingId === s.id ? 'Patientez…' : 'Rejeter'}
-                      </button>
+                      />
+                      <div className="admin-submissions__item-actions">
+                        <button
+                          className={`admin-submissions__accept-button ${processingId === s.id ? 'admin-submissions__accept-button--disabled' : ''}`}
+                          onClick={() => onAccept(s)}
+                          disabled={processingId === s.id}
+                        >
+                          {processingId === s.id ? 'Patientez…' : 'Accepter'}
+                        </button>
+                        <button
+                          className={`admin-submissions__reject-button ${processingId === s.id ? 'admin-submissions__reject-button--disabled' : ''}`}
+                          onClick={() => onReject(s)}
+                          disabled={processingId === s.id}
+                        >
+                          {processingId === s.id ? 'Patientez…' : 'Rejeter'}
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            );
-          })}
-        </div>
-      )}
+              );
+            })}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

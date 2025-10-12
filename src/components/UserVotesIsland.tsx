@@ -31,12 +31,16 @@ export default function UserVotesIsland({ username }: { username: string }) {
 
   if (loading) {
     return (
-      <div className="space-y-4">
-        <div className="h-10 w-44 animate-pulse rounded bg-gray-200" />
-        <div className="space-y-3">
-          <div className="h-20 animate-pulse rounded-2xl bg-gray-200" />
-          <div className="h-20 animate-pulse rounded-2xl bg-gray-200" />
-          <div className="h-20 animate-pulse rounded-2xl bg-gray-200" />
+      <div className="user-votes-island">
+        <div className="user-votes-island__loading">
+          <div className="user-votes-island__skeleton">
+            <div className="user-votes-island__skeleton-item" />
+          </div>
+          <div className="user-votes-island__skeleton">
+            <div className="user-votes-island__skeleton-item" />
+            <div className="user-votes-island__skeleton-item" />
+            <div className="user-votes-island__skeleton-item" />
+          </div>
         </div>
       </div>
     );
@@ -44,11 +48,17 @@ export default function UserVotesIsland({ username }: { username: string }) {
 
   if (error) {
     return (
-      <div className="rounded-2xl border bg-white p-4 text-sm text-red-600">{error}</div>
+      <div className="user-votes-island">
+        <div className="user-votes-island__error">{error}</div>
+      </div>
     );
   }
 
-  return <UserVotesList votes={votes ?? []} username={username} />;
+  return (
+    <div className="user-votes-island">
+      <UserVotesList votes={votes ?? []} username={username} />
+    </div>
+  );
 }
 
 
