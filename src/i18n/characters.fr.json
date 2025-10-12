@@ -1,39 +1,802 @@
 {
-  "_comment": "TODO : compléter les traductions restantes en utilisant scripts/build-translation-skeleton.ts comme référence.",
+  "abraham-lincoln": {
+    "name": "Abraham Lincoln",
+    "description": "Président américain qui guida une nation à travers la guerre civile."
+  },
   "achilles": {
     "name": "Achille",
-    "description": "Héros de la guerre de Troie, presque invincible."
+    "description": "Plus grand guerrier grec de la guerre de Troie ; quasi-invulnérable."
   },
-  "medusa": {
-    "name": "Méduse",
-    "description": "Gorgone dont le regard change les curieux en pierre."
+  "ada-lovelace": {
+    "name": "Ada Lovelace",
+    "description": "Visionnaire de l'informatique et des machines analytiques."
   },
-  "robin-hood": {
-    "name": "Robin des Bois",
-    "description": "Hors-la-loi archer qui vole aux riches pour aider les pauvres."
+  "aladdin": {
+    "name": "Aladdin",
+    "description": "Jeune rusé dont le destin bascule avec une lampe magique."
   },
-  "king-arthur": {
-    "name": "Roi Arthur",
-    "description": "Souverain légendaire de Camelot et chef des chevaliers de la Table ronde."
+  "alan-turing": {
+    "name": "Alan Turing",
+    "description": "Penseur fondateur de l'informatique et du décryptage."
   },
-  "merlin": {
-    "name": "Merlin",
-    "description": "Mage énigmatique et conseiller du roi Arthur."
+  "alexander-the-great": {
+    "name": "Alexandre le Grand",
+    "description": "Conquérant macédonien qui forgea un vaste empire."
+  },
+  "ali-baba": {
+    "name": "Ali Baba",
+    "description": "Homme humble qui découvre la caverne aux trésors des brigands."
+  },
+  "alice": {
+    "name": "Alice",
+    "description": "Jeune fille curieuse qui dégringole au Pays des Merveilles."
+  },
+  "amaterasu": {
+    "name": "Amaterasu",
+    "description": "Déesse shinto du soleil qui apporte la lumière au monde."
+  },
+  "anubis": {
+    "name": "Anubis",
+    "description": "Gardien à tête de chacal des tombeaux et de l'embaumement."
+  },
+  "apollo": {
+    "name": "Apollon",
+    "description": "Dieu grec de la lumière, de la musique et de la prophétie."
+  },
+  "archimedes": {
+    "name": "Archimède",
+    "description": "Mathématicien de Syracuse et inventeur génial."
+  },
+  "ares": {
+    "name": "Arès",
+    "description": "Dieu grec de la guerre et de la frénésie du combat."
+  },
+  "aristotle": {
+    "name": "Aristote",
+    "description": "Philosophe polymorphe façonnant logique, éthique et science."
+  },
+  "artemis": {
+    "name": "Artémis",
+    "description": "Déesse grecque de la chasse et de la lune."
+  },
+  "atalanta": {
+    "name": "Atalante",
+    "description": "Chasseresse grecque rapide, célèbre pour sa vitesse et son habileté."
+  },
+  "athena": {
+    "name": "Athéna",
+    "description": "Déesse grecque de la sagesse, de la stratégie et des arts."
+  },
+  "atlas": {
+    "name": "Atlas",
+    "description": "Titan condamné à porter les cieux sur ses épaules."
+  },
+  "augustus": {
+    "name": "Auguste",
+    "description": "Premier empereur romain ; architecte de la Pax Romana."
+  },
+  "baba-yaga": {
+    "name": "Baba Yaga",
+    "description": "Sorcière slave vivant dans une hutte sur pattes de poulet."
+  },
+  "baldr": {
+    "name": "Baldr",
+    "description": "Dieu nordique bien-aimé de la lumière et de la pureté."
+  },
+  "banshee": {
+    "name": "Banshee",
+    "description": "Messagère gémissante du chagrin et du trépas."
+  },
+  "basilisk": {
+    "name": "Basilic",
+    "description": "Roi serpent dont le regard et le souffle sont mortels."
+  },
+  "bastet": {
+    "name": "Bastet",
+    "description": "Déesse féline égyptienne de la grâce et de la protection."
+  },
+  "beauty": {
+    "name": "La Belle",
+    "description": "Héroïne généreuse dont la compassion transforme les maudits."
+  },
+  "benjamin-franklin": {
+    "name": "Benjamin Franklin",
+    "description": "Diplomate et inventeur touche-à-tout de la foudre."
+  },
+  "beowulf": {
+    "name": "Beowulf",
+    "description": "Héros de l'épopée vieil-anglaise ; tueur de monstres."
+  },
+  "bigfoot": {
+    "name": "Bigfoot",
+    "description": "Habitant insaisissable des forêts, sujet de légendes."
+  },
+  "bluebeard": {
+    "name": "Barbe-Bleue",
+    "description": "Mari sinistre cachant un terrible secret."
+  },
+  "captain-ahab": {
+    "name": "Capitaine Achab",
+    "description": "Capitaine baleinier obsédé poursuivant un léviathan blanc."
+  },
+  "cerberus": {
+    "name": "Cerbère",
+    "description": "Chien à trois têtes gardant la porte des enfers."
+  },
+  "charlemagne": {
+    "name": "Charlemagne",
+    "description": "Roi franc et premier empereur du Saint-Empire romain."
+  },
+  "cheshire-cat": {
+    "name": "Chat du Cheshire",
+    "description": "Félin souriant qui apparaît et disparaît à volonté."
+  },
+  "chimera": {
+    "name": "Chimère",
+    "description": "Bête composite crachant le feu et la terreur."
+  },
+  "cinderella": {
+    "name": "Cendrillon",
+    "description": "Héroïne endurante dont la fortune bascule à minuit."
+  },
+  "cleopatra": {
+    "name": "Cléopâtre",
+    "description": "Dernière souveraine active de l'Égypte ptolémaïque ; diplomate et polyglotte."
+  },
+  "confucius": {
+    "name": "Confucius",
+    "description": "Maître chinois du rituel, de la vertu et de la bonne gouvernance."
+  },
+  "cowardly-lion": {
+    "name": "Lion Peureux",
+    "description": "Lion timide apprenant le véritable courage."
+  },
+  "cyclops": {
+    "name": "Cyclope",
+    "description": "Géant à un œil d'habileté et d'appétit considérables."
+  },
+  "dante-alighieri": {
+    "name": "Dante Alighieri",
+    "description": "Poète de la *Divine Comédie* et voix de l'Italie."
+  },
+  "demeter": {
+    "name": "Déméter",
+    "description": "Déesse grecque de l'agriculture et des moissons."
+  },
+  "dionysus": {
+    "name": "Dionysos",
+    "description": "Dieu grec du vin, de l'extase et du théâtre."
+  },
+  "doctor-faustus": {
+    "name": "Docteur Faust",
+    "description": "Érudit qui troque son âme contre le savoir."
+  },
+  "don-quixote": {
+    "name": "Don Quichotte",
+    "description": "Chevalier errant idéaliste se battant contre des moulins."
+  },
+  "dorothy-gale": {
+    "name": "Dorothy Gale",
+    "description": "Voyageuse du Kansas parcourant le pays d'Oz."
+  },
+  "dr-jekyll": {
+    "name": "Dr Jekyll",
+    "description": "Médecin respectable aux prises avec un moi divisé."
+  },
+  "dr-watson": {
+    "name": "Dr Watson",
+    "description": "Médecin fidèle et chroniqueur des affaires de Holmes."
+  },
+  "dracula": {
+    "name": "Dracula",
+    "description": "Comte vampire du roman de Bram Stoker ; rusé et implacable."
+  },
+  "dragon": {
+    "name": "Dragon",
+    "description": "Antique cracheur de feu symbolisant puissance et trésor."
+  },
+  "erlang-shen": {
+    "name": "Erlang Shen",
+    "description": "Dieu chinois doté d'un troisième œil qui voit la vérité."
+  },
+  "euclid": {
+    "name": "Euclide",
+    "description": "Géomètre dont les Éléments ont façonné les mathématiques."
+  },
+  "fenrir": {
+    "name": "Fenrir",
+    "description": "Loup monstrueux destiné à briser ses chaînes."
+  },
+  "frankensteins-monster": {
+    "name": "Créature de Frankenstein",
+    "description": "Être créé en quête d'identité et d'acceptation."
+  },
+  "freyja": {
+    "name": "Freyja",
+    "description": "Déesse nordique de l'amour, de la beauté et de la magie seiðr."
+  },
+  "friday": {
+    "name": "Vendredi",
+    "description": "Compagnon ingénieux de Crusoé sur l'île."
+  },
+  "frigg": {
+    "name": "Frigg",
+    "description": "Reine nordique des dieux ; patronne de la prescience et de la famille."
+  },
+  "galileo-galilei": {
+    "name": "Galilée",
+    "description": "Astronome qui défendit l'observation et l'héliocentrisme."
+  },
+  "genghis-khan": {
+    "name": "Gengis Khan",
+    "description": "Fondateur de l'Empire mongol ; maître de la guerre des steppes."
+  },
+  "george-washington": {
+    "name": "George Washington",
+    "description": "Premier président américain ; guida une jeune nation vers la stabilité."
+  },
+  "gilgamesh": {
+    "name": "Gilgamesh",
+    "description": "Roi-héros d'Uruk ; figure centrale de l'Épopée de Gilgamesh."
+  },
+  "gorgon": {
+    "name": "Gorgone",
+    "description": "Terreur aux cheveux de serpents dont le regard pétrifie."
+  },
+  "grendel": {
+    "name": "Grendel",
+    "description": "Redoutable ennemi de Heorot, affronté par Beowulf."
+  },
+  "gretel": {
+    "name": "Gretel",
+    "description": "Sœur courageuse qui repousse le péril."
+  },
+  "griffin": {
+    "name": "Griffon",
+    "description": "Gardien lion-aigle des trésors et du ciel."
+  },
+  "grim-reaper": {
+    "name": "Faucheuse",
+    "description": "Personnification de la mort portant une faux silencieuse."
+  },
+  "guinevere": {
+    "name": "Guenièvre",
+    "description": "Reine de Camelot ; figure centrale du roman arthurien."
+  },
+  "hades": {
+    "name": "Hadès",
+    "description": "Souverain grec des enfers et des morts."
+  },
+  "hansel": {
+    "name": "Hansel",
+    "description": "Frère malin semant des traces à travers les bois."
+  },
+  "harpy": {
+    "name": "Harpie",
+    "description": "Charognarde rapide comme le vent aux serres acérées."
+  },
+  "heimdall": {
+    "name": "Heimdall",
+    "description": "Gardien nordique du Bifröst aux sens aiguisés."
+  },
+  "hephaestus": {
+    "name": "Héphaïstos",
+    "description": "Dieu grec de la forge et de l'artisanat."
+  },
+  "hera": {
+    "name": "Héra",
+    "description": "Reine des dieux grecs ; patronne du mariage et de la famille."
+  },
+  "heracles": {
+    "name": "Héraclès",
+    "description": "Héros grec célèbre pour les Douze Travaux et sa force immense."
+  },
+  "hermes": {
+    "name": "Hermès",
+    "description": "Messager des dieux grecs ; patron des voyageurs et de l'esprit."
+  },
+  "horus": {
+    "name": "Horus",
+    "description": "Divinité égyptienne à tête de faucon du ciel et de la royauté."
+  },
+  "huckleberry-finn": {
+    "name": "Huckleberry Finn",
+    "description": "Ami libre d'esprit voyageant par radeau et malice."
+  },
+  "hydra": {
+    "name": "Hydre",
+    "description": "Horreur à têtes multiples qui se régénère quand on la coupe."
+  },
+  "hypatia": {
+    "name": "Hypatie",
+    "description": "Érudite d'Alexandrie en mathématiques et philosophie."
+  },
+  "isaac-newton": {
+    "name": "Isaac Newton",
+    "description": "Physicien de la gravité, de l'optique et du calcul."
+  },
+  "ishmael": {
+    "name": "Ismaël",
+    "description": "Narrateur qui nous invite à l'appeler ainsi."
+  },
+  "isis": {
+    "name": "Isis",
+    "description": "Déesse égyptienne de la magie et de la protection."
+  },
+  "jason": {
+    "name": "Jason",
+    "description": "Chef des Argonautes en quête de la Toison d'Or."
+  },
+  "jim-hawkins": {
+    "name": "Jim Hawkins",
+    "description": "Jeune aventurier qui trouve une carte au trésor."
   },
   "joan-of-arc": {
     "name": "Jeanne d'Arc",
-    "description": "Héroïne française qui mena les troupes pendant la guerre de Cent Ans."
+    "description": "Héroïne française guidée par des visions pour lever un siège."
+  },
+  "johann-sebastian-bach": {
+    "name": "Jean-Sébastien Bach",
+    "description": "Compositeur de contrepoint complexe et de dévotion."
+  },
+  "johannes-kepler": {
+    "name": "Johannes Kepler",
+    "description": "Formulateur des lois elliptiques du mouvement planétaire."
+  },
+  "jormungandr": {
+    "name": "Jörmungand",
+    "description": "Serpent-Monde encerclant les mers."
+  },
+  "julius-caesar": {
+    "name": "Jules César",
+    "description": "Général et homme d'État romain célèbre pour ses conquêtes et réformes."
+  },
+  "kappa": {
+    "name": "Kappa",
+    "description": "Lutin de rivière amateur de farces et d'étiquette."
+  },
+  "king-arthur": {
+    "name": "Roi Arthur",
+    "description": "Roi légendaire de Camelot et porteur d'Excalibur."
+  },
+  "king-midas": {
+    "name": "Roi Midas",
+    "description": "Roi mythique dont le toucher transformait tout en or."
+  },
+  "kitsune": {
+    "name": "Kitsune",
+    "description": "Esprit-renard métamorphe de malice et de feu."
+  },
+  "kraken": {
+    "name": "Kraken",
+    "description": "Géant des mers dont les tentacules engloutissent des navires entiers."
+  },
+  "kublai-khan": {
+    "name": "Kubilai Khan",
+    "description": "Souverain mongol et empereur de la dynastie Yuan."
+  },
+  "lady-justice": {
+    "name": "Dame Justice",
+    "description": "Balance aveugle de l'équité et de la loi."
+  },
+  "lancelot": {
+    "name": "Lancelot",
+    "description": "Premier chevalier de la Table Ronde ; inégalé en habileté."
+  },
+  "leonardo-da-vinci": {
+    "name": "Léonard de Vinci",
+    "description": "Artiste-inventeur de la Renaissance à la curiosité sans bornes."
+  },
+  "leonidas-i": {
+    "name": "Léonidas Ier",
+    "description": "Roi spartiate célèbre pour la résistance aux Thermopyles."
+  },
+  "leviathan": {
+    "name": "Léviathan",
+    "description": "Serpent de mer primordial des profondeurs abyssales."
+  },
+  "little-john": {
+    "name": "Petit Jean",
+    "description": "Allié fidèle de Robin des Bois ; imposant et fort."
+  },
+  "little-red-riding-hood": {
+    "name": "Petit Chaperon Rouge",
+    "description": "Voyageuse naïve qui déjoue un loup affamé."
+  },
+  "loki": {
+    "name": "Loki",
+    "description": "Dieu nordique farceur de la malice et du changement."
+  },
+  "long-john-silver": {
+    "name": "Long John Silver",
+    "description": "Pirate rusé avec une jambe d'argent et des loyautés changeantes."
+  },
+  "ludwig-van-beethoven": {
+    "name": "Ludwig van Beethoven",
+    "description": "Compositeur qui prit les cieux d'assaut par le son."
+  },
+  "mad-hatter": {
+    "name": "Chapelier Fou",
+    "description": "Hôte excentrique du thé au Pays des Merveilles."
+  },
+  "maid-marian": {
+    "name": "Marianne",
+    "description": "Bien-aimée compagne de Robin des Bois ; courageuse et ingénieuse."
+  },
+  "manticore": {
+    "name": "Manticore",
+    "description": "Lion à visage d'homme avec une queue venimeuse."
+  },
+  "marie-curie": {
+    "name": "Marie Curie",
+    "description": "Pionnière de la radioactivité ; double lauréate du Nobel."
+  },
+  "medusa": {
+    "name": "Méduse",
+    "description": "Gorgone dont le regard changeait les spectateurs en pierre."
+  },
+  "merlin": {
+    "name": "Merlin",
+    "description": "Magicien énigmatique guidant Arthur et le destin."
+  },
+  "mermaid": {
+    "name": "Sirène",
+    "description": "Chanteuse des mers qui attire ou qui aime."
+  },
+  "michelangelo": {
+    "name": "Michel-Ange",
+    "description": "Maître sculpteur et peintre de la Renaissance."
+  },
+  "minotaur": {
+    "name": "Minotaure",
+    "description": "Homme-taureau prisonnier du labyrinthe de Crète."
+  },
+  "morgan-le-fay": {
+    "name": "Morgane",
+    "description": "Puissante enchanteresse de la légende arthurienne."
+  },
+  "mother-nature": {
+    "name": "Mère Nature",
+    "description": "Incarnation des cycles et de l'abondance de la terre."
+  },
+  "mr-hyde": {
+    "name": "Mr Hyde",
+    "description": "L'alter ego violent déchaîné du Dr Jekyll."
+  },
+  "murasaki-shikibu": {
+    "name": "Murasaki Shikibu",
+    "description": "Écrivaine de cour du *Dit du Genji*."
+  },
+  "napoleon-bonaparte": {
+    "name": "Napoléon Bonaparte",
+    "description": "Chef français et réformateur du Code napoléonien."
+  },
+  "nemean-lion": {
+    "name": "Lion de Némée",
+    "description": "Lion invulnérable vaincu uniquement par l'héroïsme."
+  },
+  "nezha": {
+    "name": "Nezha",
+    "description": "Jeune divinité chinoise et tueur de dragons célèbre pour son courage."
+  },
+  "nicolaus-copernicus": {
+    "name": "Nicolas Copernic",
+    "description": "Théoricien de l'héliocentrisme qui remodela le cosmos."
+  },
+  "odin": {
+    "name": "Odin",
+    "description": "Père de tous les dieux nordiques, chercheur de sagesse."
+  },
+  "odysseus": {
+    "name": "Ulysse",
+    "description": "Héros grec rusé de l'Odyssée ; maître de la stratégie."
+  },
+  "osiris": {
+    "name": "Osiris",
+    "description": "Dieu égyptien de l'au-delà et du renouveau."
+  },
+  "pandora": {
+    "name": "Pandore",
+    "description": "Première femme de la mythologie grecque ; ouvrit la jarre fatale."
+  },
+  "pegasus": {
+    "name": "Pégase",
+    "description": "Destrier ailé jaillit de l'écume et du chant."
+  },
+  "pericles": {
+    "name": "Périclès",
+    "description": "Homme d'État athénien de l'Âge d'Or de la cité."
+  },
+  "persephone": {
+    "name": "Perséphone",
+    "description": "Reine des enfers, emblème du retour du printemps."
+  },
+  "perseus": {
+    "name": "Persée",
+    "description": "Héros grec qui tua Méduse et sauva Andromède."
+  },
+  "phoenix": {
+    "name": "Phénix",
+    "description": "Oiseau renaissant des flammes et des cendres ; emblème du renouveau."
+  },
+  "pinocchio": {
+    "name": "Pinocchio",
+    "description": "Garçon de bois apprenant vérité et courage."
+  },
+  "plato": {
+    "name": "Platon",
+    "description": "Philosophe des formes ; élève de Socrate, maître d'Aristote."
+  },
+  "poseidon": {
+    "name": "Poséidon",
+    "description": "Dieu grec de la mer, des tremblements de terre et des chevaux."
+  },
+  "prometheus": {
+    "name": "Prométhée",
+    "description": "Titan qui apporta le feu et l'artisanat à l'humanité."
+  },
+  "puss-in-boots": {
+    "name": "Chat Botté",
+    "description": "Chat rusé dont les bottes marchent vers la fortune."
+  },
+  "pythagoras": {
+    "name": "Pythagore",
+    "description": "Philosophe du nombre et de l'harmonie."
+  },
+  "queen-elizabeth-i": {
+    "name": "Reine Élisabeth Ière",
+    "description": "Monarque Tudor qui stabilisa et inspira une époque."
+  },
+  "queequeg": {
+    "name": "Queequeg",
+    "description": "Harponneur habile à l'esprit noble."
+  },
+  "quetzalcoatl": {
+    "name": "Quetzalcóatl",
+    "description": "Divinité serpent à plumes du savoir et du vent (Mésoamérique)."
+  },
+  "ra": {
+    "name": "Rê",
+    "description": "Dieu solaire égyptien, créateur et souverain par le cours du jour."
+  },
+  "raphael": {
+    "name": "Raphaël",
+    "description": "Peintre et architecte renommé de la Haute Renaissance."
+  },
+  "rapunzel": {
+    "name": "Raiponce",
+    "description": "Jeune fille prisonnière d'une tour avec une rivière de cheveux."
+  },
+  "robin-hood": {
+    "name": "Robin des Bois",
+    "description": "Archer hors-la-loi qui vole aux riches pour aider les pauvres."
+  },
+  "robinson-crusoe": {
+    "name": "Robinson Crusoé",
+    "description": "Naufragé qui forge une vie sur une île solitaire."
+  },
+  "rumpelstiltskin": {
+    "name": "Rumpelstiltskin",
+    "description": "Farceur lié à son nom qui file la paille en or."
+  },
+  "sancho-panza": {
+    "name": "Sancho Pança",
+    "description": "Écuyer pragmatique équilibrant rêves et bon sens."
+  },
+  "scarecrow": {
+    "name": "Épouvantail",
+    "description": "Compagnon en quête d'un cerveau sur la route d'Oz."
+  },
+  "scheherazade": {
+    "name": "Shéhérazade",
+    "description": "Conteuse dont les récits repoussent le destin nuit après nuit."
+  },
+  "selkie": {
+    "name": "Selkie",
+    "description": "Peuple-phoque qui ôte sa peau pour marcher sur terre."
+  },
+  "set": {
+    "name": "Seth",
+    "description": "Dieu égyptien des tempêtes, des déserts et du tumulte."
   },
   "sherlock-holmes": {
     "name": "Sherlock Holmes",
-    "description": "Détective brillant connu pour ses déductions et son sens de l'observation."
+    "description": "Brillant détective consultant de Baker Street."
   },
-  "little-red-riding-hood": {
-    "name": "Le Petit Chaperon rouge",
-    "description": "Fillette qui rencontre un loup rusé en chemin vers sa grand-mère."
+  "sinbad": {
+    "name": "Sinbad",
+    "description": "Marin audacieux de sept voyages et d'îles étranges."
   },
-  "dracula": {
-    "name": "Comte Dracula",
-    "description": "Seigneur vampire de Transylvanie issu du roman de Bram Stoker."
+  "sir-gawain": {
+    "name": "Sire Gauvain",
+    "description": "Chevalier renommé pour son honneur et ses épreuves contre le Chevalier Vert."
+  },
+  "sleeping-beauty": {
+    "name": "Belle au Bois Dormant",
+    "description": "Princesse sous un long enchantement de sommeil."
+  },
+  "snow-white": {
+    "name": "Blanche-Neige",
+    "description": "Princesse bienveillante aidée par sept mineurs."
+  },
+  "socrates": {
+    "name": "Socrate",
+    "description": "Philosophe athénien de l'enquête et de la vertu."
+  },
+  "sphinx": {
+    "name": "Sphinx",
+    "description": "Gardienne d'énigmes dont les devinettes gardent le chemin."
+  },
+  "sun-tzu": {
+    "name": "Sun Tzu",
+    "description": "Stratège et auteur de *L'Art de la Guerre*."
+  },
+  "sun-wukong": {
+    "name": "Sun Wukong",
+    "description": "Le Roi Singe du Voyage vers l'Ouest ; agile et rebelle."
+  },
+  "susanoo": {
+    "name": "Susanoo",
+    "description": "Dieu shinto de la tempête, tueur du serpent à huit têtes."
+  },
+  "tengu": {
+    "name": "Tengu",
+    "description": "Esprit des montagnes avec prouesse martiale et fierté."
+  },
+  "tezcatlipoca": {
+    "name": "Tezcatlipoca",
+    "description": "Dieu mésoaméricain de la nuit, du destin et du pouvoir du jaguar."
+  },
+  "the-beast": {
+    "name": "La Bête",
+    "description": "Noble maudit cherchant la rédemption par l'amour."
+  },
+  "the-explorer": {
+    "name": "L'Explorateur",
+    "description": "Éclaireur attiré par les horizons inconnus."
+  },
+  "the-fool": {
+    "name": "Le Fou",
+    "description": "Vagabond innocent dont les faux pas révèlent la vérité."
+  },
+  "the-guardian": {
+    "name": "Le Gardien",
+    "description": "Protecteur qui monte la garde à la porte."
+  },
+  "the-healer": {
+    "name": "Le Guérisseur",
+    "description": "Restaurateur de corps, de liens et d'équilibre."
+  },
+  "the-hermit": {
+    "name": "L'Ermite",
+    "description": "Chercheur solitaire cultivant la lumière intérieure."
+  },
+  "the-hero": {
+    "name": "Le Héros",
+    "description": "Protagoniste courageux appelé à l'aventure."
+  },
+  "the-huntress": {
+    "name": "La Chasseresse",
+    "description": "Traqueuse qui prospère sur piste et épreuve."
+  },
+  "the-judge": {
+    "name": "Le Juge",
+    "description": "Arbitre pesant réclamations et coûts."
+  },
+  "the-little-mermaid": {
+    "name": "La Petite Sirène",
+    "description": "Jeune sirène qui aspire à un autre monde."
+  },
+  "the-lover": {
+    "name": "L'Amant",
+    "description": "Force guidée par le cœur vers l'union et la dévotion."
+  },
+  "the-magician": {
+    "name": "Le Magicien",
+    "description": "Adepte qui transforme par volonté et perspicacité."
+  },
+  "the-mentor": {
+    "name": "Le Mentor",
+    "description": "Maître qui équipe un voyage de sagesse."
+  },
+  "the-pied-piper": {
+    "name": "Le Joueur de Flûte",
+    "description": "Enchanteur de rats et d'enfants avec une mélodie magique."
+  },
+  "the-rebel": {
+    "name": "Le Rebelle",
+    "description": "Iconoclaste qui refuse la contrainte injuste."
+  },
+  "the-sage": {
+    "name": "Le Sage",
+    "description": "Chercheur de vérité au-delà des apparences."
+  },
+  "the-snow-queen": {
+    "name": "La Reine des Neiges",
+    "description": "Souveraine froide dont les éclats glacent le cœur."
+  },
+  "the-trickster": {
+    "name": "Le Filou",
+    "description": "Perturbateur rusé qui renverse l'ordre figé."
+  },
+  "the-ugly-duckling": {
+    "name": "Le Vilain Petit Canard",
+    "description": "Oisillon maladroit qui grandit dans la grâce."
+  },
+  "the-villain": {
+    "name": "Le Vilain",
+    "description": "Opposant qui teste la résolution et les idéaux."
+  },
+  "the-warrior": {
+    "name": "Le Guerrier",
+    "description": "Combattant discipliné qui affronte le conflit de face."
+  },
+  "theseus": {
+    "name": "Thésée",
+    "description": "Héros athénien qui vainquit le Minotaure."
+  },
+  "thor": {
+    "name": "Thor",
+    "description": "Dieu nordique du tonnerre maniant Mjölnir, défenseur d'Asgard."
+  },
+  "thoth": {
+    "name": "Thot",
+    "description": "Dieu égyptien de la sagesse, de l'écriture et de la mesure."
+  },
+  "thumbelina": {
+    "name": "Poucette",
+    "description": "Minuscule héroïne naviguant dans un monde de géants."
+  },
+  "thunderbird": {
+    "name": "Oiseau-Tonnerre",
+    "description": "Esprit céleste dont les ailes commandent l'orage."
+  },
+  "tin-woodman": {
+    "name": "Bûcheron de Fer-Blanc",
+    "description": "Ami loyal espérant un cœur tendre."
+  },
+  "tom-sawyer": {
+    "name": "Tom Sawyer",
+    "description": "Garçon espiègle dont les facéties égayent le Mississippi."
+  },
+  "tsukuyomi": {
+    "name": "Tsukuyomi",
+    "description": "Dieu shinto de la lune associé à l'ordre et à la nuit."
+  },
+  "tyr": {
+    "name": "Tyr",
+    "description": "Dieu nordique de la bravoure et des serments ; perdit une main face à Fenrir."
+  },
+  "unicorn": {
+    "name": "Licorne",
+    "description": "Créature pure insaisissable des forêts et des légendes."
+  },
+  "wendigo": {
+    "name": "Wendigo",
+    "description": "Esprit cannibale de la faim hivernale et du tabou."
+  },
+  "white-rabbit": {
+    "name": "Lapin Blanc",
+    "description": "Héraut pressé vérifiant constamment l'heure."
+  },
+  "william-shakespeare": {
+    "name": "William Shakespeare",
+    "description": "Dramaturge dont les mots refirent la scène."
+  },
+  "wise-old-man": {
+    "name": "Vieil Homme Sage",
+    "description": "Guide chevronné offrant des conseils durement acquis."
+  },
+  "wolfgang-amadeus-mozart": {
+    "name": "Wolfgang Amadeus Mozart",
+    "description": "Compositeur prodige d'élégance et de feu."
+  },
+  "yeti": {
+    "name": "Yéti",
+    "description": "Géant des neiges hantant les hautes crêtes."
+  },
+  "zeus": {
+    "name": "Zeus",
+    "description": "Roi des dieux grecs, associé au tonnerre et au ciel. Manie la foudre."
   }
 }
