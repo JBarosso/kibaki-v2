@@ -2,35 +2,8 @@
 // This is the entry point for all styles
 
 // Base styles and resets
-@import './base';
+@use './base' as *;
 
 // Layouts
-@import './layouts/base-layout';
-@import './layouts/site-layout';
-
-// Components
-@import './components/site-nav';
-@import './components/app-header';
-@import './components/character-card';
-@import './components/duel-container';
-@import './components/modal';
-@import './components/language-switcher';
-@import './components/skeleton-card';
-@import './components/progress-bar';
-@import './components/transition-wrapper';
-@import './components/leaderboard-list';
-@import './components/leaderboard-row';
-@import './components/leaderboard-island';
-@import './components/tournament-bracket';
-@import './components/tournament-bracket-client';
-@import './components/tournaments-list-island';
-@import './components/submit-island';
-@import './components/tournament-new-island';
-@import './components/account-island';
-@import './components/forgot-island';
-@import './components/reset-password-island';
-@import './components/admin-submissions-island';
-@import './components/user-votes-island';
-@import './components/user-votes-list';
-@import './components/user-vote-item';
-@import './components/toast-provider';
+@use './components' as *;
+@use './layouts' as *;
