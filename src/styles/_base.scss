@@ -77,6 +77,22 @@ h6 {
   // Typography
   --family-primary: 'Orbitron', sans-serif;
   --family-secondary: 'Oswald', sans-serif;
+  --fs-1: clamp(0.5rem, 0.594vw + 0.215rem, 0.75rem); /* 8px - 12px */
+  --fs-2: clamp(0.625rem, 0.594vw + 0.34rem, 0.875rem); /* 10px - 14px */
+  --fs-3: clamp(0.875rem, 0.297vw + 0.733rem, 1rem); /* 14px - 16px */
+  --fs-4: clamp(1rem, 0.594vw + 0.858rem, 1.25rem); /* 16px - 20px */
+  --fs-5: clamp(1.125rem, 0.892vw + 1.083rem, 1.5rem); /* 18px - 24px */
+  --fs-6: clamp(1.25rem, 1.189vw + 1.308rem, 1.75rem); /* 20px - 28px */
+  --fs-7: clamp(1.5rem, 1.486vw + 1.533rem, 2rem); /* 24px - 32px */
+  --fs-8: clamp(1.75rem, 1.783vw + 1.758rem, 2.25rem); /* 28px - 36px */
+  --fs-9: clamp(2rem, 2.08vw + 1.983rem, 2.5rem); /* 32px - 40px */
+  --fs-10: clamp(2.25rem, 2.377vw + 2.208rem, 2.75rem); /* 36px - 44px */
+  --fs-11: clamp(2.5rem, 2.675vw + 2.433rem, 3rem); /* 40px - 48px */
+  --fs-12: clamp(2.75rem, 2.972vw + 2.658rem, 3.25rem); /* 44px - 52px */
+  --fs-13: clamp(3rem, 3.27vw + 2.883rem, 3.5rem); /* 48px - 56px */
+  --fs-14: clamp(3.25rem, 3.568vw + 3.108rem, 3.75rem); /* 52px - 60px */
+  --fs-15: clamp(3.5rem, 3.866vw + 3.333rem, 4rem); /* 56px - 64px */
+  --fs-16: clamp(3.75rem, 4.164vw + 3.558rem, 4.25rem); /* 60px - 68px */
 
   // Spacing
   --spacing-05: clamp(0.5rem, 1.189vw - 0.07rem, 1rem); /* 8px - 16px */
@@ -106,6 +122,7 @@ body{
 
 h1, h2{
   font-family: var(--family-primary);
+  line-height: 1.2;
 }
 
 button{
