@@ -1,6 +1,7 @@
 import type { Match } from '../lib/tournaments'
 import type { CharacterInfo } from './TournamentBracketClient'
 import { useI18n } from '@/i18n'
+import { Timer } from 'lucide-react'
 
 export function groupByRound(matches: Match[]) {
   const map = new Map<number, Match[]>()
@@ -83,7 +84,9 @@ export default function TournamentBracket(props: Props) {
                   </div>
 
                   {countdown && (
-                    <div className="tournament-bracket__countdown" aria-live="polite">⏳ {countdown}</div>
+                    <div className="tournament-bracket__countdown" aria-live="polite">
+                      <Timer size={16} className="tournament-bracket__countdown-icon" /> {countdown}
+                    </div>
                   )}
 
                   <div className="tournament-bracket__competitors">

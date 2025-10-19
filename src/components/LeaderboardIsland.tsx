@@ -3,6 +3,7 @@ import type { TopCharacter, Universe } from '@/lib/top';
 import { fetchTopCharacters, fetchUniverses, fetchRankMap } from '@/lib/top';
 import LeaderboardList from '@/components/LeaderboardList';
 import { I18nProvider, useI18n, type Lang } from '@/i18n';
+import { Search } from 'lucide-react';
 
 type LeaderboardIslandProps = {
   lang: Lang;
@@ -162,9 +163,7 @@ function LeaderboardIslandInner({ heading, subtitle }: LeaderboardIslandProps) {
             className="leaderboard-island__search-input"
           />
           <div className="leaderboard-island__search-icon-wrapper">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="leaderboard-island__search-icon">
-              <path fillRule="evenodd" d="M10.5 3.75a6.75 6.75 0 1 0 4.243 11.957l3.775 3.775a.75.75 0 1 0 1.06-1.06l-3.775-3.776A6.75 6.75 0 0 0 10.5 3.75Zm-5.25 6.75a5.25 5.25 0 1 1 10.5 0 5.25 5.25 0 0 1-10.5 0Z" clipRule="evenodd" />
-            </svg>
+            <Search className="leaderboard-island__search-icon" />
           </div>
         </div>
       </div>

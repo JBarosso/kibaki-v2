@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { getPrefersReducedMotion, getAnimationDuration } from '@/lib/animations';
+import { Check } from 'lucide-react';
 
 export interface ProgressBarProps {
   progress: number; // 0-100
@@ -310,7 +311,7 @@ export function ProgressSteps({
           <div key={index} className={stepClasses}>
             {/* Step indicator */}
             <div className={indicatorClasses.join(' ')}>
-              {isCompleted ? '✓' : index + 1}
+              {isCompleted ? <Check size={16} /> : index + 1}
             </div>
 
             {/* Step label */}

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 import { I18nProvider, type Lang } from '@/i18n';
+import { Info } from 'lucide-react';
 
 type NavLabels = {
   duel: string;
@@ -131,7 +132,7 @@ function HeaderInner({ lang, navLabels, actionLabels, infoText }: AppHeaderProps
           <div className="app-header__info-dropdown">
             <details className="group">
               <summary className="app-header__info-summary">
-                <span className="app-header__info-icon" aria-hidden="true">ⓘ</span> <span>{navLabels.info}</span>
+                <Info className="app-header__info-icon" aria-hidden="true" size={18} /> <span>{navLabels.info}</span>
               </summary>
               <div className="app-header__info-content">
                 <ul className="app-header__info-list">

@@ -27,6 +27,7 @@ import { SkeletonDuel } from "@/components/SkeletonCard";
 import { useLoadingState } from "@/hooks/useLoadingState";
 import { getPrefersReducedMotion } from "@/lib/animations";
 import { I18nProvider, useI18n, type Lang } from "@/i18n";
+import { AlertTriangle } from 'lucide-react';
 
 type LoadState = "idle" | "loading" | "ready" | "error";
 
@@ -1032,7 +1033,7 @@ function DuelContainerInner(_: { lang: Lang }) {
     return (
       <div className="duel-container__error">
         <div className="duel-container__error-message">
-          <span className="duel-container__error-icon">⚠️</span>
+          <AlertTriangle className="duel-container__error-icon" size={24} />
           <span>{error ?? t("duel.error")}</span>
         </div>
         {loadingState.error && (

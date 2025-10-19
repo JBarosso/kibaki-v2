@@ -4,6 +4,7 @@
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 import { getLangCookie, resolveLang, setLangCookie, tServer } from '@/i18n';
 import type { Lang } from '@/i18n';
+import { Info } from 'lucide-react';
 
 const existingCookie = getLangCookie(Astro);
 const lang: Lang = resolveLang({ url: Astro.url, req: Astro.request, cookie: existingCookie ?? undefined });
@@ -41,7 +42,7 @@ const infoText = tServer(lang, 'info.publicDomain');
       <div class="site-nav__info-dropdown">
         <details>
           <summary class="site-nav__info-summary">
-            <span class="site-nav__info-icon" aria-hidden="true">ⓘ</span> <span>{nav.info}</span>
+            <Info client:only="react" className="site-nav__info-icon" aria-hidden="true" size={18} /> <span>{nav.info}</span>
           </summary>
           <div class="site-nav__info-content">
             <ul class="site-nav__info-list">
