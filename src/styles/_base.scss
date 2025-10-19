@@ -59,13 +59,13 @@ h6 {
   // Colors
   --primary-hsl: 179, 72%, 53%;
   --secondary-hsl: 352, 85%, 67%;
-  --primary: #3ad0ce;
-  --secondary: #ff5c50;
+  --primary: hsl(var(--primary-hsl), 1);
+  --secondary: hsl(var(--secondary-hsl), 1);
 
   --player1-hsl: 194, 85%, 67%;
   --player2-hsl: 352, 85%, 67%;
-  --player1: #60a5fa;
-  --player2: #f87171;
+  --player1: hsl(var(--player1-hsl), 1);
+  --player2: hsl(var(--player2-hsl), 1);
 
   --background: #0d0d0d;
   --foreground: #f5f5f5;

@@ -63,6 +63,7 @@
     height: 100%;
     z-index: 1;
     cursor: pointer;
+    transition: var(--transition-base);
     
     &::before,
     &::after{
@@ -72,6 +73,7 @@
       left: 0;
       width: 100%;
       height: 100%;
+      transition: var(--transition-base);
     }
 
     &::before{
@@ -91,8 +93,7 @@
     justify-content: flex-end;
     padding: var(--spacing-1);
     overflow: hidden;
-
-
+    transition: var(--transition-base);
 
     &:first-child {
       grid-area: left;
@@ -117,6 +118,22 @@
 
       .character-card__image-wrapper{
         transform: scale(1.05);
+      }
+    }
+
+    &--winner {
+      --colorPlayer-hsl: 88, 85%, 67% !important;
+      --colorPlayer: hsl(var(--colorPlayer-hsl), 1) !important;
+    }
+
+    &--loser {
+      filter: grayscale(1);
+      opacity: 0.6;
+    }
+
+    &--error {
+      .duel-container__vote-overlay::before {
+        background: linear-gradient(to top, hsl(0, 60%, 40%, 0.95), hsl(0, 60%, 50%, 0.4), hsl(0, 60%, 50%, 0.2));
       }
     }
   }

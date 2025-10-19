@@ -956,11 +956,18 @@ function DuelContainerInner(_: { lang: Lang }) {
         } catch {}
         setLastVote(side);
 
+        // Attendre un peu pour montrer l'animation, puis charger le nouveau duel
         setTimeout(async () => {
+          // Charger le nouveau duel AVANT de reset les états
           await loadFreshPair(ids, getUsedPairs(scope));
-          setOptimisticVote({ winnerId: null, status: "idle" });
-          setIsTransitioning(false);
-          setIsVoting(false);
+
+          // Reset les états APRÈS que le nouveau duel soit chargé
+          // Petit délai supplémentaire pour une transition fluide
+          setTimeout(() => {
+            setOptimisticVote({ winnerId: null, status: "idle" });
+            setIsTransitioning(false);
+            setIsVoting(false);
+          }, 100);
         }, 400);
       }
     } catch (e: any) {
@@ -1120,6 +1127,36 @@ function DuelContainerInner(_: { lang: Lang }) {
     return classes;
   };
 
+  const getColumnClasses = (characterId: number) => {
+    const classes: string[] = ["duel-container__card-column"];
+
+    if (optimisticVote.winnerId === characterId) {
+      // C'est le gagnant
+      switch (optimisticVote.status) {
+        case "pending":
+        case "success":
+          classes.push("duel-container__card-column--winner");
+          break;
+        case "error":
+          classes.push("duel-container__card-column--error");
+          break;
+      }
+    } else if (
+      optimisticVote.winnerId &&
+      optimisticVote.winnerId !== characterId
+    ) {
+      // C'est le perdant
+      if (
+        optimisticVote.status === "pending" ||
+        optimisticVote.status === "success"
+      ) {
+        classes.push("duel-container__card-column--loser");
+      }
+    }
+
+    return classes.join(" ");
+  };
+
   return (
     <div className="duel-container">
       <div className="duel-container__actions">
@@ -1149,7 +1186,7 @@ function DuelContainerInner(_: { lang: Lang }) {
       </div>
 
       <div className="duel-container__cards-grid">
-        <div className="duel-container__card-column">
+        <div className={getColumnClasses(left.id)}>
           <div
             onClick={() => !isVoting && !isTransitioning && vote("left")}
             className="duel-container__vote-overlay"
@@ -1172,7 +1209,7 @@ function DuelContainerInner(_: { lang: Lang }) {
 
         <div className="duel-container__separator">VS</div>
 
-        <div className="duel-container__card-column">
+        <div className={getColumnClasses(right.id)}>
           <div
             onClick={() => !isVoting && !isTransitioning && vote("right")}
             className="duel-container__vote-overlay"
