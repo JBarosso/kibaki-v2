@@ -111,6 +111,7 @@ h6 {
   // Shadows
 
   // Transitions
+  --transition-base: all .3s ease-in-out;
 
   // Breakpoints (for reference in media queries)
 }
@@ -127,7 +128,7 @@ h1, h2{
 
 button{
   cursor: pointer;
-  transition: all .3s ease-in-out;
+  transition: var(--transition-base);
 
   &:hover{
     opacity: .75;
