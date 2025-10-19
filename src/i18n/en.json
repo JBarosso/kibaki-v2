@@ -27,10 +27,10 @@
   "duel": {
     "pageTitle": "Kibaki — Duel",
     "heading": "Who Beats Who?",
-    "subtitle": "Pick the winner. We’ll wire up ELO in Step 4.",
+    "subtitle": "Pick the winner !",
     "loading": "Loading a new pair…",
-    "leftVote": "Vote left",
-    "rightVote": "Vote right",
+    "leftVote": "Choose",
+    "rightVote": "Choose",
     "skip": "Skip",
     "resetPairs": "Reset pairs",
     "savedLocally": "Saved locally.",

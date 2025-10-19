@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   addUsedPair,
   clearUsedPairs,
@@ -10,27 +10,30 @@ import {
   type CharacterRow,
   type DuelPair,
   SCOPE_KEY,
-} from '@/lib/duels';
-import CharacterCard from '@/components/CharacterCard';
-import Modal from '@/components/Modal';
-import { supabase } from '@/lib/supabaseClient';
-import { showToast } from '@/lib/toast';
-import { fetchUniverses, type Universe } from '@/lib/top';
-import { getRecentSeenPairs, markPairSeen } from '@/lib/seenPairs';
-import { getStorageAdapter, type StorageAdapter } from '@/lib/storageAdapter';
-import { db } from '@/lib/kibakiDB';
-import { FadeTransition, TransitionWrapper } from '@/components/TransitionWrapper';
-import { SkeletonDuel } from '@/components/SkeletonCard';
-import { useLoadingState } from '@/hooks/useLoadingState';
-import { getPrefersReducedMotion } from '@/lib/animations';
-import { I18nProvider, useI18n, type Lang } from '@/i18n';
+} from "@/lib/duels";
+import CharacterCard from "@/components/CharacterCard";
+import Modal from "@/components/Modal";
+import { supabase } from "@/lib/supabaseClient";
+import { showToast } from "@/lib/toast";
+import { fetchUniverses, type Universe } from "@/lib/top";
+import { getRecentSeenPairs, markPairSeen } from "@/lib/seenPairs";
+import { getStorageAdapter, type StorageAdapter } from "@/lib/storageAdapter";
+import { db } from "@/lib/kibakiDB";
+import {
+  FadeTransition,
+  TransitionWrapper,
+} from "@/components/TransitionWrapper";
+import { SkeletonDuel } from "@/components/SkeletonCard";
+import { useLoadingState } from "@/hooks/useLoadingState";
+import { getPrefersReducedMotion } from "@/lib/animations";
+import { I18nProvider, useI18n, type Lang } from "@/i18n";
 
-type LoadState = 'idle' | 'loading' | 'ready' | 'error';
+type LoadState = "idle" | "loading" | "ready" | "error";
 
 // Optimistic vote state types
 type OptimisticVoteState = {
   winnerId: number | null;
-  status: 'idle' | 'pending' | 'success' | 'error';
+  status: "idle" | "pending" | "success" | "error";
 };
 
 // Debug mode for testing scenarios
@@ -70,13 +73,13 @@ export default function DuelContainer({ lang }: { lang: Lang }) {
 
 function DuelContainerInner(_: { lang: Lang }) {
   const { t, getCharacterText, getUniverseLabel } = useI18n();
-  const [state, setState] = useState<LoadState>('idle');
+  const [state, setState] = useState<LoadState>("idle");
   const [error, setError] = useState<string | null>(null);
   const [ids, setIds] = useState<number[]>([]);
   const [pair, setPair] = useState<DuelPair | null>(null);
   const [openLeft, setOpenLeft] = useState(false);
   const [openRight, setOpenRight] = useState(false);
-  const [lastVote, setLastVote] = useState<'left' | 'right' | null>(null);
+  const [lastVote, setLastVote] = useState<"left" | "right" | null>(null);
   const [rateLimitedAt, setRateLimitedAt] = useState<number | null>(null);
   const [isVoting, setIsVoting] = useState(false);
   const [lastVoteAt, setLastVoteAt] = useState<number | null>(null);
@@ -84,7 +87,7 @@ function DuelContainerInner(_: { lang: Lang }) {
   // Optimistic UI states
   const [optimisticVote, setOptimisticVote] = useState<OptimisticVoteState>({
     winnerId: null,
-    status: 'idle'
+    status: "idle",
   });
   const [isTransitioning, setIsTransitioning] = useState(false);
 
@@ -99,8 +102,8 @@ function DuelContainerInner(_: { lang: Lang }) {
   const loadingState = useLoadingState({ minDisplayTime: 300 });
   const reducedMotion = getPrefersReducedMotion();
   const [universes, setUniverses] = useState<Universe[]>([]);
-  const [scope, setScope] = useState<string>('global');
-  const scopeRef = useRef<string>('global');
+  const [scope, setScope] = useState<string>("global");
+  const scopeRef = useRef<string>("global");
   const mountedRef = useRef<boolean>(false);
   const bootstrappedRef = useRef<boolean>(false);
 
@@ -119,7 +122,7 @@ function DuelContainerInner(_: { lang: Lang }) {
         setStorage(adapter);
         await adapter.cleanup();
       } catch (error) {
-        console.error('Failed to initialize storage:', error);
+        console.error("Failed to initialize storage:", error);
       }
     };
 
@@ -127,25 +130,29 @@ function DuelContainerInner(_: { lang: Lang }) {
   }, []);
 
   // Image preloading utility
-  const preloadImages = async (characters: CharacterRow[]): Promise<boolean> => {
+  const preloadImages = async (
+    characters: CharacterRow[]
+  ): Promise<boolean> => {
     const promises = characters
-      .filter(char => char.image_url)
-      .map(char => {
+      .filter((char) => char.image_url)
+      .map((char) => {
         return new Promise<boolean>((resolve) => {
           const img = new Image();
           const timeout = setTimeout(() => {
-            if (DEBUG_PREFETCH) console.log('Image preload timeout:', char.name);
+            if (DEBUG_PREFETCH)
+              console.log("Image preload timeout:", char.name);
             resolve(false);
           }, PREFETCH_CONFIG.imageTimeout);
 
           img.onload = () => {
             clearTimeout(timeout);
-            if (DEBUG_PREFETCH) console.log('Image preloaded:', char.name);
+            if (DEBUG_PREFETCH) console.log("Image preloaded:", char.name);
             resolve(true);
           };
           img.onerror = () => {
             clearTimeout(timeout);
-            if (DEBUG_PREFETCH) console.warn('Image preload failed:', char.name);
+            if (DEBUG_PREFETCH)
+              console.warn("Image preload failed:", char.name);
             resolve(false);
           };
 
@@ -157,7 +164,11 @@ function DuelContainerInner(_: { lang: Lang }) {
       const results = await Promise.all(promises);
       const allLoaded = results.every(Boolean);
       if (DEBUG_PREFETCH) {
-        console.log('Images preload result:', { allLoaded, loaded: results.filter(Boolean).length, total: results.length });
+        console.log("Images preload result:", {
+          allLoaded,
+          loaded: results.filter(Boolean).length,
+          total: results.length,
+        });
       }
       return allLoaded;
     } catch {
@@ -166,61 +177,79 @@ function DuelContainerInner(_: { lang: Lang }) {
   };
 
   // Enhanced image preloading with IndexedDB caching
-  const preloadImagesWithCache = async (characters: CharacterRow[]): Promise<boolean> => {
+  const preloadImagesWithCache = async (
+    characters: CharacterRow[]
+  ): Promise<boolean> => {
     if (!storage) return preloadImages(characters);
 
     const promises = characters
-      .filter(char => char.image_url)
-      .map(async char => {
+      .filter((char) => char.image_url)
+      .map(async (char) => {
         try {
           const cachedBlob = await storage.getImageBlob(char.id);
           if (cachedBlob) {
-            if (DEBUG_PREFETCH) console.log('Image found in cache:', char.name);
+            if (DEBUG_PREFETCH) console.log("Image found in cache:", char.name);
             return true;
           }
 
           return new Promise<boolean>((resolve) => {
             const img = new Image();
             const timeout = setTimeout(() => {
-              if (DEBUG_PREFETCH) console.log('Image preload timeout:', char.name);
+              if (DEBUG_PREFETCH)
+                console.log("Image preload timeout:", char.name);
               resolve(false);
             }, PREFETCH_CONFIG.imageTimeout);
 
             img.onload = async () => {
               clearTimeout(timeout);
               try {
-                const canvas = document.createElement('canvas');
-                const ctx = canvas.getContext('2d');
+                const canvas = document.createElement("canvas");
+                const ctx = canvas.getContext("2d");
                 if (ctx) {
                   canvas.width = img.naturalWidth;
                   canvas.height = img.naturalHeight;
                   ctx.drawImage(img, 0, 0);
 
-                  canvas.toBlob(async (blob) => {
-                    if (blob && storage) {
-                      await storage.cacheImage(char.id, char.image_url!, blob);
-                      if (DEBUG_PREFETCH) {
-                        console.log('Image cached:', char.name, `${blob.size} bytes`);
+                  canvas.toBlob(
+                    async (blob) => {
+                      if (blob && storage) {
+                        await storage.cacheImage(
+                          char.id,
+                          char.image_url!,
+                          blob
+                        );
+                        if (DEBUG_PREFETCH) {
+                          console.log(
+                            "Image cached:",
+                            char.name,
+                            `${blob.size} bytes`
+                          );
+                        }
                       }
-                    }
-                  }, 'image/jpeg', 0.8);
+                    },
+                    "image/jpeg",
+                    0.8
+                  );
                 }
               } catch (error) {
-                if (DEBUG_PREFETCH) console.warn('Image caching failed:', char.name, error);
+                if (DEBUG_PREFETCH)
+                  console.warn("Image caching failed:", char.name, error);
               }
               resolve(true);
             };
 
             img.onerror = () => {
               clearTimeout(timeout);
-              if (DEBUG_PREFETCH) console.warn('Image preload failed:', char.name);
+              if (DEBUG_PREFETCH)
+                console.warn("Image preload failed:", char.name);
               resolve(false);
             };
 
             img.src = char.image_url!;
           });
         } catch (error) {
-          if (DEBUG_PREFETCH) console.warn('Image cache check failed:', char.name, error);
+          if (DEBUG_PREFETCH)
+            console.warn("Image cache check failed:", char.name, error);
           return false;
         }
       });
@@ -229,10 +258,10 @@ function DuelContainerInner(_: { lang: Lang }) {
       const results = await Promise.all(promises);
       const allLoaded = results.every(Boolean);
       if (DEBUG_PREFETCH) {
-        console.log('Enhanced images preload result:', {
+        console.log("Enhanced images preload result:", {
           allLoaded,
           loaded: results.filter(Boolean).length,
-          total: results.length
+          total: results.length,
         });
       }
       return allLoaded;
@@ -243,12 +272,12 @@ function DuelContainerInner(_: { lang: Lang }) {
 
   // Memory monitoring (development only)
   const monitorMemory = () => {
-    if (DEBUG_PREFETCH && 'memory' in performance) {
+    if (DEBUG_PREFETCH && "memory" in performance) {
       const memory = (performance as any).memory;
-      console.log('Memory usage:', {
-        used: Math.round(memory.usedJSHeapSize / 1048576) + 'MB',
-        total: Math.round(memory.totalJSHeapSize / 1048576) + 'MB',
-        queueSize: prefetchQueue.length
+      console.log("Memory usage:", {
+        used: Math.round(memory.usedJSHeapSize / 1048576) + "MB",
+        total: Math.round(memory.totalJSHeapSize / 1048576) + "MB",
+        queueSize: prefetchQueue.length,
       });
     }
   };
@@ -259,19 +288,20 @@ function DuelContainerInner(_: { lang: Lang }) {
 
     // Debounce: avoid calling too frequently
     if (now - lastAuthSyncRef.current < AUTH_SYNC_CONFIG.debounceDelay) {
-      if (DEBUG_MODE) console.log('🔧 Auth sync debounced');
+      if (DEBUG_MODE) console.log("🔧 Auth sync debounced");
       return;
     }
 
     lastAuthSyncRef.current = now;
 
     try {
-      if (DEBUG_MODE) console.log('🔧 Starting auth sync for scope:', currentScope);
+      if (DEBUG_MODE)
+        console.log("🔧 Starting auth sync for scope:", currentScope);
 
       // Race between timeout and actual fetch
       const timeoutPromise = new Promise<Set<string>>((resolve) => {
         authSyncTimeoutRef.current = setTimeout(() => {
-          if (DEBUG_MODE) console.warn('🔧 Auth sync timeout reached');
+          if (DEBUG_MODE) console.warn("🔧 Auth sync timeout reached");
           resolve(new Set());
         }, AUTH_SYNC_CONFIG.timeout);
       });
@@ -292,15 +322,15 @@ function DuelContainerInner(_: { lang: Lang }) {
       serverPairs.forEach((k) => addUsedPair(k, currentScope));
 
       if (DEBUG_MODE) {
-        console.log('🔧 Auth sync complete:', {
+        console.log("🔧 Auth sync complete:", {
           scope: currentScope,
-          pairsLoaded: serverPairs.size
+          pairsLoaded: serverPairs.size,
         });
       }
 
       setAuthSyncComplete(true);
     } catch (error) {
-      if (DEBUG_MODE) console.warn('🔧 Auth sync failed:', error);
+      if (DEBUG_MODE) console.warn("🔧 Auth sync failed:", error);
       setAuthSyncComplete(true); // Mark complete even on failure to unblock UI
     }
   };
@@ -319,11 +349,11 @@ function DuelContainerInner(_: { lang: Lang }) {
       const cachedPairs = await storage.getPairHashes(scope);
 
       if (DEBUG_PREFETCH) {
-        console.log('Starting prefetch:', {
+        console.log("Starting prefetch:", {
           toPrefetch,
           queueSize: prefetchQueue.length,
           scope,
-          cachedPairs: cachedPairs.length
+          cachedPairs: cachedPairs.length,
         });
       }
 
@@ -331,17 +361,22 @@ function DuelContainerInner(_: { lang: Lang }) {
         try {
           let left: CharacterRow | null = null;
           let right: CharacterRow | null = null;
-          let hash: string = '';
+          let hash: string = "";
 
           const cachedIds = await storage.getCharacterIds(scope);
           if (cachedIds.length >= 2) {
             for (let attempt = 0; attempt < 10; attempt++) {
-              const leftId = cachedIds[Math.floor(Math.random() * cachedIds.length)];
-              const rightId = cachedIds[Math.floor(Math.random() * cachedIds.length)];
+              const leftId =
+                cachedIds[Math.floor(Math.random() * cachedIds.length)];
+              const rightId =
+                cachedIds[Math.floor(Math.random() * cachedIds.length)];
 
               if (leftId !== rightId) {
                 hash = makePairHash(leftId, rightId);
-                if (!currentUsedPairs.has(hash) && !cachedPairs.includes(hash)) {
+                if (
+                  !currentUsedPairs.has(hash) &&
+                  !cachedPairs.includes(hash)
+                ) {
                   const cachedLeft = await storage.getCharacter(leftId);
                   const cachedRight = await storage.getCharacter(rightId);
 
@@ -356,8 +391,14 @@ function DuelContainerInner(_: { lang: Lang }) {
           }
 
           if (!left || !right) {
-            const [leftId, rightId, newHash] = pickRandomDistinctPair(ids, currentUsedPairs);
-            const { left: apiLeft, right: apiRight } = await loadPairDetails(leftId, rightId);
+            const [leftId, rightId, newHash] = pickRandomDistinctPair(
+              ids,
+              currentUsedPairs
+            );
+            const { left: apiLeft, right: apiRight } = await loadPairDetails(
+              leftId,
+              rightId
+            );
             left = apiLeft;
             right = apiRight;
             hash = newHash;
@@ -376,17 +417,22 @@ function DuelContainerInner(_: { lang: Lang }) {
             hash,
             timestamp: Date.now(),
             scope,
-            imagesLoaded
+            imagesLoaded,
           };
 
-          setPrefetchQueue(prev => {
-            if (prev.some(d => d.hash === hash)) {
-              if (DEBUG_PREFETCH) console.log('Duplicate pair in prefetch, skipping:', hash);
+          setPrefetchQueue((prev) => {
+            if (prev.some((d) => d.hash === hash)) {
+              if (DEBUG_PREFETCH)
+                console.log("Duplicate pair in prefetch, skipping:", hash);
               return prev;
             }
             const newQueue = [...prev, prefetchedDuel];
             if (DEBUG_PREFETCH) {
-              console.log('Added to prefetch queue:', { hash, imagesLoaded, queueSize: newQueue.length });
+              console.log("Added to prefetch queue:", {
+                hash,
+                imagesLoaded,
+                queueSize: newQueue.length,
+              });
             }
             return newQueue;
           });
@@ -396,11 +442,12 @@ function DuelContainerInner(_: { lang: Lang }) {
             await storage.addPairHash(scope, hash);
           }
         } catch (error) {
-          if (DEBUG_PREFETCH) console.warn('Individual prefetch failed:', error);
+          if (DEBUG_PREFETCH)
+            console.warn("Individual prefetch failed:", error);
         }
       }
     } catch (error) {
-      if (DEBUG_PREFETCH) console.warn('Prefetch batch failed:', error);
+      if (DEBUG_PREFETCH) console.warn("Prefetch batch failed:", error);
     } finally {
       prefetchingRef.current = false;
       if (DEBUG_PREFETCH) monitorMemory();
@@ -414,37 +461,37 @@ function DuelContainerInner(_: { lang: Lang }) {
     mountedRef.current = true;
 
     (async () => {
-      setState('loading');
+      setState("loading");
       setError(null);
-      loadingState.startLoading('Loading characters...');
+      loadingState.startLoading("Loading characters...");
 
       try {
         // Load universes
-        loadingState.updateProgress(20, 'Loading universes...');
+        loadingState.updateProgress(20, "Loading universes...");
         const u = await fetchUniverses();
         if (!mountedRef.current) return;
         setUniverses(u);
 
         // Load saved scope from LS
-        loadingState.updateProgress(40, 'Initializing scope...');
-        let savedScope = 'global';
+        loadingState.updateProgress(40, "Initializing scope...");
+        let savedScope = "global";
         try {
-          if (typeof window !== 'undefined' && 'localStorage' in window) {
+          if (typeof window !== "undefined" && "localStorage" in window) {
             const s = window.localStorage.getItem(SCOPE_KEY);
-            if (s && typeof s === 'string') savedScope = s;
+            if (s && typeof s === "string") savedScope = s;
           }
         } catch {}
         if (!mountedRef.current) return;
         setScope(savedScope);
 
         // Fetch ids for scope
-        loadingState.updateProgress(60, 'Fetching character data...');
+        loadingState.updateProgress(60, "Fetching character data...");
         const fetchedIds = await getAllCharacterIds(savedScope);
         if (!mountedRef.current) return;
         setIds(fetchedIds);
 
         // 🔧 CRITICAL: Load pair IMMEDIATELY without waiting for auth
-        loadingState.updateProgress(80, 'Preparing duel...');
+        loadingState.updateProgress(80, "Preparing duel...");
         if (fetchedIds.length >= 2) {
           await loadFreshPair(fetchedIds, getUsedPairs(savedScope));
         } else {
@@ -452,8 +499,8 @@ function DuelContainerInner(_: { lang: Lang }) {
         }
         if (!mountedRef.current) return;
 
-        loadingState.updateProgress(100, 'Ready!');
-        setState('ready');
+        loadingState.updateProgress(100, "Ready!");
+        setState("ready");
         loadingState.stopLoading();
 
         // Start initial prefetching after first duel is loaded
@@ -463,12 +510,11 @@ function DuelContainerInner(_: { lang: Lang }) {
         setTimeout(() => {
           syncServerSeenPairs(savedScope);
         }, 1000); // Wait 1s after UI is ready
-
       } catch (e: any) {
         if (!mountedRef.current) return;
         const errorMessage = e?.message ?? String(e);
         setError(errorMessage);
-        setState('error');
+        setState("error");
         loadingState.setError(errorMessage);
       }
     })();
@@ -485,27 +531,27 @@ function DuelContainerInner(_: { lang: Lang }) {
   useEffect(() => {
     scopeRef.current = scope;
 
-    setPrefetchQueue(prev => {
-      const filtered = prev.filter(d => d.scope === scope);
+    setPrefetchQueue((prev) => {
+      const filtered = prev.filter((d) => d.scope === scope);
       if (DEBUG_PREFETCH && filtered.length !== prev.length) {
-        console.log('Cleared prefetch queue for scope change:', {
+        console.log("Cleared prefetch queue for scope change:", {
           from: prev.length,
           to: filtered.length,
-          scope
+          scope,
         });
       }
       return filtered;
     });
 
     const run = async () => {
-      if (state === 'idle') return;
-      setState('loading');
+      if (state === "idle") return;
+      setState("loading");
       setError(null);
       setAuthSyncComplete(false); // Reset auth sync status
 
       try {
         try {
-          if (typeof window !== 'undefined' && 'localStorage' in window) {
+          if (typeof window !== "undefined" && "localStorage" in window) {
             window.localStorage.setItem(SCOPE_KEY, scope);
           }
         } catch {}
@@ -524,7 +570,7 @@ function DuelContainerInner(_: { lang: Lang }) {
           setPair(null);
         }
 
-        setState('ready');
+        setState("ready");
 
         setTimeout(() => prefetchNextDuels(), PREFETCH_CONFIG.prefetchDelay);
 
@@ -532,11 +578,10 @@ function DuelContainerInner(_: { lang: Lang }) {
         setTimeout(() => {
           syncServerSeenPairs(scope);
         }, 500);
-
       } catch (e: any) {
         if (!mountedRef.current) return;
         setError(e?.message ?? String(e));
-        setState('error');
+        setState("error");
       }
     };
     run();
@@ -544,17 +589,23 @@ function DuelContainerInner(_: { lang: Lang }) {
 
   // 🔧 IMPROVED: Auth state change listener
   useEffect(() => {
-    const { data: listener } = supabase.auth.onAuthStateChange(async (event) => {
-      if (event === 'SIGNED_IN') {
-        const currentScope = scopeRef.current;
-        if (DEBUG_MODE) console.log('🔧 User signed in, syncing pairs for scope:', currentScope);
+    const { data: listener } = supabase.auth.onAuthStateChange(
+      async (event) => {
+        if (event === "SIGNED_IN") {
+          const currentScope = scopeRef.current;
+          if (DEBUG_MODE)
+            console.log(
+              "🔧 User signed in, syncing pairs for scope:",
+              currentScope
+            );
 
-        // Trigger auth sync with debouncing
-        setTimeout(() => {
-          syncServerSeenPairs(currentScope);
-        }, 500);
+          // Trigger auth sync with debouncing
+          setTimeout(() => {
+            syncServerSeenPairs(currentScope);
+          }, 500);
+        }
       }
-    });
+    );
     return () => {
       listener.subscription.unsubscribe();
     };
@@ -566,15 +617,19 @@ function DuelContainerInner(_: { lang: Lang }) {
       if (!storage) return;
 
       try {
-        const migrated = localStorage.getItem('kibaki_migrated_to_idb');
-        if (migrated === 'true') return;
+        const migrated = localStorage.getItem("kibaki_migrated_to_idb");
+        if (migrated === "true") return;
 
         if (DEBUG_PREFETCH) {
-          console.log('🔄 Starting migration from localStorage to IndexedDB...');
+          console.log(
+            "🔄 Starting migration from localStorage to IndexedDB..."
+          );
         }
 
-        const keys = Object.keys(localStorage).filter(k =>
-          k.startsWith('kibaki_char_ids_v1::') || k.startsWith('kibaki_pair_hashes_v1::')
+        const keys = Object.keys(localStorage).filter(
+          (k) =>
+            k.startsWith("kibaki_char_ids_v1::") ||
+            k.startsWith("kibaki_pair_hashes_v1::")
         );
 
         let migrationCount = 0;
@@ -583,38 +638,44 @@ function DuelContainerInner(_: { lang: Lang }) {
           try {
             const data = localStorage.getItem(key);
             if (data) {
-              if (key.includes('char_ids')) {
+              if (key.includes("char_ids")) {
                 const { ids } = JSON.parse(data);
-                const scopeName = key.split('::')[1];
+                const scopeName = key.split("::")[1];
                 if (DEBUG_PREFETCH) {
-                  console.log(`Migrating ${ids.length} character IDs from scope ${scopeName}`);
+                  console.log(
+                    `Migrating ${ids.length} character IDs from scope ${scopeName}`
+                  );
                 }
-              } else if (key.includes('pair_hashes')) {
+              } else if (key.includes("pair_hashes")) {
                 const pairs = JSON.parse(data);
-                const scopeName = key.split('::')[1];
+                const scopeName = key.split("::")[1];
                 if (Array.isArray(pairs)) {
                   for (const hash of pairs) {
                     await storage.addPairHash(scopeName, hash);
                   }
                   migrationCount += pairs.length;
                   if (DEBUG_PREFETCH) {
-                    console.log(`Migrated ${pairs.length} pair hashes from scope ${scopeName}`);
+                    console.log(
+                      `Migrated ${pairs.length} pair hashes from scope ${scopeName}`
+                    );
                   }
                 }
               }
             }
           } catch (error) {
-            console.warn('Failed to migrate key:', key, error);
+            console.warn("Failed to migrate key:", key, error);
           }
         }
 
-        localStorage.setItem('kibaki_migrated_to_idb', 'true');
+        localStorage.setItem("kibaki_migrated_to_idb", "true");
 
         if (DEBUG_PREFETCH && migrationCount > 0) {
-          console.log(`✅ Migration complete: ${migrationCount} items migrated`);
+          console.log(
+            `✅ Migration complete: ${migrationCount} items migrated`
+          );
         }
       } catch (error) {
-        console.error('Migration failed:', error);
+        console.error("Migration failed:", error);
       }
     };
 
@@ -628,15 +689,15 @@ function DuelContainerInner(_: { lang: Lang }) {
     const cleanup = setInterval(async () => {
       const now = Date.now();
 
-      setPrefetchQueue(prev => {
-        const filtered = prev.filter(d =>
-          (now - d.timestamp) < PREFETCH_CONFIG.maxAge && d.scope === scope
+      setPrefetchQueue((prev) => {
+        const filtered = prev.filter(
+          (d) => now - d.timestamp < PREFETCH_CONFIG.maxAge && d.scope === scope
         );
         if (DEBUG_PREFETCH && filtered.length !== prev.length) {
-          console.log('Cleaned up old prefetches:', {
+          console.log("Cleaned up old prefetches:", {
             from: prev.length,
             to: filtered.length,
-            removed: prev.length - filtered.length
+            removed: prev.length - filtered.length,
           });
           monitorMemory();
         }
@@ -647,14 +708,14 @@ function DuelContainerInner(_: { lang: Lang }) {
         try {
           await storage.cleanup();
 
-          if (storage instanceof Promise || 'getStorageInfo' in storage) {
+          if (storage instanceof Promise || "getStorageInfo" in storage) {
             const storageInfo = await db.getStorageInfo();
             if (storageInfo && storageInfo.percent > 80) {
-              console.warn('Storage quota high:', storageInfo.percent + '%');
+              console.warn("Storage quota high:", storageInfo.percent + "%");
             }
           }
         } catch (error) {
-          console.warn('Storage cleanup failed:', error);
+          console.warn("Storage cleanup failed:", error);
         }
       }
     }, 300000); // Every 5 minutes
@@ -668,60 +729,62 @@ function DuelContainerInner(_: { lang: Lang }) {
       setPrefetchQueue([]);
       prefetchingRef.current = false;
       if (DEBUG_PREFETCH) {
-        console.log('Component unmounting, cleared prefetch queue');
+        console.log("Component unmounting, cleared prefetch queue");
       }
     };
   }, []);
 
   // Debug helpers for development
   useEffect(() => {
-    if (DEBUG_PREFETCH && typeof window !== 'undefined') {
+    if (DEBUG_PREFETCH && typeof window !== "undefined") {
       (window as any).kibakiDebug = {
         clearPrefetch: () => {
           setPrefetchQueue([]);
-          console.log('Prefetch queue cleared manually');
+          console.log("Prefetch queue cleared manually");
         },
         queueStatus: () => {
-          console.table(prefetchQueue.map(d => ({
-            hash: d.hash,
-            scope: d.scope,
-            imagesLoaded: d.imagesLoaded,
-            age: Math.round((Date.now() - d.timestamp) / 1000) + 's'
-          })));
+          console.table(
+            prefetchQueue.map((d) => ({
+              hash: d.hash,
+              scope: d.scope,
+              imagesLoaded: d.imagesLoaded,
+              age: Math.round((Date.now() - d.timestamp) / 1000) + "s",
+            }))
+          );
           return prefetchQueue;
         },
         forcePrefetch: () => {
           prefetchNextDuels();
-          console.log('Forced prefetch triggered');
+          console.log("Forced prefetch triggered");
         },
         memoryStatus: () => {
           monitorMemory();
         },
         authSyncStatus: () => {
-          console.log('Auth sync:', {
+          console.log("Auth sync:", {
             complete: authSyncComplete,
             lastSync: lastAuthSyncRef.current,
-            timeSinceLastSync: Date.now() - lastAuthSyncRef.current
+            timeSinceLastSync: Date.now() - lastAuthSyncRef.current,
           });
           return authSyncComplete;
         },
         forceAuthSync: () => {
           syncServerSeenPairs(scope);
-          console.log('Forced auth sync triggered');
+          console.log("Forced auth sync triggered");
         },
         storageInfo: async () => {
           if (storage) {
             const stats = await db.getCacheStats();
             const info = await db.getStorageInfo();
-            console.log('💾 Storage Statistics:', stats);
-            console.log('📊 Quota Information:', info);
+            console.log("💾 Storage Statistics:", stats);
+            console.log("📊 Quota Information:", info);
             return { stats, info };
           }
-          console.log('No storage adapter available');
-        }
+          console.log("No storage adapter available");
+        },
       };
 
-      console.log('🔧 Kibaki Debug helpers available on window.kibakiDebug');
+      console.log("🔧 Kibaki Debug helpers available on window.kibakiDebug");
     }
   }, [prefetchQueue, authSyncComplete]);
 
@@ -731,21 +794,26 @@ function DuelContainerInner(_: { lang: Lang }) {
       return;
     }
 
-    const validPrefetch = prefetchQueue.find(d =>
-      d.scope === scope &&
-      !avoid.has(d.hash) &&
-      (Date.now() - d.timestamp) < PREFETCH_CONFIG.maxAge
+    const validPrefetch = prefetchQueue.find(
+      (d) =>
+        d.scope === scope &&
+        !avoid.has(d.hash) &&
+        Date.now() - d.timestamp < PREFETCH_CONFIG.maxAge
     );
 
     if (validPrefetch) {
-      setPair({ left: validPrefetch.left, right: validPrefetch.right, hash: validPrefetch.hash });
-      setPrefetchQueue(prev => prev.filter(d => d !== validPrefetch));
+      setPair({
+        left: validPrefetch.left,
+        right: validPrefetch.right,
+        hash: validPrefetch.hash,
+      });
+      setPrefetchQueue((prev) => prev.filter((d) => d !== validPrefetch));
 
       if (DEBUG_PREFETCH) {
-        console.log('Used prefetched duel:', {
+        console.log("Used prefetched duel:", {
           hash: validPrefetch.hash,
           imagesLoaded: validPrefetch.imagesLoaded,
-          age: Date.now() - validPrefetch.timestamp
+          age: Date.now() - validPrefetch.timestamp,
         });
       }
 
@@ -754,7 +822,7 @@ function DuelContainerInner(_: { lang: Lang }) {
     }
 
     if (DEBUG_PREFETCH) {
-      console.log('No valid prefetch available, using normal loading');
+      console.log("No valid prefetch available, using normal loading");
     }
 
     const [leftId, rightId, hash] = pickRandomDistinctPair(allIds, avoid);
@@ -768,46 +836,59 @@ function DuelContainerInner(_: { lang: Lang }) {
     const nonce = crypto.randomUUID();
 
     if (DEBUG_MODE) {
-      console.log('🔧 DEBUG: Vote initiated', { winnerId, loserId, nonce });
+      console.log("🔧 DEBUG: Vote initiated", { winnerId, loserId, nonce });
 
       const urlParams = new URLSearchParams(window.location.search);
-      const debugScenario = urlParams.get('debug');
+      const debugScenario = urlParams.get("debug");
 
       switch (debugScenario) {
-        case 'rate-limit':
-          console.log('🔧 DEBUG: Simulating rate limit');
-          await new Promise(resolve => setTimeout(resolve, 300));
-          return { ok: false, reason: 'rate_limited', duplicate: false, result: {} };
+        case "rate-limit":
+          console.log("🔧 DEBUG: Simulating rate limit");
+          await new Promise((resolve) => setTimeout(resolve, 300));
+          return {
+            ok: false,
+            reason: "rate_limited",
+            duplicate: false,
+            result: {},
+          };
 
-        case 'server-error':
-          console.log('🔧 DEBUG: Simulating server error');
-          await new Promise(resolve => setTimeout(resolve, 500));
-          return { ok: false, reason: 'server_error', duplicate: false, result: {} };
+        case "server-error":
+          console.log("🔧 DEBUG: Simulating server error");
+          await new Promise((resolve) => setTimeout(resolve, 500));
+          return {
+            ok: false,
+            reason: "server_error",
+            duplicate: false,
+            result: {},
+          };
 
-        case 'network-error':
-          console.log('🔧 DEBUG: Simulating network error');
-          await new Promise(resolve => setTimeout(resolve, 200));
-          throw new Error('Network connection failed');
+        case "network-error":
+          console.log("🔧 DEBUG: Simulating network error");
+          await new Promise((resolve) => setTimeout(resolve, 200));
+          throw new Error("Network connection failed");
 
-        case 'slow-network':
-          console.log('🔧 DEBUG: Simulating slow network');
-          await new Promise(resolve => setTimeout(resolve, 2000));
+        case "slow-network":
+          console.log("🔧 DEBUG: Simulating slow network");
+          await new Promise((resolve) => setTimeout(resolve, 2000));
           break;
 
         default:
-          console.log('🔧 DEBUG: Normal flow - Add ?debug=rate-limit|server-error|network-error|slow-network to test scenarios');
+          console.log(
+            "🔧 DEBUG: Normal flow - Add ?debug=rate-limit|server-error|network-error|slow-network to test scenarios"
+          );
       }
     }
 
     const { data } = await supabase.auth.getSession();
-    const token = data.session?.access_token ?? import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
+    const token =
+      data.session?.access_token ?? import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
     const url = `${import.meta.env.PUBLIC_SUPABASE_URL}/functions/v1/vote`;
 
     const response = await fetch(url, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({ winner_id: winnerId, loser_id: loserId, nonce }),
     });
@@ -815,74 +896,78 @@ function DuelContainerInner(_: { lang: Lang }) {
     const result: any = await response.json().catch(() => ({}));
 
     if (DEBUG_MODE) {
-      console.log('🔧 DEBUG: Vote response', { ok: response.ok, result });
+      console.log("🔧 DEBUG: Vote response", { ok: response.ok, result });
     }
 
     return {
       ok: response.ok,
       reason: result?.reason,
       duplicate: result?.duplicate,
-      result
+      result,
     };
   };
 
-  const vote = async (side: 'left' | 'right') => {
+  const vote = async (side: "left" | "right") => {
     if (!pair) return;
     if (isVoting || isTransitioning) return;
     const now = Date.now();
     if (now - (lastVoteAt ?? 0) < 700) return;
 
     const currentPair = pair;
-    const winnerId = side === 'left' ? currentPair.left.id : currentPair.right.id;
-    const loserId = side === 'left' ? currentPair.right.id : currentPair.left.id;
+    const winnerId =
+      side === "left" ? currentPair.left.id : currentPair.right.id;
+    const loserId =
+      side === "left" ? currentPair.right.id : currentPair.left.id;
 
-    setOptimisticVote({ winnerId, status: 'pending' });
+    setOptimisticVote({ winnerId, status: "pending" });
     setIsTransitioning(true);
     setIsVoting(true);
 
     try {
       const voteResult = await postVote(winnerId, loserId);
 
-      if (!voteResult.ok && voteResult.reason === 'rate_limited') {
-        setOptimisticVote({ winnerId, status: 'error' });
+      if (!voteResult.ok && voteResult.reason === "rate_limited") {
+        setOptimisticVote({ winnerId, status: "error" });
         setRateLimitedAt(Date.now());
-        showToast({ type: 'error', message: t('duel.rateLimited') });
+        showToast({ type: "error", message: t("duel.rateLimited") });
         setTimeout(() => {
-          setOptimisticVote({ winnerId: null, status: 'idle' });
+          setOptimisticVote({ winnerId: null, status: "idle" });
           setIsTransitioning(false);
           setIsVoting(false);
         }, 600);
         return;
       } else if (!voteResult.ok) {
-        setOptimisticVote({ winnerId, status: 'error' });
-        showToast({ type: 'error', message: t('duel.voteError') });
+        setOptimisticVote({ winnerId, status: "error" });
+        showToast({ type: "error", message: t("duel.voteError") });
         setTimeout(() => {
-          setOptimisticVote({ winnerId: null, status: 'idle' });
+          setOptimisticVote({ winnerId: null, status: "idle" });
           setIsTransitioning(false);
           setIsVoting(false);
         }, 600);
         return;
       } else {
-        setOptimisticVote({ winnerId, status: 'success' });
-        showToast({ type: 'info', message: t('actions.voteTaken') });
+        setOptimisticVote({ winnerId, status: "success" });
+        showToast({ type: "info", message: t("actions.voteTaken") });
 
         setLastVoteAt(Date.now());
         addUsedPair(currentPair.hash, scope);
-        try { void markPairSeen(currentPair.hash).catch(() => {}); } catch {}
+        try {
+          void markPairSeen(currentPair.hash).catch(() => {});
+        } catch {}
         setLastVote(side);
 
         setTimeout(async () => {
           await loadFreshPair(ids, getUsedPairs(scope));
-          setOptimisticVote({ winnerId: null, status: 'idle' });
+          setOptimisticVote({ winnerId: null, status: "idle" });
           setIsTransitioning(false);
           setIsVoting(false);
         }, 400);
       }
     } catch (e: any) {
-      setOptimisticVote({ winnerId, status: 'error' });
-      showToast({ type: 'error', message: t('duel.voteImpossible') });
+      setOptimisticVote({ winnerId, status: "error" });
+      showToast({ type: "error", message: t("duel.voteImpossible") });
       setTimeout(() => {
-        setOptimisticVote({ winnerId: null, status: 'idle' });
+        setOptimisticVote({ winnerId: null, status: "idle" });
         setIsTransitioning(false);
         setIsVoting(false);
       }, 600);
@@ -892,12 +977,14 @@ function DuelContainerInner(_: { lang: Lang }) {
   const skip = async () => {
     if (!pair) return;
     addUsedPair(pair.hash, scope);
-    try { void markPairSeen(pair.hash).catch(() => {}); } catch {}
+    try {
+      void markPairSeen(pair.hash).catch(() => {});
+    } catch {}
     try {
       await loadFreshPair(ids, getUsedPairs(scope));
     } catch (e: any) {
       setError(e?.message ?? String(e));
-      setState('error');
+      setState("error");
     }
   };
 
@@ -907,17 +994,19 @@ function DuelContainerInner(_: { lang: Lang }) {
       await loadFreshPair(ids, getUsedPairs(scope));
     } catch (e: any) {
       setError(e?.message ?? String(e));
-      setState('error');
+      setState("error");
     }
   };
 
-  if (state === 'loading' || state === 'idle') {
+  if (state === "loading" || state === "idle") {
     return (
       <div className="duel-container">
         <SkeletonDuel />
         {loadingState.isLoading && loadingState.message && (
           <div className="duel-container__loading">
-            <div className="duel-container__loading">{loadingState.message}</div>
+            <div className="duel-container__loading">
+              {loadingState.message}
+            </div>
             {loadingState.progress !== undefined && (
               <div className="duel-container__progress">
                 <div
@@ -932,12 +1021,12 @@ function DuelContainerInner(_: { lang: Lang }) {
     );
   }
 
-  if (state === 'error') {
+  if (state === "error") {
     return (
       <div className="duel-container__error">
         <div className="duel-container__error-message">
           <span className="duel-container__error-icon">⚠️</span>
-          <span>{error ?? t('duel.error')}</span>
+          <span>{error ?? t("duel.error")}</span>
         </div>
         {loadingState.error && (
           <div className="duel-container__error-details">
@@ -952,11 +1041,13 @@ function DuelContainerInner(_: { lang: Lang }) {
     return (
       <div className="duel-container">
         <div className="duel-container__header">
-          <ScopeSelector universes={universes} value={scope} onChange={setScope} />
+          <ScopeSelector
+            universes={universes}
+            value={scope}
+            onChange={setScope}
+          />
         </div>
-        <div className="duel-container__empty">
-          {t('duel.notEnough')}
-        </div>
+        <div className="duel-container__empty">{t("duel.notEnough")}</div>
       </div>
     );
   }
@@ -965,34 +1056,36 @@ function DuelContainerInner(_: { lang: Lang }) {
     return (
       <div className="duel-container">
         <div className="duel-container__header">
-          <ScopeSelector universes={universes} value={scope} onChange={(s) => setScope(s)} />
+          <ScopeSelector
+            universes={universes}
+            value={scope}
+            onChange={(s) => setScope(s)}
+          />
         </div>
-        <div className="duel-container__loading">
-          {t('duel.loading')}
-        </div>
+        <div className="duel-container__loading">{t("duel.loading")}</div>
       </div>
     );
   }
 
   const { left, right, hash } = pair;
-  const leftView = getCharacterText(left);
+  const leftView = { name: getCharacterText(left).name, description: undefined };
   const rightView = getCharacterText(right);
 
   const getCardClasses = (characterId: number) => {
     const classes: string[] = [];
 
-    classes.push('duel-container__card');
+    classes.push("duel-container__card");
 
     if (optimisticVote.winnerId === characterId) {
       switch (optimisticVote.status) {
-        case 'pending':
-          classes.push('duel-container__card--pending');
+        case "pending":
+          classes.push("duel-container__card--pending");
           break;
-        case 'success':
-          classes.push('duel-container__card--success');
+        case "success":
+          classes.push("duel-container__card--success");
           break;
-        case 'error':
-          classes.push('duel-container__card--error');
+        case "error":
+          classes.push("duel-container__card--error");
           break;
         default:
           break;
@@ -1000,28 +1093,28 @@ function DuelContainerInner(_: { lang: Lang }) {
     } else if (
       optimisticVote.winnerId &&
       optimisticVote.winnerId !== characterId &&
-      optimisticVote.status === 'pending'
+      optimisticVote.status === "pending"
     ) {
-      classes.push('duel-container__card--inactive');
+      classes.push("duel-container__card--inactive");
     }
 
-    return classes.join(' ');
+    return classes.join(" ");
   };
 
   const getButtonClasses = (characterId: number) => {
     const disabled = isVoting || isTransitioning;
     const isWinner = optimisticVote.winnerId === characterId;
 
-    let classes = 'duel-container__vote-button';
+    let classes = "duel-container__vote-button";
 
     if (disabled) {
-      classes += ' duel-container__vote-button--disabled';
+      classes += " duel-container__vote-button--disabled";
     }
 
-    if (isWinner && optimisticVote.status === 'success') {
-      classes += ' duel-container__vote-button--success';
-    } else if (isWinner && optimisticVote.status === 'error') {
-      classes += ' duel-container__vote-button--error';
+    if (isWinner && optimisticVote.status === "success") {
+      classes += " duel-container__vote-button--success";
+    } else if (isWinner && optimisticVote.status === "error") {
+      classes += " duel-container__vote-button--error";
     }
 
     return classes;
@@ -1029,12 +1122,30 @@ function DuelContainerInner(_: { lang: Lang }) {
 
   return (
     <div className="duel-container">
-      <div className="duel-container__header">
-        <ScopeSelector universes={universes} value={scope} onChange={(s) => setScope(s)} />
+      <div className="duel-container__actions">
+        <ScopeSelector
+          universes={universes}
+          value={scope}
+          onChange={(s) => setScope(s)}
+        />
         {/* 🔧 NEW: Auth sync indicator */}
-        {!authSyncComplete && DEBUG_MODE && (
+        {/* {!authSyncComplete && DEBUG_MODE && (
           <span className="duel-container__sync-indicator">Syncing...</span>
-        )}
+        )} */}
+        <button onClick={skip} className="duel-container__action-button">
+          {t("duel.skip")}
+        </button>
+        {/* <button onClick={resetPairs} className="duel-container__action-button">
+          {t("duel.resetPairs")}
+        </button> */}
+        {/* {import.meta.env.DEV ? (
+          <span className="duel-container__hash">hash: {hash}</span>
+        ) : null} */}
+        {/* {lastVote ? (
+          <span className="duel-container__saved-label">
+            {t("duel.savedLocally")}
+          </span>
+        ) : null} */}
       </div>
 
       <div className="duel-container__cards-grid">
@@ -1047,13 +1158,15 @@ function DuelContainerInner(_: { lang: Lang }) {
             display={leftView}
           />
           <button
-            onClick={() => vote('left')}
+            onClick={() => vote("left")}
             disabled={isVoting || isTransitioning}
             className={getButtonClasses(left.id)}
           >
-            {t('duel.leftVote')}
+            {t("duel.leftVote")}
           </button>
         </div>
+
+        <div className="duel-container__separator">VS</div>
 
         <div className="duel-container__card-column">
           <CharacterCard
@@ -1064,76 +1177,97 @@ function DuelContainerInner(_: { lang: Lang }) {
             display={rightView}
           />
           <button
-            onClick={() => vote('right')}
+            onClick={() => vote("right")}
             disabled={isVoting || isTransitioning}
             className={getButtonClasses(right.id)}
           >
-            {t('duel.rightVote')}
+            {t("duel.rightVote")}
           </button>
         </div>
       </div>
 
-      <div className="duel-container__actions">
-        <button
-          onClick={skip}
-          className="duel-container__action-button"
-        >
-          {t('duel.skip')}
-        </button>
-        <button
-          onClick={resetPairs}
-          className="duel-container__action-button"
-        >
-          {t('duel.resetPairs')}
-        </button>
-        {import.meta.env.DEV ? (
-          <span className="duel-container__hash">hash: {hash}</span>
-        ) : null}
-        {lastVote ? (
-          <span className="duel-container__saved-label">{t('duel.savedLocally')}</span>
-        ) : null}
-      </div>
-
       {/* Modals */}
-      <Modal open={openLeft} onClose={() => setOpenLeft(false)} title={leftView.name}>
+      <Modal
+        open={openLeft}
+        onClose={() => setOpenLeft(false)}
+        title={leftView.name}
+      >
         <CharacterDetails character={left} display={leftView} />
       </Modal>
-      <Modal open={openRight} onClose={() => setOpenRight(false)} title={rightView.name}>
+      <Modal
+        open={openRight}
+        onClose={() => setOpenRight(false)}
+        title={rightView.name}
+      >
         <CharacterDetails character={right} display={rightView} />
       </Modal>
     </div>
   );
 }
 
-function CharacterDetails({ character, display }: { character: CharacterRow; display: { name: string; description?: string } }) {
-  const { t } = useI18n();
+function CharacterDetails({
+  character,
+  display,
+}: {
+  character: CharacterRow;
+  display: { name: string; description?: string };
+}) {
+  const { t, getUniverseLabel } = useI18n();
+  const universeLabel = getUniverseLabel(character.universe.slug);
+
   return (
     <div className="character-details">
-      <div className="character-details__elo">ELO: <strong>{character.elo}</strong></div>
-      <div className="character-details__wins">{t('duel.modalWins')}: <strong>{character.wins}</strong></div>
-      <div className="character-details__losses">{t('duel.modalLosses')}: <strong>{character.losses}</strong></div>
+      {character.image_url ? (
+        <div className="character-details__image-wrapper">
+          <img
+            src={character.image_url}
+            alt={display.name}
+            className="character-details__image"
+            loading="lazy"
+            decoding="async"
+            referrerPolicy="no-referrer"
+          />
+        </div>
+      ) : (
+        <div className="character-details__image-placeholder" />
+      )}
+      <div className="character-details__universe">
+        {universeLabel}
+      </div>
       {display.description ? (
         <p className="character-details__description">{display.description}</p>
       ) : (
-        <p className="character-details__description character-details__description--empty">{t('duel.noDescription')}</p>
+        <p className="character-details__description character-details__description--empty">
+          {t("duel.noDescription")}
+        </p>
       )}
     </div>
   );
 }
 
-function ScopeSelector({ universes, value, onChange }: { universes: Universe[]; value: string; onChange: (v: string) => void }) {
+function ScopeSelector({
+  universes,
+  value,
+  onChange,
+}: {
+  universes: Universe[];
+  value: string;
+  onChange: (v: string) => void;
+}) {
   const { t, getUniverseLabel } = useI18n();
   return (
     <div className="scope-selector">
-      <label className="scope-selector__label">{t('duel.scopeLabel')}</label>
+      {/* <label className="scope-selector__label">{t('duel.scopeLabel')}</label> */}
       <select
         className="scope-selector__select"
         value={value}
         onChange={(e) => onChange(e.target.value)}
       >
-        <option value="global">{t('duel.globalScope')}</option>
+        <option value="global">{t("duel.globalScope")}</option>
         {universes.map((u) => (
-          <option key={u.id} value={u.slug}>{getUniverseLabel(u.slug)}</option>
+          <option key={u.id} value={u.slug}>
+            {getUniverseLabel(u.slug)}
+          </option>
         ))}
       </select>
     </div>

@@ -19,10 +19,11 @@ function truncate(text: string, max = 120): string {
 }
 
 export default function CharacterCard({ character, side, onMore, className, display }: CharacterCardProps) {
-  const { t } = useI18n();
-  const { name, description, image_url, elo, wins, losses } = character;
+  const { t, getUniverseLabel } = useI18n();
+  const { name, description, image_url, elo, wins, losses, universe } = character;
   const displayName = display?.name ?? name;
   const displayDescription = display?.description ?? description ?? undefined;
+  const universeLabel = getUniverseLabel(universe.slug);
 
   return (
     <div className={`character-card ${className || ''}`}>
@@ -47,16 +48,19 @@ export default function CharacterCard({ character, side, onMore, className, disp
 
       <div className="character-card__content">
         <div className="character-card__header">
-          <h3 className="character-card__name" title={displayName}>{displayName}</h3>
+          <h2 className="character-card__name" title={displayName}>{displayName}</h2>
           <div className="character-card__elo">ELO: <span className="character-card__elo-value">{elo}</span></div>
         </div>
+        <div className="character-card__universe">{universeLabel}</div>
         <div className="character-card__stats">W‑L: <span className="character-card__stats-value">{wins}</span>‑<span className="character-card__stats-value">{losses}</span></div>
 
         {displayDescription ? (
           <p className="character-card__description">{truncate(displayDescription, 120)}</p>
-        ) : (
+        ) : null}
+
+        {/* (
           <p className="character-card__description character-card__description--empty">{t('duel.noDescription')}</p>
-        )}
+        ) */}
 
         <div className="character-card__footer">
           <button

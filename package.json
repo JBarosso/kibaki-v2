@@ -3,8 +3,13 @@
   "version": "1.0.0",
   "type": "module",
   "dependencies": {
-    "@supabase/supabase-js": "^2.57.4",
+    "@supabase/supabase-js": "^2.75.1",
     "dexie": "^4.2.0",
+    "dotenv": "^17.2.3",
+    "node-fetch": "^2.7.0",
+    "openai": "^6.5.0",
+    "p-limit": "^7.1.1",
+    "p-retry": "^7.1.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },
@@ -17,7 +22,7 @@
   "devDependencies": {
     "@astrojs/react": "^4.4.0",
     "@astrojs/tailwind": "^6.0.2",
-    "@astrojs/vercel": "^8.2.10",
+    "@astrojs/vercel": "^8.0.4",
     "astro": "^5.14.6",
     "autoprefixer": "^10.4.21",
     "postcss": "^8.5.6",

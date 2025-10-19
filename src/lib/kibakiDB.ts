@@ -278,6 +278,8 @@ if (import.meta.env.DEV) {
           elo: 1000 + i,
           wins: i,
           losses: i,
+          universe: { id: 1, slug: 'test', name: 'Test Universe' },
+          universe_id: 1,
           cached_at: Date.now(),
           ttl: 3600000
         }));

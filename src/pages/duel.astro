@@ -17,7 +17,11 @@ const subtitle = tServer(lang, 'duel.subtitle');
 ---
 <SiteLayout title={pageTitle}>
   <Seo slot="head" title={pageTitle} description={subtitle} />
-  <h1 class="text-2xl font-bold mb-4">{heading}</h1>
-  <p class="text-sm text-gray-600 mb-6">{subtitle}</p>
-  <DuelContainer client:load lang={lang} />
+  <div class="duel-page__container">
+    <div class="duel-page__header">
+      <h1>{heading}</h1>
+      <p>{subtitle}</p>
+    </div>
+    <DuelContainer client:load lang={lang} />
+  </div>
 </SiteLayout>

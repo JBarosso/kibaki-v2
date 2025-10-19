@@ -17,6 +17,7 @@ export type CharacterRow = {
   elo: number;
   wins: number;
   losses: number;
+  universe: { id: number; slug: string; name: string };
 };
 
 export type DuelPair = {
@@ -217,7 +218,7 @@ export async function loadPairDetails(
 
   const { data, error } = await supabase
     .from('characters')
-    .select('id, name, slug, description, image_url, elo, wins, losses')
+    .select('id, name, slug, description, image_url, elo, wins, losses, universe:univers!inner ( id, slug, name )')
     .in('id', ids);
 
   if (error) {

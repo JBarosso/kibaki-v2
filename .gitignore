@@ -7,7 +7,8 @@ dist/
 .vercel/
 .netlify/
 .claude/
-.design/
+design/
+scripts/
 
 #env
 .env

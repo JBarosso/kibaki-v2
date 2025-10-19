@@ -19,7 +19,7 @@ export interface StorageAdapter {
   addPairHash(scope: string, hash: string): Promise<void>;
   clearPairHashes(scope: string): Promise<void>;
   getCharacter(id: number): Promise<CachedCharacter | null>;
-  setCharacter(character: CharacterRow, universeId?: number): Promise<void>;
+  setCharacter(character: CharacterRow): Promise<void>;
   getCharacters(ids: number[]): Promise<CachedCharacter[]>;
   cacheImage(characterId: number, imageUrl: string, blob: Blob): Promise<void>;
   getImageBlob(characterId: number): Promise<Blob | null>;
@@ -186,13 +186,13 @@ class IndexedDBAdapter implements StorageAdapter {
     }
   }
 
-  async setCharacter(character: CharacterRow, universeId?: number): Promise<void> {
+  async setCharacter(character: CharacterRow): Promise<void> {
     try {
       if (!(await this.isAvailable())) return;
 
       const cachedChar: CachedCharacter = {
         ...character,
-        universe_id: universeId,
+        universe_id: character.universe.id,
         cached_at: Date.now(),
         ttl: 3600000 // 1 hour
       };
@@ -393,7 +393,7 @@ class LocalStorageAdapter implements StorageAdapter {
     return null;
   }
 
-  async setCharacter(character: CharacterRow, universeId?: number): Promise<void> {
+  async setCharacter(character: CharacterRow): Promise<void> {
     // localStorage doesn't cache full character objects
   }
 
@@ -491,10 +491,10 @@ class MemoryAdapter implements StorageAdapter {
     return null;
   }
 
-  async setCharacter(character: CharacterRow, universeId?: number): Promise<void> {
+  async setCharacter(character: CharacterRow): Promise<void> {
     const cachedChar: CachedCharacter = {
       ...character,
-      universe_id: universeId,
+      universe_id: character.universe.id,
       cached_at: Date.now(),
       ttl: 3600000
     };

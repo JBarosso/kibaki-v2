@@ -48,6 +48,25 @@ function HeaderInner({ lang, navLabels, actionLabels, infoText }: AppHeaderProps
   const [session, setSession] = useState<Session>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
 
+  // Update CSS variable with header height
+  useEffect(() => {
+    const updateHeaderHeight = () => {
+      const header = document.querySelector('.app-header');
+      if (header) {
+        const height = header.getBoundingClientRect().height;
+        document.documentElement.style.setProperty('--header-height', `${height}px`);
+      }
+    };
+
+    // Update on mount and resize
+    updateHeaderHeight();
+    window.addEventListener('resize', updateHeaderHeight);
+
+    return () => {
+      window.removeEventListener('resize', updateHeaderHeight);
+    };
+  }, []);
+
   useEffect(() => {
     const init = async () => {
       const { data } = await supabase.auth.getSession();
