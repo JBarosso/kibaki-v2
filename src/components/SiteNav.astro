@@ -2,9 +2,9 @@
 // Composant de navigation statique pour les pages légales
 // Basé sur AppHeader.tsx mais sans interactivité côté client
 import LanguageSwitcher from '@/components/LanguageSwitcher';
+import InfoDropdown from '@/components/InfoDropdown';
 import { getLangCookie, resolveLang, setLangCookie, tServer } from '@/i18n';
 import type { Lang } from '@/i18n';
-import { Info } from 'lucide-react';
 
 const existingCookie = getLangCookie(Astro);
 const lang: Lang = resolveLang({ url: Astro.url, req: Astro.request, cookie: existingCookie ?? undefined });
@@ -39,21 +39,15 @@ const infoText = tServer(lang, 'info.publicDomain');
       <a href="/account" class="site-nav__link">{nav.account}</a>
 
       {/* Info dropdown */}
-      <div class="site-nav__info-dropdown">
-        <details>
-          <summary class="site-nav__info-summary">
-            <Info client:only="react" className="site-nav__info-icon" aria-hidden="true" size={18} /> <span>{nav.info}</span>
-          </summary>
-          <div class="site-nav__info-content">
-            <ul class="site-nav__info-list">
-              <li class="site-nav__info-item"><a class="site-nav__info-link" href="/legal">{nav.legal}</a></li>
-              <li class="site-nav__info-item"><a class="site-nav__info-link" href="/privacy">{nav.privacy}</a></li>
-              <li class="site-nav__info-item"><a class="site-nav__info-link" href="/terms">{nav.terms}</a></li>
-            </ul>
-            <p class="site-nav__info-text">{infoText}</p>
-          </div>
-        </details>
-      </div>
+      <InfoDropdown
+        client:only="react"
+        links={[
+          { href: '/legal', label: nav.legal },
+          { href: '/privacy', label: nav.privacy },
+          { href: '/terms', label: nav.terms }
+        ]}
+        infoText={infoText}
+      />
 
       <LanguageSwitcher client:only="react" lang={lang} />
     </nav>

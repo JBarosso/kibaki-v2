@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import { ensureOwnProfile } from '@/lib/profiles';
 import { showToast } from '@/lib/toast';
+import CustomSelect from '@/components/CustomSelect';
 
 type UniverseRow = { id: number; slug: string; name: string };
 
@@ -34,7 +35,7 @@ export default function SubmitIsland() {
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState<{ username: string } | null>(null);
 
-  const firstInputRef = useRef<HTMLSelectElement | null>(null);
+  const firstInputRef = useRef<HTMLDivElement | null>(null);
 
   const resetForm = () => {
     setSelectValue('');
@@ -178,19 +179,17 @@ export default function SubmitIsland() {
       <form onSubmit={onSubmit} className="submit-island__form">
         <div className="submit-island__field">
           <label className="submit-island__label">Univers</label>
-          <select
-            className={`submit-island__select ${universesLoading ? 'submit-island__select--disabled' : ''}`}
+          <CustomSelect
+            options={[
+              { value: '', label: '— Sélectionner —' },
+              ...universes.map((u) => ({ value: String(u.id), label: u.name })),
+              { value: 'other', label: 'Other…' }
+            ]}
             value={selectValue}
-            onChange={(e) => setSelectValue(e.target.value)}
+            onChange={setSelectValue}
             disabled={universesLoading}
-            ref={firstInputRef}
-          >
-            <option value="">— Sélectionner —</option>
-            {universes.map((u) => (
-              <option key={u.id} value={String(u.id)}>{u.name}</option>
-            ))}
-            <option value="other">Other…</option>
-          </select>
+            className="submit-island__select"
+          />
           {universesError && (
             <p className="submit-island__error">{universesError}</p>
           )}

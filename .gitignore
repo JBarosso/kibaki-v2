@@ -9,6 +9,7 @@ dist/
 .claude/
 design/
 scripts/
+MIGRATION_GUIDE.md
 
 #env
 .env

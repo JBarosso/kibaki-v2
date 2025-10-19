@@ -13,7 +13,6 @@
 }
 
 .duel-container {
-
   &__scope-selector {
   }
 
@@ -32,6 +31,15 @@
     grid-template-rows: 100%;
     grid-template-areas: "left separator right";
     background-color: var(--neutral);
+
+    @media (max-width: 640px) {
+      grid-template-columns: 1fr;
+      grid-template-rows: 1fr 1px 1fr;
+      grid-template-areas:
+        "left"
+        "separator"
+        "right";
+    }
   }
 
   &__separator {
@@ -42,8 +50,8 @@
     color: var(--neutral-light);
     border-radius: 50%;
     grid-area: separator;
-    transform: translate(-50%, -50%);
     align-self: center;
+    justify-self: center;
     display: grid;
     align-items: center;
     text-align: center;
@@ -55,7 +63,7 @@
     position: relative;
   }
 
-  &__vote-overlay{
+  &__vote-overlay {
     position: absolute;
     bottom: 0;
     left: 0;
@@ -64,10 +72,10 @@
     z-index: 1;
     cursor: pointer;
     transition: var(--transition-base);
-    
+
     &::before,
-    &::after{
-      content: '';
+    &::after {
+      content: "";
       position: absolute;
       bottom: 0;
       left: 0;
@@ -76,12 +84,22 @@
       transition: var(--transition-base);
     }
 
-    &::before{
-      background: linear-gradient(to top, hsl(var(--neutral-hsl), 0.95), hsl(var(--colorPlayer-hsl), 0.3), hsl(var(--colorPlayer-hsl), 0.1));
+    &::before {
+      background: linear-gradient(
+        to top,
+        hsl(var(--neutral-hsl), 0.95),
+        hsl(var(--colorPlayer-hsl), 0.3),
+        hsl(var(--colorPlayer-hsl), 0.1)
+      );
     }
 
-    &::after{
-      background: linear-gradient(to var(--direction, right), transparent, transparent, hsl(var(--colorPlayer-hsl), 0.2));
+    &::after {
+      background: linear-gradient(
+        to var(--direction, right),
+        transparent,
+        transparent,
+        hsl(var(--colorPlayer-hsl), 0.2)
+      );
     }
   }
 
@@ -114,9 +132,8 @@
       display: none;
     }
 
-    &:hover{
-
-      .character-card__image-wrapper{
+    &:hover {
+      .character-card__image-wrapper {
         transform: scale(1.05);
       }
     }
@@ -133,13 +150,17 @@
 
     &--error {
       .duel-container__vote-overlay::before {
-        background: linear-gradient(to top, hsl(0, 60%, 40%, 0.95), hsl(0, 60%, 50%, 0.4), hsl(0, 60%, 50%, 0.2));
+        background: linear-gradient(
+          to top,
+          hsl(0, 60%, 40%, 0.95),
+          hsl(0, 60%, 50%, 0.4),
+          hsl(0, 60%, 50%, 0.2)
+        );
       }
     }
   }
 
   &__card {
-
     &--pending {
     }
 
@@ -190,17 +211,18 @@
     gap: 8px;
     backdrop-filter: blur(12px);
     border: 1px solid hsl(0, 0%, 100%, 0.1);
-    background-color:  transparent;
+    background-color: transparent;
     padding: 10px 16px;
     font-weight: 500;
     letter-spacing: 0.05em;
     border-radius: var(--radius-2);
     color: var(--button-color);
-    font-size: var(--fs-1);
+    font-size: 12px;
 
-    &:hover{
+    &:hover {
       --button-color: var(--secondary);
       border-color: var(--button-color);
+      background-color: hsl(var(--neutral-hsl), 0.25);
     }
   }
 
@@ -240,65 +262,11 @@
   }
 
   &__select {
-    --select-color: var(--neutral-light);
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    gap: 8px;
-    backdrop-filter: blur(12px);
-    border: 1px solid var(--primary);
-    background-color: transparent;
-    padding: 8px 16px;
-    font-weight: 400;
-    letter-spacing: 0.02em;
-    border-radius: 8px;
-    color: var(--select-color);
-    font-size: 14px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    padding-right: 36px;
-    appearance: none;
-
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 0.75rem center;
-    background-size: 1rem;
-
-    &:hover {
-      background-color: hsl(var(--neutral-hsl), 0.25);
-    }
-
-    &:focus {
-      outline: none;
-      border-color: #00d9ff;
-      box-shadow: 0 0 0 3px rgba(0, 217, 255, 0.1);
-    }
-
-    // Styles pour les options du dropdown
-    option {
-      background-color: #0f172a;
-      color: #e2e8f0;
-      padding: 12px 16px;
-      font-weight: 200;
-      cursor: pointer;
-
-      &:hover,
-      &:focus {
-        background-color: var(--primary);
-        color: #0f172a;
-      }
-
-      &:checked {
-        background-color: var(--primary);
-        color: #0f172a;
-        font-weight: 400;
-      }
-    }
+    --select-color: var(--neutral-light-hsl);
   }
 }
 
 .character-card {
-
   &__image-wrapper {
     position: absolute;
     top: 0;
@@ -308,7 +276,7 @@
     z-index: 0;
     transition: var(--transition-base);
 
-    img{
+    img {
       height: 100%;
       width: 100%;
       object-fit: cover;
@@ -322,25 +290,29 @@
     color: var(--neutral-light);
     display: grid;
     grid-template-columns: 1fr auto;
+    gap: 0 8px;
+    text-wrap-style: balance;
+    align-items: flex-end;
   }
 
-  &__name{
+  &__name {
     font-weight: 600;
     font-size: var(--fs-10);
   }
 
-  &__universe{
+  &__universe {
     color: var(--colorPlayer);
     font-weight: 300;
     font-size: var(--fs-4);
   }
 
-  &__footer{
+  &__footer {
     grid-column: 2/3;
     grid-row: 1/-1;
+    margin-bottom: 0.6em;
   }
 
-  &__more-button{
+  &__more-button {
     --width: 24px;
     width: var(--width);
     height: var(--width);
@@ -357,17 +329,22 @@
   }
 }
 
-.duel-page__header{
+.duel-page__header {
   position: relative;
   z-index: 1;
   text-align: center;
-  margin: var(--header-margin, 100px) auto var(--spacing-1) auto;
+  margin: var(--header-height, 100px) auto var(--spacing-1) auto;
   padding: var(--spacing-05) var(--spacing-1);
   width: fit-content;
   border-radius: var(--radius-2);
   background: rgba(255, 255, 255, 0.2);
-  border-radius: 16px;
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
   backdrop-filter: blur(5px);
   border: 1px solid rgba(255, 255, 255, 0.3);
+
+  font-size: var(--fs-4);
+
+  h1 {
+    font-size: var(--fs-11);
+  }
 }

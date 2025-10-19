@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import type { Lang } from '@/i18n';
 import { isLang, persistLangClient, useI18nOptional } from '@/i18n';
+import CustomSelect from '@/components/CustomSelect';
 
 const OPTIONS: { value: Lang; label: string }[] = [
   { value: 'en', label: 'EN' },
@@ -28,11 +29,10 @@ export default function LanguageSwitcher({ lang }: Props) {
     }
   }, [ctx, current]);
 
-  const onChange: React.ChangeEventHandler<HTMLSelectElement> = (event) => {
-    const value = event.target.value;
+  const onChange = (value: string) => {
     if (!isLang(value)) return;
-    setCurrent(value);
-    persistLangClient(value);
+    setCurrent(value as Lang);
+    persistLangClient(value as Lang);
     const url = new URL(window.location.href);
     url.searchParams.set('lang', value);
     window.location.href = url.toString();
@@ -40,21 +40,15 @@ export default function LanguageSwitcher({ lang }: Props) {
 
   return (
     <div className="language-switcher">
-      <label htmlFor="language-switcher" className="language-switcher__label">
+      {/* <label htmlFor="language-switcher" className="language-switcher__label">
         Language
-      </label>
-      <select
-        id="language-switcher"
+      </label> */}
+      <CustomSelect
+        options={OPTIONS}
         value={current}
         onChange={onChange}
         className="language-switcher__select"
-      >
-        {OPTIONS.map((option) => (
-          <option key={option.value} value={option.value}>
-            {option.label}
-          </option>
-        ))}
-      </select>
+      />
     </div>
   );
 }

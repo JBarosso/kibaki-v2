@@ -67,12 +67,15 @@ h6 {
   --player1: hsl(var(--player1-hsl), 1);
   --player2: hsl(var(--player2-hsl), 1);
 
-  --background: #0d0d0d;
+  --background-hsl: 222, 47%, 11%;
+  --background: hsl(var(--background-hsl), 1);
   --foreground: #f5f5f5;
 
   --neutral-hsl: 0, 0%, 6%;
-  --neutral: #101010;
-  --neutral-light: #efefef;
+  --neutral: hsl(var(--neutral-hsl), 1);
+  --neutral-light-hsl: 0, 0%, 96%;
+  --neutral-light: hsl(var(--neutral-light-hsl), 1);
+
 
   // Typography
   --family-primary: 'Orbitron', sans-serif;
@@ -119,6 +122,7 @@ h6 {
 body{
   font-family: var(--family-secondary);
   font-weight: 400;
+  overflow-x: hidden;
 }
 
 h1, h2{
@@ -133,9 +137,5 @@ button{
 
   *{
     transition: inherit;
-  }
-
-  &:hover{
-    opacity: .75;
   }
 }

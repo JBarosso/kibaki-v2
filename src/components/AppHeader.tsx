@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 import { I18nProvider, type Lang } from '@/i18n';
@@ -48,6 +48,8 @@ export default function AppHeader(props: AppHeaderProps) {
 function HeaderInner({ lang, navLabels, actionLabels, infoText }: AppHeaderProps) {
   const [session, setSession] = useState<Session>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
+  const [infoDropdownOpen, setInfoDropdownOpen] = useState(false);
+  const infoDropdownRef = useRef<HTMLDivElement>(null);
 
   // Update CSS variable with header height
   useEffect(() => {
@@ -99,6 +101,18 @@ function HeaderInner({ lang, navLabels, actionLabels, infoText }: AppHeaderProps
     setCurrentPath(typeof window !== 'undefined' ? window.location.pathname : '');
   }, []);
 
+  // Close info dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (infoDropdownRef.current && !infoDropdownRef.current.contains(event.target as Node)) {
+        setInfoDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   const isActive = (href: string) => currentPath === href || currentPath.startsWith(href + '/');
 
   const username = profile?.username ?? undefined;
@@ -129,20 +143,33 @@ function HeaderInner({ lang, navLabels, actionLabels, infoText }: AppHeaderProps
           )}
 
           {/* Info dropdown */}
-          <div className="app-header__info-dropdown">
-            <details className="group">
-              <summary className="app-header__info-summary">
-                <Info className="app-header__info-icon" aria-hidden="true" size={18} /> <span>{navLabels.info}</span>
-              </summary>
+          <div className="app-header__info-dropdown" ref={infoDropdownRef}>
+            <button
+              type="button"
+              className={`app-header__info-summary ${infoDropdownOpen ? 'app-header__info-summary--open' : ''}`}
+              onClick={() => setInfoDropdownOpen(!infoDropdownOpen)}
+              aria-haspopup="true"
+              aria-expanded={infoDropdownOpen}
+            >
+              <Info className="app-header__info-icon" aria-hidden="true" size={18} />
+            </button>
+
+            {infoDropdownOpen && (
               <div className="app-header__info-content">
                 <ul className="app-header__info-list">
-                  <li className="app-header__info-item"><a className="app-header__info-link" href="/legal">{navLabels.legal}</a></li>
-                  <li className="app-header__info-item"><a className="app-header__info-link" href="/privacy">{navLabels.privacy}</a></li>
-                  <li className="app-header__info-item"><a className="app-header__info-link" href="/terms">{navLabels.terms}</a></li>
+                  <li className="app-header__info-item">
+                    <a className="app-header__info-link" href="/legal">{navLabels.legal}</a>
+                  </li>
+                  <li className="app-header__info-item">
+                    <a className="app-header__info-link" href="/privacy">{navLabels.privacy}</a>
+                  </li>
+                  <li className="app-header__info-item">
+                    <a className="app-header__info-link" href="/terms">{navLabels.terms}</a>
+                  </li>
                 </ul>
                 <p className="app-header__info-text">{infoText}</p>
               </div>
-            </details>
+            )}
           </div>
 
           <LanguageSwitcher lang={lang} />

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { createTournament, isAdmin } from '../lib/tournaments'
 import { supabase } from '../lib/supabaseClient'
+import CustomSelect from '@/components/CustomSelect'
 
 type Character = { id: number; name: string; universe_id: number | null }
 type Universe  = { id: number; name: string }
@@ -113,29 +114,33 @@ export default function TournamentNewIsland() {
                  value={name} onChange={e=>setName(e.target.value)} required />
         </label>
 
-        <label className="tournament-new__field">
+        <div className="tournament-new__field">
           <span className="tournament-new__label">Universe (optional)</span>
-          <select className="tournament-new__select"
-                  value={universeId === '' ? '' : Number(universeId)}
-                  onChange={e => setUniverseId(e.target.value === '' ? '' : Number(e.target.value))}>
-            <option value="">All universes</option>
-            {universes.map(u => (
-              <option key={u.id} value={u.id}>{u.name}</option>
-            ))}
-          </select>
-        </label>
+          <CustomSelect
+            className="tournament-new__select"
+            options={[
+              { value: '', label: 'All universes' },
+              ...universes.map(u => ({ value: String(u.id), label: u.name }))
+            ]}
+            value={universeId === '' ? '' : String(universeId)}
+            onChange={v => setUniverseId(v === '' ? '' : Number(v))}
+          />
+        </div>
 
         <div className="tournament-new__field">
           <span className="tournament-new__label">Round duration</span>
           <div className="tournament-new__duration-grid">
-            <select className="tournament-new__select"
-                    value={preset}
-                    onChange={e => setPreset(e.target.value as any)}>
-              <option value="1d">1 day</option>
-              <option value="1w">1 week</option>
-              <option value="1m">1 month (30d)</option>
-              <option value="custom">Custom (minutes)</option>
-            </select>
+            <CustomSelect
+              className="tournament-new__select"
+              options={[
+                { value: '1d', label: '1 day' },
+                { value: '1w', label: '1 week' },
+                { value: '1m', label: '1 month (30d)' },
+                { value: 'custom', label: 'Custom (minutes)' }
+              ]}
+              value={preset}
+              onChange={v => setPreset(v as Preset)}
+            />
             <input className="tournament-new__input"
                    type="number" min={1}
                    value={customMinutes}

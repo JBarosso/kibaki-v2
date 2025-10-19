@@ -28,6 +28,7 @@ import { useLoadingState } from "@/hooks/useLoadingState";
 import { getPrefersReducedMotion } from "@/lib/animations";
 import { I18nProvider, useI18n, type Lang } from "@/i18n";
 import { AlertTriangle, SkipForward } from 'lucide-react';
+import CustomSelect from '@/components/CustomSelect';
 
 type LoadState = "idle" | "loading" | "ready" | "error";
 
@@ -1301,21 +1302,23 @@ function ScopeSelector({
   onChange: (v: string) => void;
 }) {
   const { t, getUniverseLabel } = useI18n();
+
+  const options = [
+    { value: 'global', label: t("duel.globalScope") },
+    ...universes.map((u) => ({
+      value: u.slug,
+      label: getUniverseLabel(u.slug)
+    }))
+  ];
+
   return (
     <div className="scope-selector">
-      {/* <label className="scope-selector__label">{t('duel.scopeLabel')}</label> */}
-      <select
-        className="scope-selector__select"
+      <CustomSelect
+        options={options}
         value={value}
-        onChange={(e) => onChange(e.target.value)}
-      >
-        <option value="global">{t("duel.globalScope")}</option>
-        {universes.map((u) => (
-          <option key={u.id} value={u.slug}>
-            {getUniverseLabel(u.slug)}
-          </option>
-        ))}
-      </select>
+        onChange={onChange}
+        className="scope-selector__select"
+      />
     </div>
   );
 }
