@@ -1150,6 +1150,10 @@ function DuelContainerInner(_: { lang: Lang }) {
 
       <div className="duel-container__cards-grid">
         <div className="duel-container__card-column">
+          <div
+            onClick={() => !isVoting && !isTransitioning && vote("left")}
+            className="duel-container__vote-overlay"
+          />
           <CharacterCard
             character={left}
             side="left"
@@ -1169,6 +1173,10 @@ function DuelContainerInner(_: { lang: Lang }) {
         <div className="duel-container__separator">VS</div>
 
         <div className="duel-container__card-column">
+          <div
+            onClick={() => !isVoting && !isTransitioning && vote("right")}
+            className="duel-container__vote-overlay"
+          />
           <CharacterCard
             character={right}
             side="right"
