@@ -913,7 +913,7 @@ function DuelContainerInner(_: { lang: Lang }) {
 
   if (state === 'loading' || state === 'idle') {
     return (
-      <FadeTransition show={true} className="duel-container">
+      <div className="duel-container">
         <SkeletonDuel />
         {loadingState.isLoading && loadingState.message && (
           <div className="duel-container__loading">
@@ -921,32 +921,30 @@ function DuelContainerInner(_: { lang: Lang }) {
             {loadingState.progress !== undefined && (
               <div className="duel-container__progress">
                 <div
-                  className={`duel-container__progress-bar ${reducedMotion ? '' : 'duel-container__progress-bar--animated'}`}
+                  className="duel-container__progress-bar"
                   style={{ width: `${loadingState.progress}%` }}
                 />
               </div>
             )}
           </div>
         )}
-      </FadeTransition>
+      </div>
     );
   }
 
   if (state === 'error') {
     return (
-      <FadeTransition show={true}>
-        <div className="duel-container__error">
-          <div className="duel-container__error-message">
-            <span className="duel-container__error-icon">⚠️</span>
-            <span>{error ?? t('duel.error')}</span>
-          </div>
-          {loadingState.error && (
-            <div className="duel-container__error-details">
-              {loadingState.error}
-            </div>
-          )}
+      <div className="duel-container__error">
+        <div className="duel-container__error-message">
+          <span className="duel-container__error-icon">⚠️</span>
+          <span>{error ?? t('duel.error')}</span>
         </div>
-      </FadeTransition>
+        {loadingState.error && (
+          <div className="duel-container__error-details">
+            {loadingState.error}
+          </div>
+        )}
+      </div>
     );
   }
 
@@ -980,14 +978,10 @@ function DuelContainerInner(_: { lang: Lang }) {
   const leftView = getCharacterText(left);
   const rightView = getCharacterText(right);
 
-  const getCardAnimationClasses = (characterId: number) => {
+  const getCardClasses = (characterId: number) => {
     const classes: string[] = [];
 
     classes.push('duel-container__card');
-
-    if (!reducedMotion) {
-      classes.push('duel-container__card-transition');
-    }
 
     if (optimisticVote.winnerId === characterId) {
       switch (optimisticVote.status) {
@@ -1034,82 +1028,70 @@ function DuelContainerInner(_: { lang: Lang }) {
   };
 
   return (
-    <TransitionWrapper show={state === 'ready'} duration="fast">
-      <div className="duel-container">
-        <FadeTransition show={true} duration="fast">
-          <div className="duel-container__header">
-            <ScopeSelector universes={universes} value={scope} onChange={(s) => setScope(s)} />
-            {/* 🔧 NEW: Auth sync indicator */}
-            {!authSyncComplete && DEBUG_MODE && (
-              <span className="duel-container__sync-indicator">Syncing...</span>
-            )}
-          </div>
-        </FadeTransition>
+    <div className="duel-container">
+      <div className="duel-container__header">
+        <ScopeSelector universes={universes} value={scope} onChange={(s) => setScope(s)} />
+        {/* 🔧 NEW: Auth sync indicator */}
+        {!authSyncComplete && DEBUG_MODE && (
+          <span className="duel-container__sync-indicator">Syncing...</span>
+        )}
+      </div>
 
-        <TransitionWrapper
-          show={!isTransitioning}
-          duration="normal"
-          className="duel-container__cards-transition"
+      <div className="duel-container__cards-grid">
+        <div className="duel-container__card-column">
+          <CharacterCard
+            character={left}
+            side="left"
+            onMore={() => setOpenLeft(true)}
+            className={getCardClasses(left.id)}
+            display={leftView}
+          />
+          <button
+            onClick={() => vote('left')}
+            disabled={isVoting || isTransitioning}
+            className={getButtonClasses(left.id)}
+          >
+            {t('duel.leftVote')}
+          </button>
+        </div>
+
+        <div className="duel-container__card-column">
+          <CharacterCard
+            character={right}
+            side="right"
+            onMore={() => setOpenRight(true)}
+            className={getCardClasses(right.id)}
+            display={rightView}
+          />
+          <button
+            onClick={() => vote('right')}
+            disabled={isVoting || isTransitioning}
+            className={getButtonClasses(right.id)}
+          >
+            {t('duel.rightVote')}
+          </button>
+        </div>
+      </div>
+
+      <div className="duel-container__actions">
+        <button
+          onClick={skip}
+          className="duel-container__action-button"
         >
-          <div className="duel-container__cards-grid">
-            <div className="duel-container__card-column">
-              <CharacterCard
-                character={left}
-                side="left"
-                onMore={() => setOpenLeft(true)}
-                className={getCardAnimationClasses(left.id)}
-                display={leftView}
-              />
-              <button
-                onClick={() => vote('left')}
-                disabled={isVoting || isTransitioning}
-                className={getButtonClasses(left.id)}
-              >
-                {t('duel.leftVote')}
-              </button>
-            </div>
-
-            <div className="duel-container__card-column">
-              <CharacterCard
-                character={right}
-                side="right"
-                onMore={() => setOpenRight(true)}
-                className={getCardAnimationClasses(right.id)}
-                display={rightView}
-              />
-              <button
-                onClick={() => vote('right')}
-                disabled={isVoting || isTransitioning}
-                className={getButtonClasses(right.id)}
-              >
-                {t('duel.rightVote')}
-              </button>
-            </div>
-          </div>
-        </TransitionWrapper>
-
-        <FadeTransition show={true} duration="fast">
-          <div className="duel-container__actions">
-            <button
-              onClick={skip}
-              className={`duel-container__action-button ${reducedMotion ? '' : 'duel-container__action-button--animated'}`}
-            >
-              {t('duel.skip')}
-            </button>
-            <button
-              onClick={resetPairs}
-              className={`duel-container__action-button ${reducedMotion ? '' : 'duel-container__action-button--animated'}`}
-            >
-              {t('duel.resetPairs')}
-            </button>
-            {import.meta.env.DEV ? (
-              <span className="duel-container__hash">hash: {hash}</span>
-            ) : null}
-            {lastVote ? (
-              <span className="duel-container__saved-label">{t('duel.savedLocally')}</span>
-            ) : null}
-          </div>
-        </FadeTransition>
+          {t('duel.skip')}
+        </button>
+        <button
+          onClick={resetPairs}
+          className="duel-container__action-button"
+        >
+          {t('duel.resetPairs')}
+        </button>
+        {import.meta.env.DEV ? (
+          <span className="duel-container__hash">hash: {hash}</span>
+        ) : null}
+        {lastVote ? (
+          <span className="duel-container__saved-label">{t('duel.savedLocally')}</span>
+        ) : null}
       </div>
 
       {/* Modals */}
@@ -1119,7 +1101,7 @@ function DuelContainerInner(_: { lang: Lang }) {
       <Modal open={openRight} onClose={() => setOpenRight(false)} title={rightView.name}>
         <CharacterDetails character={right} display={rightView} />
       </Modal>
-    </TransitionWrapper>
+    </div>
   );
 }
 
