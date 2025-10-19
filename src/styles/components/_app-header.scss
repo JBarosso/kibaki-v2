@@ -32,6 +32,10 @@
 
   &__logo {
     color: var(--neutral-light);
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 1px;
+    font-size: 18px;
   }
 
   &__burger {
