@@ -8,7 +8,13 @@
     left: 0;
     width: 100svw;
     height: 100svh;
+    min-height: 800px;
     z-index: 0;
+
+    @media (max-width: 1024px) {
+      position: relative;
+      padding-top: 16px;
+    }
   }
 }
 
@@ -341,6 +347,15 @@
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
   backdrop-filter: blur(5px);
   border: 1px solid rgba(255, 255, 255, 0.3);
+
+  visibility: hidden;
+  height: 0;
+  margin-bottom: 0;
+  padding: 0;
+
+  @media (max-width: 1024px) {
+    margin-top: 0;
+  }
 
   font-size: var(--fs-4);
 

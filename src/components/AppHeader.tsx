@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 import { I18nProvider, type Lang } from '@/i18n';
-import { Info } from 'lucide-react';
+import { Info, Menu, X, Swords, Trophy, Home, User } from 'lucide-react';
 
 type NavLabels = {
   duel: string;
@@ -49,7 +49,9 @@ function HeaderInner({ lang, navLabels, actionLabels, infoText }: AppHeaderProps
   const [session, setSession] = useState<Session>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [infoDropdownOpen, setInfoDropdownOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const infoDropdownRef = useRef<HTMLDivElement>(null);
+  const navRef = useRef<HTMLElement>(null);
 
   // Update CSS variable with header height
   useEffect(() => {
@@ -101,11 +103,18 @@ function HeaderInner({ lang, navLabels, actionLabels, infoText }: AppHeaderProps
     setCurrentPath(typeof window !== 'undefined' ? window.location.pathname : '');
   }, []);
 
-  // Close info dropdown when clicking outside
+  // Close dropdowns when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (infoDropdownRef.current && !infoDropdownRef.current.contains(event.target as Node)) {
         setInfoDropdownOpen(false);
+      }
+      if (navRef.current && !navRef.current.contains(event.target as Node)) {
+        const target = event.target as HTMLElement;
+        // Don't close if clicking the burger button
+        if (!target.closest('.app-header__burger')) {
+          setMobileMenuOpen(false);
+        }
       }
     };
 
@@ -113,33 +122,115 @@ function HeaderInner({ lang, navLabels, actionLabels, infoText }: AppHeaderProps
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  // Prevent body scroll when mobile menu is open
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [mobileMenuOpen]);
+
   const isActive = (href: string) => currentPath === href || currentPath.startsWith(href + '/');
 
   const username = profile?.username ?? undefined;
   const isAdmin = profile?.is_admin === true;
+
+  // Navigation items configuration with icons
+  const navItems = [
+    { href: '/duel', label: navLabels.duel, icon: Swords },
+    { href: '/t', label: navLabels.tournaments, icon: Home },
+    { href: '/top', label: navLabels.top, icon: Trophy },
+    { href: '/submit', label: navLabels.submit, icon: null },
+  ];
 
   return (
     <header className="app-header">
       <div className="app-header__container">
         <a href="/" className="app-header__logo">Kibaki</a>
 
-        <nav className="app-header__nav">
-          <a href="/duel" className={linkCls(isActive('/duel'))}>{navLabels.duel}</a>
-          <a href="/t" className={linkCls(isActive('/t'))}>{navLabels.tournaments}</a>
-          <a href="/top" className={linkCls(isActive('/top'))}>{navLabels.top}</a>
-          <a href="/submit" className={linkCls(isActive('/submit'))}>{navLabels.submit}</a>
+        {/* Burger button (mobile only) */}
+        <button
+          type="button"
+          className={`app-header__burger ${mobileMenuOpen ? 'app-header__burger--open' : ''}`}
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          aria-label={mobileMenuOpen ? 'Fermer le menu' : 'Ouvrir le menu'}
+          aria-expanded={mobileMenuOpen}
+        >
+          {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+        </button>
+
+        {/* Backdrop (mobile only) */}
+        {mobileMenuOpen && (
+          <div
+            className="app-header__backdrop"
+            onClick={() => setMobileMenuOpen(false)}
+          />
+        )}
+
+        {/* Single navigation (transforms between desktop/mobile) */}
+        <nav
+          className={`app-header__nav ${mobileMenuOpen ? 'app-header__nav--open' : ''}`}
+          ref={navRef}
+        >
+          {navItems.map((item) => {
+            const Icon = item.icon;
+            const active = isActive(item.href);
+
+            return (
+              <a
+                key={item.href}
+                href={item.href}
+                className={linkCls(active)}
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                {Icon && <Icon className="app-header__link-icon" size={20} />}
+                <span className="app-header__link-label">{item.label}</span>
+              </a>
+            );
+          })}
           {session ? (
             <>
-              <a href="/account" className={linkCls(isActive('/account'))}>{navLabels.account}</a>
+              <a
+                href="/account"
+                className={linkCls(isActive('/account'))}
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                <User className="app-header__link-icon" size={20} />
+                <span className="app-header__link-label">{navLabels.account}</span>
+              </a>
               {username && (
-                <a href={`/u/${username}`} className={linkCls(isActive(`/u/${username}`))}>{navLabels.profile}</a>
+                <a
+                  href={`/u/${username}`}
+                  className={linkCls(isActive(`/u/${username}`))}
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  <User className="app-header__link-icon" size={20} />
+                  <span className="app-header__link-label">{navLabels.profile}</span>
+                </a>
               )}
               {isAdmin && (
-                <a href="/admin/submissions" className={linkCls(isActive('/admin/submissions'))}>Admin</a>
+                <a
+                  href="/admin/submissions"
+                  className={linkCls(isActive('/admin/submissions'))}
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  <span className="app-header__link-label">Admin</span>
+                </a>
               )}
             </>
           ) : (
-            <a href="/account" className={linkCls(isActive('/account'))}>{actionLabels.signIn}</a>
+            <a
+              href="/account"
+              className={linkCls(isActive('/account'))}
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              <User className="app-header__link-icon" size={20} />
+              <span className="app-header__link-label">{actionLabels.signIn}</span>
+            </a>
           )}
 
           {/* Info dropdown */}
