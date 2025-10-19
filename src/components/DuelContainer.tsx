@@ -27,7 +27,7 @@ import { SkeletonDuel } from "@/components/SkeletonCard";
 import { useLoadingState } from "@/hooks/useLoadingState";
 import { getPrefersReducedMotion } from "@/lib/animations";
 import { I18nProvider, useI18n, type Lang } from "@/i18n";
-import { AlertTriangle } from 'lucide-react';
+import { AlertTriangle, SkipForward } from 'lucide-react';
 
 type LoadState = "idle" | "loading" | "ready" | "error";
 
@@ -1171,7 +1171,7 @@ function DuelContainerInner(_: { lang: Lang }) {
           <span className="duel-container__sync-indicator">Syncing...</span>
         )} */}
         <button onClick={skip} className="duel-container__action-button">
-          {t("duel.skip")}
+          <SkipForward className="duel-container__action-button-icon" size={16} color="var(--button-color)" /> <span>{t("duel.skip")}</span>
         </button>
         {/* <button onClick={resetPairs} className="duel-container__action-button">
           {t("duel.resetPairs")}

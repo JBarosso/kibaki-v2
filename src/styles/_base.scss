@@ -129,6 +129,11 @@ h1, h2{
 button{
   cursor: pointer;
   transition: var(--transition-base);
+  border-style: solid;
+
+  *{
+    transition: inherit;
+  }
 
   &:hover{
     opacity: .75;
