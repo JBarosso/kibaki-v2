@@ -70,6 +70,12 @@ export default function TournamentBracket(props: Props) {
               const userChoseC1 = !!userChoice && m.char1_id === userChoice
               const userChoseC2 = !!userChoice && m.char2_id === userChoice
               const canVote = during && !!m.char1_id && !!m.char2_id && props.onVote && !userChoice && m.status === 'open'
+              
+              // Determine winner/loser classes
+              const c1IsWinner = m.winner_id === m.char1_id
+              const c2IsWinner = m.winner_id === m.char2_id
+              const c1IsLoser = m.winner_id && m.winner_id === m.char2_id
+              const c2IsLoser = m.winner_id && m.winner_id === m.char1_id
 
               const countdown = before
                 ? t('tournaments.statusOpens', { duration: formatDuration(opens - now) })
@@ -90,7 +96,7 @@ export default function TournamentBracket(props: Props) {
                   )}
 
                   <div className="tournament-bracket__competitors">
-                    <div className="tournament-bracket__competitor">
+                    <div className={`tournament-bracket__competitor ${c1IsWinner ? 'tournament-bracket__competitor--winner' : ''} ${c1IsLoser ? 'tournament-bracket__competitor--loser' : ''}`}>
                       <span className={`tournament-bracket__competitor-name ${userChoseC1 ? 'tournament-bracket__competitor-name--selected' : ''}`}>{c1.name}</span>
                       {canVote ? (
                         <button className="tournament-bracket__vote-button"
@@ -99,7 +105,7 @@ export default function TournamentBracket(props: Props) {
                         <span className="tournament-bracket__votes">{m.char1_votes}</span>
                       )}
                     </div>
-                    <div className="tournament-bracket__competitor">
+                    <div className={`tournament-bracket__competitor ${c2IsWinner ? 'tournament-bracket__competitor--winner' : ''} ${c2IsLoser ? 'tournament-bracket__competitor--loser' : ''}`}>
                       <span className={`tournament-bracket__competitor-name ${userChoseC2 ? 'tournament-bracket__competitor-name--selected' : ''}`}>{c2.name}</span>
                       {canVote ? (
                         <button className="tournament-bracket__vote-button"

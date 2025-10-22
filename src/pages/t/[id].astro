@@ -2,7 +2,7 @@
 import SiteLayout from '../../layouts/SiteLayout.astro'
 import { getTournament } from '../../lib/tournaments'
 import TournamentBracketClient from '../../components/TournamentBracketClient'
-import { getLangCookie, resolveLang, setLangCookie, getTournamentStatus } from '@/i18n'
+import { getLangCookie, resolveLang, setLangCookie, getTournamentStatus, tServer } from '@/i18n'
 import type { Lang } from '@/i18n'
 
 const { id } = Astro.params
@@ -15,14 +15,148 @@ if (existingCookie !== lang) {
 }
 
 const tournament = await getTournament(id)
+const statusLabel = getTournamentStatus(tournament.status, lang)
 ---
 <SiteLayout title={tournament.name}>
-  <section class="mx-auto max-w-6xl px-4 py-8">
-    <header class="mb-6 flex items-center justify-between">
-      <h1 class="text-2xl font-semibold">{tournament.name}</h1>
-      <span class="text-sm text-gray-600">{getTournamentStatus(tournament.status, lang)}</span>
-    </header>
+  <section class="tournament-detail-page">
+    <div class="tournament-detail-page__container">
+      <div class="tournament-detail-page__header">
+        <a href="/t" class="tournament-detail-page__back">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+          </svg>
+          <span>{tServer(lang, 'tournaments.backToList')}</span>
+        </a>
+        
+        <div class="tournament-detail-page__title-row">
+          <h1 class="tournament-detail-page__heading">{tournament.name}</h1>
+          <span class={`tournament-detail-page__status tournament-detail-page__status--${tournament.status}`}>
+            {statusLabel}
+          </span>
+        </div>
+      </div>
 
-    <TournamentBracketClient tournamentId={id} lang={lang} client:only="react" />
+      <TournamentBracketClient tournamentId={id} lang={lang} client:only="react" />
+    </div>
   </section>
 </SiteLayout>
+
+<style>
+.tournament-detail-page {
+  width: 100%;
+  padding: var(--spacing-2) 0;
+  min-height: calc(100vh - 200px);
+
+  &__container {
+    max-width: var(--container-max-width);
+    margin: 0 auto;
+    padding: var(--container-padding);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-2);
+  }
+
+  &__header {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  &__back {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    background-color: hsl(var(--neutral-hsl), 0.5);
+    border: 1px solid hsl(var(--neutral-hsl), 0.7);
+    border-radius: var(--radius-2);
+    color: hsl(var(--neutral-light-hsl), 0.8);
+    font-size: var(--fs-2);
+    font-family: var(--family-secondary);
+    font-weight: 400;
+    text-decoration: none;
+    transition: var(--transition-base);
+    width: fit-content;
+
+    &:hover {
+      background-color: hsl(var(--neutral-hsl), 0.6);
+      border-color: hsl(var(--neutral-light-hsl), 0.15);
+      color: var(--neutral-light);
+    }
+
+    svg {
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+      stroke-width: 2;
+    }
+
+    span {
+      line-height: 1;
+    }
+  }
+
+  &__title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-1);
+    flex-wrap: wrap;
+  }
+
+  &__heading {
+    font-size: var(--fs-6);
+    font-family: var(--family-primary);
+    font-weight: 700;
+    color: var(--neutral-light);
+    letter-spacing: 0.02em;
+  }
+
+  &__status {
+    padding: 8px 16px;
+    border-radius: var(--radius-2);
+    font-size: var(--fs-2);
+    font-family: var(--family-primary);
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+
+    &--scheduled {
+      background-color: hsl(38, 92%, 50%, 0.15);
+      color: hsl(38, 92%, 50%);
+      border: 1px solid hsl(38, 92%, 50%, 0.4);
+    }
+
+    &--running {
+      background-color: hsl(var(--primary-hsl), 0.15);
+      color: var(--primary);
+      border: 1px solid hsl(var(--primary-hsl), 0.4);
+    }
+
+    &--completed {
+      background-color: hsl(142, 76%, 56%, 0.15);
+      color: hsl(142, 76%, 56%);
+      border: 1px solid hsl(142, 76%, 56%, 0.4);
+    }
+
+    &--canceled {
+      background-color: hsl(var(--secondary-hsl), 0.15);
+      color: var(--secondary);
+      border: 1px solid hsl(var(--secondary-hsl), 0.4);
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .tournament-detail-page {
+    &__title-row {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    &__heading {
+      font-size: var(--fs-6);
+    }
+  }
+}
+</style>

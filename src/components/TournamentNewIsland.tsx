@@ -2,6 +2,8 @@ import { useEffect, useMemo, useState } from 'react'
 import { createTournament, isAdmin } from '../lib/tournaments'
 import { supabase } from '../lib/supabaseClient'
 import CustomSelect from '@/components/CustomSelect'
+import { Input, Button, Field } from '@/components/Form'
+import { I18nProvider, useI18n, type Lang } from '@/i18n'
 
 type Character = { id: number; name: string; universe_id: number | null }
 type Universe  = { id: number; name: string }
@@ -16,7 +18,20 @@ function toLocalDatetimeInputValue(d: Date) {
   return `${yyyy}-${mm}-${dd}T${HH}:${MM}`
 }
 
-export default function TournamentNewIsland() {
+type Props = {
+  lang: Lang
+}
+
+export default function TournamentNewIsland(props: Props) {
+  return (
+    <I18nProvider lang={props.lang}>
+      <TournamentNewIslandInner />
+    </I18nProvider>
+  )
+}
+
+function TournamentNewIslandInner() {
+  const { t } = useI18n()
   const [ok, setOk] = useState<boolean | null>(null)
 
   // Form
@@ -102,78 +117,104 @@ export default function TournamentNewIsland() {
     window.location.href = `/t/${tId}`
   }
 
-  if (ok === null) return <div className="tournament-new__loading">Checking permissions…</div>
-  if (!ok) return <div className="tournament-new__forbidden">Forbidden: admin only.</div>
+  if (ok === null) return (
+    <div className="tournament-new__loading">
+      {t('tournaments.checkingPermissions')}
+    </div>
+  )
+  
+  if (!ok) return (
+    <div className="tournament-new__forbidden">
+      {t('tournaments.adminOnly')}
+    </div>
+  )
 
   return (
     <form onSubmit={onSubmit} className="tournament-new__form">
-      <div className="tournament-new__form-grid">
-        <label className="tournament-new__field">
-          <span className="tournament-new__label">Name</span>
-          <input className="tournament-new__input"
-                 value={name} onChange={e=>setName(e.target.value)} required />
-        </label>
-
-        <div className="tournament-new__field">
-          <span className="tournament-new__label">Universe (optional)</span>
-          <CustomSelect
-            className="tournament-new__select"
-            options={[
-              { value: '', label: 'All universes' },
-              ...universes.map(u => ({ value: String(u.id), label: u.name }))
-            ]}
-            value={universeId === '' ? '' : String(universeId)}
-            onChange={v => setUniverseId(v === '' ? '' : Number(v))}
-          />
-        </div>
-
-        <div className="tournament-new__field">
-          <span className="tournament-new__label">Round duration</span>
-          <div className="tournament-new__duration-grid">
-            <CustomSelect
-              className="tournament-new__select"
-              options={[
-                { value: '1d', label: '1 day' },
-                { value: '1w', label: '1 week' },
-                { value: '1m', label: '1 month (30d)' },
-                { value: 'custom', label: 'Custom (minutes)' }
-              ]}
-              value={preset}
-              onChange={v => setPreset(v as Preset)}
+      <div className="tournament-new__basic-info">
+        <h2 className="tournament-new__section-title">{t('tournaments.basicInfo')}</h2>
+        
+        <div className="tournament-new__form-grid">
+          <Field label={t('tournaments.tournamentName')} required htmlFor="name">
+            <Input
+              id="name"
+              type="text"
+              value={name}
+              onChange={e => setName(e.target.value)}
+              placeholder={t('tournaments.namePlaceholder')}
+              required
             />
-            <input className="tournament-new__input"
-                   type="number" min={1}
-                   value={customMinutes}
-                   onChange={e=>setCustomMinutes(Number(e.target.value))}
-                   disabled={preset !== 'custom'}
-                   placeholder="Minutes" />
-          </div>
-          <div className="tournament-new__duration-note">
-            Will use <b>{resolvedMinutes}</b> minutes per round.
-          </div>
+          </Field>
+
+          <Field label={t('tournaments.universe')} htmlFor="universe">
+            <CustomSelect
+              options={[
+                { value: '', label: t('tournaments.allUniverses') },
+                ...universes.map(u => ({ value: String(u.id), label: u.name }))
+              ]}
+              value={universeId === '' ? '' : String(universeId)}
+              onChange={v => setUniverseId(v === '' ? '' : Number(v))}
+            />
+          </Field>
         </div>
 
-        <label className="tournament-new__field">
-          <span className="tournament-new__label">Start time (local)</span>
-          <input className="tournament-new__input"
-                 type="datetime-local"
-                 value={startLocal}
-                 onChange={e=>setStartLocal(e.target.value)}
-                 required />
-        </label>
+        <div className="tournament-new__form-grid">
+          <Field label={t('tournaments.roundDuration')} htmlFor="duration">
+            <div className="tournament-new__duration-grid">
+              <CustomSelect
+                options={[
+                  { value: '1d', label: t('tournaments.duration1d') },
+                  { value: '1w', label: t('tournaments.duration1w') },
+                  { value: '1m', label: t('tournaments.duration1m') },
+                  { value: 'custom', label: t('tournaments.durationCustom') }
+                ]}
+                value={preset}
+                onChange={v => setPreset(v as Preset)}
+              />
+              <Input
+                type="number"
+                min={1}
+                value={customMinutes}
+                onChange={e => setCustomMinutes(Number(e.target.value))}
+                disabled={preset !== 'custom'}
+                placeholder={t('tournaments.minutesPlaceholder')}
+              />
+            </div>
+            <div className="tournament-new__duration-note">
+              {t('tournaments.willUseMinutes', { minutes: resolvedMinutes })}
+            </div>
+          </Field>
+
+          <Field label={t('tournaments.startTime')} required htmlFor="start-time">
+            <Input
+              id="start-time"
+              type="datetime-local"
+              value={startLocal}
+              onChange={e => setStartLocal(e.target.value)}
+              required
+            />
+          </Field>
+        </div>
       </div>
 
       <div className="tournament-new__participants-section">
         <div className="tournament-new__participants-header">
-          <span className="tournament-new__participants-title">Participants (click to add/remove, order = seed)</span>
+          <h2 className="tournament-new__section-title">{t('tournaments.participantsTitle')}</h2>
           <div className="tournament-new__participants-controls">
-            <button type="button" onClick={selectAll}
-                    className="tournament-new__participants-button">Select all</button>
-            <button type="button" onClick={clearAll}
-                    className="tournament-new__participants-button">Clear</button>
-            <input className="tournament-new__participants-search"
-                   placeholder="Search…"
-                   value={filter} onChange={e=>setFilter(e.target.value)} />
+            <Button type="button" onClick={selectAll} variant="ghost" buttonSize="small">
+              {t('tournaments.selectAll')}
+            </Button>
+            <Button type="button" onClick={clearAll} variant="ghost" buttonSize="small">
+              {t('tournaments.clearAll')}
+            </Button>
+            <Input
+              type="search"
+              placeholder={t('tournaments.searchParticipants')}
+              value={filter}
+              onChange={e => setFilter(e.target.value)}
+              inputSize="small"
+              className="tournament-new__participants-search"
+            />
           </div>
         </div>
 
@@ -181,9 +222,12 @@ export default function TournamentNewIsland() {
           {filtered.map(c => {
             const active = selected.includes(c.id)
             return (
-              <button type="button" key={c.id}
+              <button
+                type="button"
+                key={c.id}
                 onClick={() => toggle(c.id)}
-                className={`tournament-new__participant-button ${active ? 'tournament-new__participant-button--active' : ''}`}>
+                className={`tournament-new__participant-button ${active ? 'tournament-new__participant-button--active' : ''}`}
+              >
                 {c.name}
               </button>
             )
@@ -192,20 +236,26 @@ export default function TournamentNewIsland() {
 
         {selected.length > 0 && (
           <div className="tournament-new__seed-order">
-            <div className="tournament-new__seed-title">Seed order:</div>
+            <h3 className="tournament-new__seed-title">{t('tournaments.seedOrder')}</h3>
             <ol className="tournament-new__seed-list">
               {selected.map((id) => {
                 const c = characters.find(x => x.id === id)
-                return <li key={id} className="tournament-new__seed-item">{c?.name ?? `#${id}`}</li>
+                return (
+                  <li key={id} className="tournament-new__seed-item">
+                    {c?.name ?? `#${id}`}
+                  </li>
+                )
               })}
             </ol>
           </div>
         )}
       </div>
 
-      <button type="submit" className="tournament-new__submit-button">
-        Create tournament
-      </button>
+      <div className="tournament-new__actions">
+        <Button type="submit" variant="primary" fullWidth>
+          {t('tournaments.createTournament')}
+        </Button>
+      </div>
     </form>
   )
 }

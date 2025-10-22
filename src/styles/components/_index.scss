@@ -1,3 +1,10 @@
+// Generic form components
+@forward './form-input';
+@forward './form-button';
+@forward './form-textarea';
+@forward './form-checkbox';
+
+// Specific components
 @forward './app-header';
 @forward './character-card';
 @forward './modal';

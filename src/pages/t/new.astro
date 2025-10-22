@@ -1,11 +1,97 @@
 ---
 import SiteLayout from '../../layouts/SiteLayout.astro'
 import TournamentNewIsland from '../../components/TournamentNewIsland'
+import { getLangCookie, resolveLang, setLangCookie, tServer } from '@/i18n'
+import type { Lang } from '@/i18n'
+
+const existingCookie = getLangCookie(Astro)
+const lang: Lang = resolveLang({ url: Astro.url, req: Astro.request, cookie: existingCookie ?? undefined })
+if (existingCookie !== lang) {
+  setLangCookie(Astro, lang)
+}
+
+const pageTitle = tServer(lang, 'tournaments.createPageTitle')
+const heading = tServer(lang, 'tournaments.createHeading')
 ---
 
-<SiteLayout title="New Tournament">
-  <section class="mx-auto max-w-5xl px-4 py-8">
-    <h1 class="text-2xl font-semibold mb-6">Create Tournament</h1>
-    <TournamentNewIsland client:only="react" />
+<SiteLayout title={pageTitle}>
+  <section class="tournament-new-page">
+    <div class="tournament-new-page__container">
+      <div class="tournament-new-page__header">
+        <a href="/t" class="tournament-new-page__back">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+          </svg>
+          <span>{tServer(lang, 'tournaments.backToList')}</span>
+        </a>
+        <h1 class="tournament-new-page__heading">{heading}</h1>
+      </div>
+      <TournamentNewIsland client:only="react" lang={lang} />
+    </div>
   </section>
 </SiteLayout>
+
+<style>
+.tournament-new-page {
+  width: 100%;
+  padding: var(--spacing-2) 0;
+  min-height: calc(100vh - 200px);
+
+  &__container {
+    max-width: var(--container-max-width);
+    margin: 0 auto;
+    padding: var(--container-padding);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-2);
+  }
+
+  &__header {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  &__back {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    background-color: hsl(var(--neutral-hsl), 0.5);
+    border: 1px solid hsl(var(--neutral-hsl), 0.7);
+    border-radius: var(--radius-2);
+    color: hsl(var(--neutral-light-hsl), 0.8);
+    font-size: var(--fs-2);
+    font-family: var(--family-secondary);
+    font-weight: 400;
+    text-decoration: none;
+    transition: var(--transition-base);
+    width: fit-content;
+
+    &:hover {
+      background-color: hsl(var(--neutral-hsl), 0.6);
+      border-color: hsl(var(--neutral-light-hsl), 0.15);
+      color: var(--neutral-light);
+    }
+
+    svg {
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+      stroke-width: 2;
+    }
+
+    span {
+      line-height: 1;
+    }
+  }
+
+  &__heading {
+    font-size: var(--fs-6);
+    font-family: var(--family-primary);
+    font-weight: 700;
+    color: var(--neutral-light);
+    letter-spacing: 0.02em;
+  }
+}
+</style>

@@ -1,0 +1,159 @@
+// Generic form input component
+.form-input {
+  width: 100%;
+  padding: 10px 14px;
+  background-color: hsl(var(--neutral-hsl), 0.6);
+  border: 1px solid hsl(var(--neutral-hsl), 0.8);
+  border-radius: var(--radius-2);
+  color: var(--neutral-light);
+  font-size: var(--fs-3);
+  font-family: var(--family-secondary);
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  transition: var(--transition-base);
+
+  &::placeholder {
+    color: hsl(var(--neutral-light-hsl), 0.3);
+  }
+
+  &:hover {
+    background-color: hsl(var(--neutral-hsl), 0.7);
+    border-color: hsl(var(--neutral-light-hsl), 0.15);
+  }
+
+  &:focus {
+    outline: none;
+    background-color: hsl(var(--neutral-hsl), 0.7);
+    border-color: hsl(var(--neutral-light-hsl), 0.2);
+    box-shadow: none;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background-color: hsl(var(--neutral-hsl), 0.1);
+  }
+
+  // Input with icon
+  &--with-icon {
+    padding-left: 44px;
+  }
+
+  // Error state
+  &--error {
+    border-color: var(--secondary);
+    
+    &:focus {
+      box-shadow: 0 0 0 3px hsl(var(--secondary-hsl), 0.1);
+    }
+  }
+
+  // Success state
+  &--success {
+    border-color: hsl(142, 76%, 56%);
+    
+    &:focus {
+      box-shadow: 0 0 0 3px hsl(142, 76%, 56%, 0.1);
+    }
+  }
+
+  // Small variant
+  &--small {
+    padding: 8px 12px;
+    font-size: var(--fs-2);
+  }
+
+  // Large variant
+  &--large {
+    padding: 16px 20px;
+    font-size: var(--fs-4);
+  }
+
+  // Number input - remove spinners
+  &[type="number"] {
+    -moz-appearance: textfield;
+    
+    &::-webkit-outer-spin-button,
+    &::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+  }
+
+  // Search input
+  &[type="search"] {
+    &::-webkit-search-cancel-button {
+      -webkit-appearance: none;
+      height: 16px;
+      width: 16px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23f5f5f5'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M6 18L18 6M6 6l12 12'%3E%3C/path%3E%3C/svg%3E");
+      cursor: pointer;
+    }
+  }
+}
+
+// Form field wrapper
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+
+  // Horizontal layout
+  &--horizontal {
+    flex-direction: row;
+    align-items: center;
+    gap: 16px;
+  }
+}
+
+// Form label
+.form-label {
+  display: block;
+  color: var(--neutral-light);
+  font-size: var(--fs-3);
+  font-weight: 500;
+  font-family: var(--family-primary);
+  letter-spacing: 0.02em;
+  
+  // Required indicator
+  &--required::after {
+    content: " *";
+    color: var(--secondary);
+  }
+
+  // Small variant
+  &--small {
+    font-size: var(--fs-2);
+  }
+}
+
+// Form error message
+.form-error {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--secondary);
+  font-size: var(--fs-2);
+  margin-top: 4px;
+  animation: form-error-slide-in 0.2s ease-out;
+}
+
+// Form helper text
+.form-helper {
+  color: hsl(var(--neutral-light-hsl), 0.6);
+  font-size: var(--fs-2);
+  margin-top: 4px;
+}
+
+@keyframes form-error-slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+

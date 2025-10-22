@@ -1,17 +1,100 @@
 .tournament-bracket-client {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
 
-  &__admin-controls {
-
+  &__admin-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: var(--spacing-1);
+    background-color: hsl(var(--neutral-hsl), 0.2);
+    backdrop-filter: blur(12px);
+    border: 1px solid hsl(var(--neutral-hsl), 0.4);
+    border-radius: var(--radius-2);
+    flex-wrap: wrap;
   }
 
-  &__admin-button {
+  &__action-button {
+    padding: 10px 20px;
+    background-color: transparent;
+    border: 1px solid hsl(var(--neutral-hsl), 0.5);
+    border-radius: var(--radius-2);
+    color: hsl(var(--neutral-light-hsl), 0.9);
+    font-size: var(--fs-2);
+    font-family: var(--family-primary);
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: var(--transition-base);
+
+    &:hover {
+      background-color: hsl(var(--neutral-hsl), 0.3);
+      border-color: var(--primary);
+      color: var(--primary);
+      box-shadow: 0 0 15px hsl(var(--primary-hsl), 0.2);
+    }
+
+    // Danger variant for cancel/delete
+    &:nth-child(2),
+    &:nth-child(3) {
+      border-color: hsl(var(--secondary-hsl), 0.5);
+      color: var(--secondary);
+
+      &:hover {
+        background-color: hsl(var(--secondary-hsl), 0.1);
+        border-color: var(--secondary);
+        box-shadow: 0 0 15px hsl(var(--secondary-hsl), 0.2);
+      }
+    }
 
     &--disabled {
-
+      opacity: 0.5;
+      cursor: not-allowed;
+      pointer-events: none;
     }
   }
 
   &__banner {
+    padding: 12px 20px;
+    background: linear-gradient(
+      135deg,
+      hsl(var(--primary-hsl), 0.15) 0%,
+      hsl(var(--primary-hsl), 0.05) 100%
+    );
+    border: 1px solid hsl(var(--primary-hsl), 0.4);
+    border-left: 4px solid var(--primary);
+    border-radius: var(--radius-2);
+    color: var(--primary);
+    font-size: var(--fs-3);
+    font-family: var(--family-primary);
+    font-weight: 600;
+    text-align: center;
+    animation: banner-slide-in 0.3s ease-out;
+  }
+}
 
+@keyframes banner-slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 768px) {
+  .tournament-bracket-client {
+    &__admin-actions {
+      flex-direction: column;
+      
+      button {
+        width: 100%;
+      }
+    }
   }
 }

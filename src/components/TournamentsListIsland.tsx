@@ -91,15 +91,23 @@ function TournamentsListInner(_: Props) {
             onClick={()=>setTab('completed')}
           >{t('tournaments.completedTab')}</button>
         </div>
-        {admin && (
-          <button
-            onClick={onPurge}
-            disabled={busy}
-            className={`tournaments-list__purge-button ${busy ? 'tournaments-list__purge-button--disabled' : ''}`}
-          >
-            {t('tournaments.purge')}
-          </button>
-        )}
+        
+        <div className="tournaments-list__actions">
+          {admin && (
+            <>
+              <a href="/t/new" className="tournaments-list__create-button">
+                {t('tournaments.createButton')}
+              </a>
+              <button
+                onClick={onPurge}
+                disabled={busy}
+                className={`tournaments-list__purge-button ${busy ? 'tournaments-list__purge-button--disabled' : ''}`}
+              >
+                {t('tournaments.purge')}
+              </button>
+            </>
+          )}
+        </div>
       </div>
 
       {message && <div className="tournaments-list__message">{message}</div>}
@@ -107,15 +115,17 @@ function TournamentsListInner(_: Props) {
       <ul className="tournaments-list__list">
         {list.map(t => (
           <li className="tournaments-list__item" key={t.id}>
-            <a href={`/t/${t.id}`} className="tournaments-list__item-link">{t.name}</a>
-            <div className="tournaments-list__item-info">
-              {admin && t.status === 'canceled' && (
-                <span className="tournaments-list__canceled-badge">
-                  {t('tournaments.canceled')}
-                </span>
-              )}
-              <span className="tournaments-list__item-status">{getTournamentStatus(t.status)}</span>
-            </div>
+            <a href={`/t/${t.id}`} className="tournaments-list__item-link">
+              <span className="tournaments-list__item-name">{t.name}</span>
+              <div className="tournaments-list__item-info">
+                {admin && t.status === 'canceled' && (
+                  <span className="tournaments-list__canceled-badge">
+                    {t('tournaments.canceled')}
+                  </span>
+                )}
+                <span className="tournaments-list__item-status">{getTournamentStatus(t.status)}</span>
+              </div>
+            </a>
           </li>
         ))}
         {list.length === 0 && (

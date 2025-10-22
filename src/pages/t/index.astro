@@ -12,16 +12,36 @@ if (existingCookie !== lang) {
 
 const pageTitle = tServer(lang, 'tournaments.pageTitle')
 const heading = tServer(lang, 'tournaments.heading')
-const createLabel = tServer(lang, 'actions.createTournament')
 ---
 <SiteLayout title={pageTitle}>
-  <section class="mx-auto max-w-5xl px-4 py-8">
-    <h1 class="text-2xl font-semibold mb-4">{heading}</h1>
-    <TournamentsListIsland client:only="react" lang={lang} />
-    <div class="mt-6">
-      <a href="/t/new" class="inline-flex items-center rounded-md border px-3 py-2 text-sm hover:bg-gray-50">
-        {createLabel}
-      </a>
+  <section class="tournaments-page">
+    <div class="tournaments-page__container">
+      <h1 class="tournaments-page__heading">{heading}</h1>
+      <TournamentsListIsland client:only="react" lang={lang} />
     </div>
   </section>
 </SiteLayout>
+
+<style>
+.tournaments-page {
+  width: 100%;
+  padding: var(--spacing-2) 0;
+
+  &__container {
+    max-width: var(--container-max-width);
+    margin: 0 auto;
+    padding: var(--container-padding);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-2);
+  }
+
+  &__heading {
+    font-size: var(--fs-6);
+    font-family: var(--family-primary);
+    font-weight: 700;
+    color: var(--neutral-light);
+    letter-spacing: 0.02em;
+  }
+}
+</style>

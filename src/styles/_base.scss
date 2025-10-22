@@ -124,13 +124,17 @@ h6 {
   --breakpoint-lg: 1024px;
   --breakpoint-xl: 1280px;
   --breakpoint-2xl: 1536px;
+
+  // Container
+  --container-max-width: 1440px;
+  --container-padding: 0 clamp(1rem, 2.08vw + 0.003rem, 1.875rem);
 }
 
 body{
   font-family: var(--family-secondary);
   font-weight: 400;
   overflow-x: hidden;
-  background-color: #0d0d0d;
+  background-color: #121212;
   color: var(--neutral-light);
 }
 

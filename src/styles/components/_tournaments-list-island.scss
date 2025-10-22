@@ -1,56 +1,212 @@
 .tournaments-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
 
   &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--spacing-1);
+    flex-wrap: wrap;
+  }
 
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  &__create-button {
+    padding: 10px 24px;
+    background-color: var(--primary);
+    border: 1px solid var(--primary);
+    border-radius: var(--radius-2);
+    color: var(--background-dark);
+    font-size: var(--fs-3);
+    font-family: var(--family-primary);
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    text-decoration: none;
+    cursor: pointer;
+    transition: var(--transition-base);
+
+    &:hover {
+      background-color: hsl(var(--primary-hsl), 0.85);
+      box-shadow: 0 0 20px hsl(var(--primary-hsl), 0.4);
+      transform: translateY(-1px);
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
   }
 
   &__tabs {
-
+    display: flex;
+    gap: 8px;
+    background-color: hsl(var(--neutral-hsl), 0.5);
+    padding: 4px;
+    border-radius: var(--radius-2);
   }
 
   &__tab {
+    padding: 8px 20px;
+    background-color: transparent;
+    border: none;
+    border-radius: var(--radius-1);
+    color: hsl(var(--neutral-light-hsl), 0.6);
+    font-size: var(--fs-2);
+    font-family: var(--family-primary);
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: var(--transition-base);
+
+    &:hover {
+      background-color: hsl(var(--neutral-hsl), 0.4);
+      color: var(--neutral-light);
+    }
 
     &--active {
+      background-color: var(--primary);
+      color: var(--background-dark);
 
+      &:hover {
+        background-color: var(--primary);
+      }
     }
   }
 
   &__purge-button {
+    padding: 10px 20px;
+    background-color: transparent;
+    border: 1px solid hsl(var(--secondary-hsl), 0.5);
+    border-radius: var(--radius-2);
+    color: var(--secondary);
+    font-size: var(--fs-2);
+    font-family: var(--family-primary);
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: var(--transition-base);
+
+    &:hover {
+      background-color: hsl(var(--secondary-hsl), 0.1);
+      border-color: var(--secondary);
+      box-shadow: 0 0 15px hsl(var(--secondary-hsl), 0.2);
+    }
 
     &--disabled {
-
+      opacity: 0.5;
+      cursor: not-allowed;
+      pointer-events: none;
     }
   }
 
   &__message {
-
+    padding: 16px 20px;
+    background-color: hsl(142, 76%, 56%, 0.1);
+    border: 1px solid hsl(142, 76%, 56%, 0.3);
+    border-radius: var(--radius-2);
+    color: hsl(142, 76%, 56%);
+    font-size: var(--fs-3);
+    animation: message-slide-in 0.3s ease-out;
   }
 
   &__list {
-
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
   }
 
   &__item {
+    background-color: hsl(var(--neutral-hsl), 0.5);
+    border: 1px solid hsl(var(--neutral-hsl), 0.7);
+    border-radius: var(--radius-2);
+    transition: var(--transition-base);
+    overflow: hidden;
 
+    &:hover {
+      background-color: hsl(var(--neutral-hsl), 0.6);
+      border-color: hsl(var(--neutral-light-hsl), 0.15);
+    }
   }
 
   &__item-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--spacing-1);
+    padding: 16px 20px;
+    color: var(--neutral-light);
+    text-decoration: none;
+    transition: var(--transition-base);
+  }
 
+  &__item-name {
+    font-size: var(--fs-3);
+    font-family: var(--family-primary);
+    font-weight: 600;
+    transition: inherit;
+
+    .tournaments-list__item:hover & {
+      color: var(--primary);
+    }
   }
 
   &__item-info {
-
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
   }
 
   &__canceled-badge {
-
+    padding: 4px 12px;
+    background-color: hsl(var(--secondary-hsl), 0.2);
+    border: 1px solid var(--secondary);
+    border-radius: var(--radius-1);
+    color: var(--secondary);
+    font-size: var(--fs-1);
+    font-family: var(--family-secondary);
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
   }
 
   &__item-status {
-
+    padding: 6px 14px;
+    background-color: hsl(var(--primary-hsl), 0.1);
+    border-radius: var(--radius-1);
+    color: hsl(var(--primary-hsl), 0.9);
+    font-size: var(--fs-2);
+    font-family: var(--family-secondary);
+    font-weight: 500;
+    letter-spacing: 0.03em;
   }
 
   &__empty {
+    padding: 60px 20px;
+    text-align: center;
+    color: hsl(var(--neutral-light-hsl), 0.4);
+    font-size: var(--fs-4);
+    font-family: var(--family-primary);
+  }
+}
 
+@keyframes message-slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
