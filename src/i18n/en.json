@@ -81,7 +81,15 @@
     "update": "Update (tick)",
     "statusOpens": "Starts in {duration}",
     "statusEnds": "Ends in {duration}",
-    "roundLabel": "Round {round}"
+    "roundLabel": "Round {round}",
+    "statusScheduled": "Scheduled",
+    "statusRunning": "Running",
+    "statusCompleted": "Completed",
+    "statusCanceled": "Canceled",
+    "matchStatusScheduled": "SCHEDULED",
+    "matchStatusOpen": "OPEN",
+    "matchStatusClosed": "CLOSED",
+    "matchStatusVoid": "VOID"
   },
   "legal": {
     "legalTitle": "Legal notice — Kibaki",

@@ -16,7 +16,7 @@ export function groupByRound(matches: Match[]) {
 function formatDuration(ms: number): string {
   if (ms <= 0) return '00:00'
   const sec = Math.floor(ms / 1000)
-  const d = Math.floor(ms / 86400)
+  const d = Math.floor(sec / 86400)  // Utiliser sec (secondes) au lieu de ms
   const h = Math.floor((sec % 86400) / 3600)
   const m = Math.floor((sec % 3600) / 60)
   const s = sec % 60
@@ -39,7 +39,7 @@ type Props = {
 }
 
 export default function TournamentBracket(props: Props) {
-  const { getCharacterText, t } = useI18n()
+  const { getCharacterText, t, getMatchStatus } = useI18n()
   const now = new Date(props.nowIso).getTime()
   const rounds = groupByRound(props.matches)
   const myVotes = props.myVotes ?? {}
@@ -121,7 +121,7 @@ export default function TournamentBracket(props: Props) {
 
                     <div className="tournament-bracket__footer">
                       <span className={`tournament-bracket__status ${m.status === 'closed' ? 'tournament-bracket__status--closed' : ''}`}>
-                        {m.status.toUpperCase()}
+                        {getMatchStatus(m.status)}
                       </span>
                       {m.winner_id && (
                         <span className="tournament-bracket__winner">

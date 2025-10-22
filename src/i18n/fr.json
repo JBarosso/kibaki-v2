@@ -81,7 +81,15 @@
     "update": "Mettre à jour",
     "statusOpens": "Commence dans {duration}",
     "statusEnds": "Se termine dans {duration}",
-    "roundLabel": "Manche {round}"
+    "roundLabel": "Manche {round}",
+    "statusScheduled": "Planifié",
+    "statusRunning": "En cours",
+    "statusCompleted": "Terminé",
+    "statusCanceled": "Annulé",
+    "matchStatusScheduled": "PLANIFIÉ",
+    "matchStatusOpen": "OUVERT",
+    "matchStatusClosed": "FERMÉ",
+    "matchStatusVoid": "ANNULÉ"
   },
   "legal": {
     "legalTitle": "Mentions légales — Kibaki",

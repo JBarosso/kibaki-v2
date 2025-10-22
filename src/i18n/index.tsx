@@ -119,11 +119,33 @@ export function getCharacterText(character: CharacterInput, lang: Lang) {
   return { name, description };
 }
 
+export function getTournamentStatus(status: string, lang: Lang): string {
+  const statusMap: Record<string, string> = {
+    'scheduled': translate(lang, 'tournaments.statusScheduled'),
+    'running': translate(lang, 'tournaments.statusRunning'),
+    'completed': translate(lang, 'tournaments.statusCompleted'),
+    'canceled': translate(lang, 'tournaments.statusCanceled'),
+  };
+  return statusMap[status] ?? status;
+}
+
+export function getMatchStatus(status: string, lang: Lang): string {
+  const statusMap: Record<string, string> = {
+    'scheduled': translate(lang, 'tournaments.matchStatusScheduled'),
+    'open': translate(lang, 'tournaments.matchStatusOpen'),
+    'closed': translate(lang, 'tournaments.matchStatusClosed'),
+    'void': translate(lang, 'tournaments.matchStatusVoid'),
+  };
+  return statusMap[status] ?? status.toUpperCase();
+}
+
 type I18nContextValue = {
   lang: Lang;
   t: (key: string, params?: TranslateParams) => string;
   getUniverseLabel: (slug: string) => string;
   getCharacterText: (character: CharacterInput) => { name: string; description?: string };
+  getTournamentStatus: (status: string) => string;
+  getMatchStatus: (status: string) => string;
 };
 
 const I18nContext = createContext<I18nContextValue | null>(null);
@@ -168,6 +190,8 @@ export function I18nProvider({ lang, children }: { lang?: Lang; children: ReactN
     t: (key: string, params?: TranslateParams) => translate(current, key, params),
     getUniverseLabel: (slug: string) => getUniverseLabel(slug, current),
     getCharacterText: (character: CharacterInput) => getCharacterText(character, current),
+    getTournamentStatus: (status: string) => getTournamentStatus(status, current),
+    getMatchStatus: (status: string) => getMatchStatus(status, current),
   }), [current]);
 
   return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;

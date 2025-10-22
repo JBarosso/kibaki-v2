@@ -25,7 +25,7 @@ export default function TournamentsListIsland(props: Props) {
 }
 
 function TournamentsListInner(_: Props) {
-  const { t } = useI18n()
+  const { t, getTournamentStatus } = useI18n()
   const [items, setItems] = useState<Tournament[]>([])
   const [tab, setTab] = useState<'active'|'completed'>('active')
   const [admin, setAdmin] = useState(false)
@@ -114,7 +114,7 @@ function TournamentsListInner(_: Props) {
                   {t('tournaments.canceled')}
                 </span>
               )}
-              <span className="tournaments-list__item-status">{t.status}</span>
+              <span className="tournaments-list__item-status">{getTournamentStatus(t.status)}</span>
             </div>
           </li>
         ))}
