@@ -3,10 +3,6 @@
   z-index: 1;
   font-weight: 300;
 
-  @media (min-width: 1024px) {
-    padding: var(--spacing-1) 0;
-  }
-
   a {
     text-decoration: none;
     transition: var(--transition-base);
@@ -20,14 +16,8 @@
     margin: 0 auto;
     backdrop-filter: blur(24px);
     gap: var(--spacing-3);
-    background-color: hsl(var(--background-hsl), 1);
-    
-    @media (min-width: 1024px) {
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      background-color: hsl(var(--background-hsl), 0.8);
-      border-radius: var(--radius-2);
-      width: fit-content;
-    }
+    background-color: hsl(var(--background-dark-hsl), 1);
+    border: 1px solid #ffffff1a;
   }
 
   &__logo {
@@ -301,6 +291,18 @@
 
     .custom-select__option {
       padding: 6px 12px;
+    }
+  }
+}
+
+.app-header--floating {
+  @media (min-width: 1024px) {
+    padding: var(--spacing-1) 0;
+    .app-header__container {
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background-color: hsl(var(--background-hsl), 0.8);
+      border-radius: var(--radius-2);
+      width: fit-content;
     }
   }
 }

@@ -27,6 +27,7 @@ type AppHeaderProps = {
   navLabels: NavLabels;
   actionLabels: ActionLabels;
   infoText: string;
+  headerClassName?: string;
 };
 
 type Profile = {
@@ -45,7 +46,7 @@ export default function AppHeader(props: AppHeaderProps) {
   );
 }
 
-function HeaderInner({ lang, navLabels, actionLabels, infoText }: AppHeaderProps) {
+function HeaderInner({ lang, navLabels, actionLabels, infoText, headerClassName }: AppHeaderProps) {
   const [session, setSession] = useState<Session>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [infoDropdownOpen, setInfoDropdownOpen] = useState(false);
@@ -148,7 +149,7 @@ function HeaderInner({ lang, navLabels, actionLabels, infoText }: AppHeaderProps
   ];
 
   return (
-    <header className="app-header">
+    <header className={`app-header${headerClassName ? ` ${headerClassName}` : ''}`}>
       <div className="app-header__container">
         <a href="/" className="app-header__logo">Kibaki</a>
 

@@ -5,7 +5,7 @@ import "../styles/style.scss";
 import { getLangCookie, resolveLang, setLangCookie, tServer } from "@/i18n";
 import type { Lang } from "@/i18n";
 
-const { title = "Kibaki" } = Astro.props;
+const { title = "Kibaki", headerClassName } = Astro.props;
 const hasHead = Astro.slots?.has?.("head") ?? false;
 
 const existingCookie = getLangCookie(Astro);
@@ -48,7 +48,7 @@ const infoText = tServer(lang, "info.publicDomain");
     <meta name="theme-color" content="#ffffff" /> -->
   </head>
   <body class="site-layout__body">
-    <AppHeader client:load lang={lang} navLabels={navLabels} actionLabels={actionLabels} infoText={infoText} />
+    <AppHeader client:load lang={lang} navLabels={navLabels} actionLabels={actionLabels} infoText={infoText} headerClassName={headerClassName} />
     <ToastProvider client:load />
     <main class="site-layout__main">
       <slot />
