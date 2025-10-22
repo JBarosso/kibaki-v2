@@ -152,3 +152,10 @@ button{
     transition: inherit;
   }
 }
+
+.site-container{
+  width: 100%;
+  max-width: var(--container-max-width);
+  margin: 0 auto;
+  padding: 0 var(--container-padding);
+}
