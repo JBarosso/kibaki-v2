@@ -19,23 +19,24 @@
   }
 
   &__create-button {
-    padding: 10px 24px;
-    background-color: var(--primary);
-    border: 1px solid var(--primary);
+    padding: 12px 28px;
+    background-color: var(--accent);
+    border: 1px solid var(--accent);
     border-radius: var(--radius-2);
-    color: var(--background-dark);
+    color: var(--background-rich);
     font-size: var(--fs-2);
     font-family: var(--family-primary);
     font-weight: 600;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.02em;
     text-transform: uppercase;
     text-decoration: none;
     cursor: pointer;
     transition: var(--transition-base);
 
     &:hover {
-      background-color: hsl(var(--primary-hsl), 0.85);
-      transform: translateY(-1px);
+      background-color: var(--accent-hover);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-accent);
     }
 
     &:active {
@@ -46,36 +47,37 @@
   &__tabs {
     display: flex;
     gap: 8px;
-    background-color: hsl(var(--neutral-hsl), 0.5);
+    background-color: hsla(0, 0%, 6%, 0.5);
     padding: 4px;
     border-radius: var(--radius-2);
   }
 
   &__tab {
-    padding: 8px 20px;
+    padding: 10px 24px;
     background-color: transparent;
     border: none;
-    border-radius: var(--radius-1);
-    color: hsl(var(--neutral-light-hsl), 0.6);
+    border-radius: 6px;
+    color: var(--text-muted);
     font-size: var(--fs-2);
     font-family: var(--family-primary);
     font-weight: 500;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.02em;
     text-transform: uppercase;
     cursor: pointer;
     transition: var(--transition-base);
 
     &:hover {
-      background-color: hsl(var(--neutral-hsl), 0.4);
-      color: var(--neutral-light);
+      background-color: hsla(42, 46%, 58%, 0.1);
+      color: var(--text-secondary);
     }
 
     &--active {
-      background-color: var(--primary);
-      color: var(--background-dark);
+      background-color: var(--accent);
+      color: var(--background-rich);
 
       &:hover {
-        background-color: var(--primary);
+        background-color: var(--accent-hover);
+        color: var(--background-rich);
       }
     }
   }
@@ -83,20 +85,20 @@
   &__purge-button {
     padding: 10px 20px;
     background-color: transparent;
-    border: 1px solid hsl(var(--secondary-hsl), 0.5);
+    border: 1px solid hsla(0, 28%, 66%, 0.5);
     border-radius: var(--radius-2);
-    color: var(--secondary);
+    color: var(--error);
     font-size: var(--fs-2);
     font-family: var(--family-primary);
     font-weight: 500;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.02em;
     text-transform: uppercase;
     cursor: pointer;
     transition: var(--transition-base);
 
     &:hover {
-      background-color: hsl(var(--secondary-hsl), 0.1);
-      border-color: var(--secondary);
+      background-color: hsla(0, 28%, 66%, 0.1);
+      border-color: var(--error);
     }
 
     &--disabled {
@@ -108,10 +110,10 @@
 
   &__message {
     padding: 16px 20px;
-    background-color: hsl(142, 50%, 40%, 0.15);
-    border: 1px solid hsl(142, 50%, 50%, 0.4);
+    background-color: hsla(150, 23%, 47%, 0.15);
+    border: 1px solid hsla(150, 23%, 47%, 0.4);
     border-radius: var(--radius-2);
-    color: hsl(142, 50%, 65%);
+    color: var(--success);
     font-size: var(--fs-3);
     animation: message-slide-in 0.3s ease-out;
   }
@@ -130,7 +132,7 @@
     gap: var(--spacing-1);
     padding: 16px 20px;
     border-radius: var(--radius-2);
-    color: var(--neutral-light);
+    color: var(--text-ivory);
     border: var(--card-border);
     background-color: var(--card-background);
     text-decoration: none;
@@ -138,6 +140,7 @@
     
     &:hover {
       border: var(--card-hover-border);
+      box-shadow: var(--card-hover-shadow);
     }
   }
 
@@ -147,8 +150,8 @@
     font-weight: 600;
     transition: inherit;
 
-    .tournaments-list__item:hover & {
-      color: var(--primary);
+    .tournaments-list__item-link:hover & {
+      color: var(--gold);
     }
   }
 
@@ -161,10 +164,10 @@
 
   &__canceled-badge {
     padding: 4px 12px;
-    background-color: hsl(var(--secondary-hsl), 0.2);
-    border: 1px solid var(--secondary);
-    border-radius: var(--radius-1);
-    color: var(--secondary);
+    background-color: hsla(0, 28%, 66%, 0.15);
+    border: 1px solid var(--status-canceled);
+    border-radius: 6px;
+    color: var(--status-canceled);
     font-size: var(--fs-1);
     font-family: var(--family-secondary);
     font-weight: 600;
@@ -174,40 +177,43 @@
 
   &__item-status {
     padding: 6px 14px;
-    background-color: hsl(var(--primary-hsl), 0.1);
-    border-radius: var(--radius-1);
-    color: hsl(var(--primary-hsl), 0.9);
+    border-radius: 6px;
     font-size: var(--fs-2);
     font-family: var(--family-secondary);
     font-weight: 500;
-    letter-spacing: 0.03em;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
 
     // Modifier pour chaque statut
     &--scheduled {
-      background-color: hsl(200, 70%, 50%, 0.15);
-      color: hsl(200, 70%, 65%);
+      background-color: hsla(38, 75%, 60%, 0.15);
+      color: var(--status-scheduled);
+      border: 1px solid hsla(38, 75%, 60%, 0.3);
     }
 
     &--running {
-      background-color: hsl(142, 50%, 40%, 0.15);
-      color: hsl(142, 50%, 65%);
+      background-color: hsla(183, 56%, 64%, 0.15);
+      color: var(--status-running);
+      border: 1px solid hsla(183, 56%, 64%, 0.3);
     }
 
     &--completed {
-      background-color: hsl(var(--neutral-hsl), 0.2);
-      color: hsl(var(--neutral-light-hsl), 0.7);
+      background-color: hsla(42, 46%, 58%, 0.15);
+      color: var(--status-completed);
+      border: 1px solid hsla(42, 46%, 58%, 0.3);
     }
 
     &--canceled {
-      background-color: hsl(var(--secondary-hsl), 0.15);
-      color: var(--secondary);
+      background-color: hsla(0, 28%, 66%, 0.15);
+      color: var(--status-canceled);
+      border: 1px solid hsla(0, 28%, 66%, 0.3);
     }
   }
 
   &__empty {
     padding: 60px 20px;
     text-align: center;
-    color: hsl(var(--neutral-light-hsl), 0.4);
+    color: var(--text-muted);
     font-size: var(--fs-4);
     font-family: var(--family-primary);
   }

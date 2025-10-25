@@ -9,9 +9,8 @@
     justify-content: center;
     gap: 12px;
     padding: var(--spacing-1);
-    background-color: hsl(var(--neutral-hsl), 0.2);
-    backdrop-filter: blur(12px);
-    border: 1px solid hsl(var(--neutral-hsl), 0.4);
+    background-color: var(--background-charcoal);
+    border: 1px solid hsla(42, 46%, 58%, 0.2);
     border-radius: var(--radius-2);
     flex-wrap: wrap;
   }
@@ -19,32 +18,32 @@
   &__action-button {
     padding: 10px 20px;
     background-color: transparent;
-    border: 1px solid hsl(var(--neutral-hsl), 0.5);
+    border: 1px solid hsla(42, 46%, 58%, 0.4);
     border-radius: var(--radius-2);
-    color: hsl(var(--neutral-light-hsl), 0.9);
+    color: var(--gold);
     font-size: var(--fs-2);
     font-family: var(--family-primary);
     font-weight: 600;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.02em;
     text-transform: uppercase;
     cursor: pointer;
     transition: var(--transition-base);
 
     &:hover {
-      background-color: hsl(var(--neutral-hsl), 0.3);
-      border-color: var(--primary);
-      color: var(--primary);
+      background-color: hsla(42, 46%, 58%, 0.1);
+      border-color: var(--copper);
+      color: var(--copper);
     }
 
     // Danger variant for cancel/delete
     &:nth-child(2),
     &:nth-child(3) {
-      border-color: hsl(var(--secondary-hsl), 0.5);
-      color: var(--secondary);
+      border-color: hsla(0, 28%, 66%, 0.4);
+      color: var(--error);
 
       &:hover {
-        background-color: hsl(var(--secondary-hsl), 0.1);
-        border-color: var(--secondary);
+        background-color: hsla(0, 28%, 66%, 0.1);
+        border-color: var(--error);
       }
     }
 
@@ -59,13 +58,13 @@
     padding: 12px 20px;
     background: linear-gradient(
       135deg,
-      hsl(var(--primary-hsl), 0.15) 0%,
-      hsl(var(--primary-hsl), 0.05) 100%
+      hsla(183, 56%, 64%, 0.15) 0%,
+      hsla(183, 56%, 64%, 0.05) 100%
     );
-    border: 1px solid hsl(var(--primary-hsl), 0.4);
-    border-left: 4px solid var(--primary);
+    border: 1px solid hsla(183, 56%, 64%, 0.4);
+    border-left: 4px solid var(--accent);
     border-radius: var(--radius-2);
-    color: var(--primary);
+    color: var(--accent);
     font-size: var(--fs-3);
     font-family: var(--family-primary);
     font-weight: 600;
@@ -75,19 +74,20 @@
 
   &__winner-banner {
     position: relative;
-    padding: 24px 32px;
+    padding: 32px;
     background: linear-gradient(
       135deg,
-      hsl(45, 60%, 20%, 0.4) 0%,
-      hsl(45, 60%, 25%, 0.3) 50%,
-      hsl(45, 60%, 20%, 0.4) 100%
+      hsla(42, 46%, 20%, 0.6) 0%,
+      hsla(42, 46%, 15%, 0.5) 50%,
+      hsla(42, 46%, 20%, 0.6) 100%
     );
-    border: 2px solid hsl(45, 60%, 45%, 0.6);
-    border-radius: var(--radius-2);
+    border: 2px solid hsla(42, 46%, 58%, 0.6);
+    border-radius: 12px;
     animation: banner-slide-in 0.5s ease-out;
     overflow: hidden;
+    box-shadow: var(--shadow-gold);
 
-    // Effet de brillance animé subtil
+    // Effet de brillance animé subtil (adouci)
     &::before {
       content: '';
       position: absolute;
@@ -99,9 +99,9 @@
         45deg,
         transparent 0%,
         transparent 40%,
-        hsl(45, 60%, 50%, 0.05) 45%,
-        hsl(45, 60%, 50%, 0.1) 50%,
-        hsl(45, 60%, 50%, 0.05) 55%,
+        hsla(42, 46%, 58%, 0.03) 45%,
+        hsla(42, 46%, 58%, 0.06) 50%,
+        hsla(42, 46%, 58%, 0.03) 55%,
         transparent 60%,
         transparent 100%
       );
@@ -123,14 +123,15 @@
     width: 120px;
     height: 120px;
     border-radius: 50%;
-    border: 3px solid hsl(45, 60%, 50%, 0.8);
+    border: 3px solid var(--gold);
     background: linear-gradient(
       135deg,
-      hsl(45, 50%, 20%) 0%,
-      hsl(45, 40%, 15%) 100%
+      hsla(42, 40%, 20%, 1) 0%,
+      hsla(42, 30%, 15%, 1) 100%
     );
     overflow: hidden;
     position: relative;
+    box-shadow: 0 8px 32px rgba(201, 169, 97, 0.2);
 
     &::after {
       content: '';
@@ -140,7 +141,7 @@
       right: 0;
       bottom: 0;
       border-radius: 50%;
-      box-shadow: inset 0 -20px 30px hsl(45, 60%, 30%, 0.2);
+      box-shadow: inset 0 -20px 30px hsla(42, 46%, 30%, 0.3);
       pointer-events: none;
     }
   }
@@ -172,9 +173,9 @@
     font-size: var(--fs-2);
     font-family: var(--family-secondary);
     font-weight: 500;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: hsl(45, 60%, 65%);
+    color: var(--bronze);
   }
 
   &__winner-name {
@@ -182,7 +183,7 @@
     font-family: var(--family-primary);
     font-weight: 700;
     letter-spacing: 0.02em;
-    color: hsl(45, 60%, 75%);
+    color: var(--gold);
   }
 }
 

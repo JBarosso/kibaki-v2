@@ -23,10 +23,10 @@
     align-items: center;
     gap: 8px;
     padding: 8px 14px;
-    background-color: hsl(var(--neutral-hsl), 0.5);
-    border: 1px solid hsl(var(--neutral-hsl), 0.7);
+    background-color: var(--background-charcoal);
+    border: 1px solid hsla(42, 46%, 58%, 0.3);
     border-radius: var(--radius-2);
-    color: hsl(var(--neutral-light-hsl), 0.8);
+    color: var(--text-secondary);
     font-size: var(--fs-2);
     font-family: var(--family-secondary);
     font-weight: 400;
@@ -35,9 +35,9 @@
     width: fit-content;
 
     &:hover {
-      background-color: hsl(var(--neutral-hsl), 0.6);
-      border-color: hsl(var(--neutral-light-hsl), 0.15);
-      color: var(--neutral-light);
+      background-color: var(--background-elevated);
+      border-color: var(--bronze);
+      color: var(--gold);
     }
 
     svg {
@@ -64,7 +64,7 @@
     font-size: var(--fs-6);
     font-family: var(--family-primary);
     font-weight: 700;
-    color: var(--neutral-light);
+    color: var(--text-ivory);
     letter-spacing: 0.02em;
   }
 
@@ -78,27 +78,27 @@
     text-transform: uppercase;
 
     &--scheduled {
-      background-color: hsl(38, 92%, 50%, 0.15);
-      color: hsl(38, 92%, 50%);
-      border: 1px solid hsl(38, 92%, 50%, 0.4);
+      background-color: hsla(38, 75%, 60%, 0.15);
+      color: var(--status-scheduled);
+      border: 1px solid hsla(38, 75%, 60%, 0.3);
     }
 
     &--running {
-      background-color: hsl(var(--primary-hsl), 0.15);
-      color: var(--primary);
-      border: 1px solid hsl(var(--primary-hsl), 0.4);
+      background-color: hsla(183, 56%, 64%, 0.15);
+      color: var(--status-running);
+      border: 1px solid hsla(183, 56%, 64%, 0.3);
     }
 
     &--completed {
-      background-color: hsl(142, 76%, 56%, 0.15);
-      color: hsl(142, 76%, 56%);
-      border: 1px solid hsl(142, 76%, 56%, 0.4);
+      background-color: hsla(42, 46%, 58%, 0.15);
+      color: var(--status-completed);
+      border: 1px solid hsla(42, 46%, 58%, 0.3);
     }
 
     &--canceled {
-      background-color: hsl(var(--secondary-hsl), 0.15);
-      color: var(--secondary);
-      border: 1px solid hsl(var(--secondary-hsl), 0.4);
+      background-color: hsla(0, 28%, 66%, 0.15);
+      color: var(--status-canceled);
+      border: 1px solid hsla(0, 28%, 66%, 0.3);
     }
   }
 }

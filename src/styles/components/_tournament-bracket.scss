@@ -14,23 +14,23 @@
     // Modifiers pour les statuts
     &--upcoming {
       .tournament-bracket__round-header {
-        background-color: hsl(200, 70%, 50%, 0.15);
-        border-left-color: hsl(200, 70%, 65%);
+        background-color: hsla(38, 75%, 60%, 0.15);
+        border-left-color: var(--status-scheduled);
       }
     }
 
     &--in_progress {
       .tournament-bracket__round-header {
-        background-color: hsl(142, 76%, 56%, 0.15);
-        border-left-color: hsl(142, 76%, 60%);
+        background-color: hsla(183, 56%, 64%, 0.15);
+        border-left-color: var(--status-running);
       }
     }
 
     &--completed {
       .tournament-bracket__round-header {
-        background-color: hsl(var(--neutral-hsl), 0.3);
-        border-left-color: hsl(var(--neutral-light-hsl), 0.4);
-        opacity: 0.85;
+        background-color: hsla(42, 46%, 58%, 0.15);
+        border-left-color: var(--status-completed);
+        opacity: 0.9;
       }
     }
 
@@ -54,9 +54,9 @@
     align-items: center;
     gap: var(--spacing-2);
     padding: 12px 16px;
-    background-color: hsl(var(--neutral-hsl), 0.5);
-    border: none;
-    border-left: 3px solid hsl(var(--neutral-light-hsl), 0.3);
+    background-color: var(--background-charcoal);
+    border: 1px solid hsla(42, 46%, 58%, 0.2);
+    border-left: 3px solid var(--bronze);
     border-radius: var(--radius-2) var(--radius-2) 0 0;
     cursor: pointer;
     transition: var(--transition-base);
@@ -64,12 +64,13 @@
     text-align: left;
 
     &:hover {
-      background-color: hsl(var(--neutral-hsl), 0.6);
+      background-color: var(--background-elevated);
+      border-color: hsla(42, 46%, 58%, 0.3);
       transform: translateX(2px);
     }
 
     &:focus {
-      outline: 2px solid var(--primary);
+      outline: 2px solid var(--accent);
       outline-offset: 2px;
     }
   }
@@ -85,21 +86,21 @@
     font-size: var(--fs-4);
     font-family: var(--family-primary);
     font-weight: 700;
-    color: hsl(var(--neutral-light-hsl), 0.9);
-    letter-spacing: 0.04em;
+    color: var(--text-ivory);
+    letter-spacing: 0.02em;
     text-transform: uppercase;
   }
 
   &__round-time {
     font-size: var(--fs-1);
     font-family: var(--family-secondary);
-    color: hsl(var(--neutral-light-hsl), 0.5);
+    color: var(--text-muted);
     letter-spacing: 0.02em;
   }
 
   &__round-icon {
     flex-shrink: 0;
-    color: hsl(var(--neutral-light-hsl), 0.7);
+    color: var(--text-secondary);
     transition: transform 0.3s ease;
     align-self: flex-start;
     margin-top: 4px;
@@ -114,12 +115,13 @@
     margin: 0 16px 12px 16px;
     background: linear-gradient(
       135deg,
-      hsl(var(--primary-hsl), 0.1) 0%,
-      hsl(var(--primary-hsl), 0.05) 100%
+      hsla(183, 56%, 64%, 0.15) 0%,
+      hsla(183, 56%, 64%, 0.05) 100%
     );
-    border: 1px solid hsl(var(--primary-hsl), 0.3);
+    border: 1px solid hsla(183, 56%, 64%, 0.4);
+    border-left: 3px solid var(--accent);
     border-radius: var(--radius-2);
-    color: var(--primary);
+    color: var(--accent);
     font-size: var(--fs-2);
     font-family: var(--family-primary);
     font-weight: 600;
@@ -130,7 +132,7 @@
     grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
     gap: 16px;
     padding: 16px;
-    background-color: hsl(var(--background-dark-hsl), 0.3);
+    background-color: hsla(0, 0%, 6%, 0.3);
     animation: accordion-slide-down 0.3s ease-out;
   }
 
@@ -139,14 +141,15 @@
     flex-direction: column;
     gap: 12px;
     padding: 16px;
-    background-color: hsl(var(--neutral-hsl), 0.5);
-    border: 1px solid hsl(var(--neutral-hsl), 0.7);
+    background-color: var(--background-charcoal);
+    border: 1px solid hsla(42, 46%, 58%, 0.15);
     border-radius: var(--radius-2);
     transition: var(--transition-base);
 
     &:hover {
-      background-color: hsl(var(--neutral-hsl), 0.6);
-      border-color: hsl(var(--neutral-light-hsl), 0.12);
+      background-color: var(--background-elevated);
+      border-color: hsla(42, 46%, 58%, 0.3);
+      box-shadow: var(--shadow-sm);
     }
   }
 
@@ -166,34 +169,34 @@
     justify-content: space-between;
     gap: 12px;
     padding: 12px 16px;
-    background-color: hsl(var(--neutral-hsl), 0.6);
-    border: 1px solid hsl(var(--neutral-hsl), 0.8);
+    background-color: hsla(0, 0%, 10%, 0.6);
+    border: 1px solid hsla(42, 46%, 58%, 0.2);
     border-radius: var(--radius-2);
     transition: var(--transition-base);
 
-    // Winner state (green)
+    // Winner state (gold)
     &--winner {
       background: linear-gradient(
         135deg,
-        hsl(142, 76%, 56%, 0.2) 0%,
-        hsl(142, 76%, 56%, 0.05) 100%
+        hsla(42, 46%, 58%, 0.2) 0%,
+        hsla(42, 46%, 58%, 0.05) 100%
       );
-      border-color: hsl(142, 76%, 56%, 0.6);
+      border-color: var(--gold);
       
       .tournament-bracket__competitor-name {
-        color: hsl(142, 76%, 56%);
+        color: var(--gold);
         font-weight: 600;
       }
     }
 
     // Loser state (gray)
     &--loser {
-      background-color: hsl(var(--neutral-hsl), 0.15);
-      border-color: hsl(var(--neutral-hsl), 0.3);
-      opacity: 0.6;
+      background-color: hsla(0, 0%, 6%, 0.3);
+      border-color: hsla(42, 46%, 58%, 0.1);
+      opacity: 0.5;
       
       .tournament-bracket__competitor-name {
-        color: hsl(var(--neutral-light-hsl), 0.5);
+        color: var(--text-muted);
         text-decoration: line-through;
       }
     }
@@ -204,33 +207,33 @@
     font-size: var(--fs-3);
     font-family: var(--family-primary);
     font-weight: 500;
-    color: var(--neutral-light);
+    color: var(--text-ivory);
     transition: inherit;
 
     &--selected {
-      color: var(--primary);
+      color: var(--accent);
       font-weight: 600;
     }
   }
 
   &__vote-button {
     padding: 8px 20px;
-    background-color: var(--primary);
-    border: 1px solid var(--primary);
+    background-color: var(--accent);
+    border: 1px solid var(--accent);
     border-radius: var(--radius-2);
-    color: var(--background-dark);
+    color: var(--background-rich);
     font-size: var(--fs-2);
     font-family: var(--family-primary);
     font-weight: 600;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.02em;
     text-transform: uppercase;
     cursor: pointer;
     transition: var(--transition-base);
     flex-shrink: 0;
 
     &:hover {
-      background-color: hsl(var(--primary-hsl), 0.85);
-      box-shadow: 0 0 15px hsl(var(--primary-hsl), 0.4);
+      background-color: var(--accent-hover);
+      box-shadow: var(--shadow-accent);
       transform: scale(1.05);
     }
 
@@ -241,10 +244,10 @@
 
   &__votes {
     padding: 6px 14px;
-    background-color: hsl(var(--primary-hsl), 0.1);
-    border: 1px solid hsl(var(--primary-hsl), 0.3);
-    border-radius: var(--radius-1);
-    color: var(--primary);
+    background-color: hsla(183, 56%, 64%, 0.15);
+    border: 1px solid hsla(183, 56%, 64%, 0.3);
+    border-radius: 6px;
+    color: var(--accent);
     font-size: var(--fs-3);
     font-family: var(--family-primary);
     font-weight: 700;
@@ -257,12 +260,12 @@
     padding: 10px 14px;
     background: linear-gradient(
       135deg,
-      hsl(var(--primary-hsl), 0.15) 0%,
-      hsl(var(--primary-hsl), 0.05) 100%
+      hsla(183, 56%, 64%, 0.15) 0%,
+      hsla(183, 56%, 64%, 0.05) 100%
     );
-    border: 1px solid var(--primary);
+    border: 1px solid var(--accent);
     border-radius: var(--radius-2);
-    color: var(--primary);
+    color: var(--accent);
     font-size: var(--fs-2);
     font-family: var(--family-secondary);
     font-weight: 500;
@@ -271,10 +274,10 @@
 
   &__flash {
     padding: 10px 14px;
-    background-color: hsl(142, 76%, 56%, 0.15);
-    border: 1px solid hsl(142, 76%, 56%, 0.4);
+    background-color: hsla(150, 23%, 47%, 0.15);
+    border: 1px solid hsla(150, 23%, 47%, 0.4);
     border-radius: var(--radius-2);
-    color: hsl(142, 76%, 56%);
+    color: var(--success);
     font-size: var(--fs-2);
     font-family: var(--family-secondary);
     font-weight: 500;
@@ -288,16 +291,16 @@
     justify-content: space-between;
     gap: 12px;
     padding-top: 8px;
-    border-top: 1px solid hsl(var(--neutral-hsl), 0.4);
+    border-top: 1px solid hsla(42, 46%, 58%, 0.2);
     flex-wrap: wrap;
   }
 
   &__status {
     padding: 4px 10px;
-    background-color: hsl(var(--neutral-hsl), 0.3);
-    border: 1px solid hsl(var(--neutral-hsl), 0.5);
-    border-radius: var(--radius-1);
-    color: hsl(var(--neutral-light-hsl), 0.7);
+    background-color: hsla(42, 46%, 58%, 0.15);
+    border: 1px solid hsla(42, 46%, 58%, 0.3);
+    border-radius: 6px;
+    color: var(--text-secondary);
     font-size: var(--fs-1);
     font-family: var(--family-secondary);
     font-weight: 600;
@@ -305,9 +308,9 @@
     text-transform: uppercase;
 
     &--closed {
-      background-color: hsl(var(--secondary-hsl), 0.15);
-      border-color: hsl(var(--secondary-hsl), 0.4);
-      color: var(--secondary);
+      background-color: hsla(0, 28%, 66%, 0.15);
+      border-color: hsla(0, 28%, 66%, 0.3);
+      color: var(--error);
     }
   }
 
@@ -315,12 +318,12 @@
     padding: 4px 10px;
     background: linear-gradient(
       135deg,
-      hsl(142, 76%, 56%, 0.2) 0%,
-      hsl(142, 76%, 56%, 0.1) 100%
+      hsla(42, 46%, 58%, 0.2) 0%,
+      hsla(42, 46%, 58%, 0.1) 100%
     );
-    border: 1px solid hsl(142, 76%, 56%, 0.4);
-    border-radius: var(--radius-1);
-    color: hsl(142, 76%, 56%);
+    border: 1px solid hsla(42, 46%, 58%, 0.4);
+    border-radius: 6px;
+    color: var(--gold);
     font-size: var(--fs-2);
     font-family: var(--family-primary);
     font-weight: 600;
@@ -335,21 +338,21 @@
   &__update-button {
     padding: 10px 24px;
     background-color: transparent;
-    border: 1px solid hsl(var(--primary-hsl), 0.5);
+    border: 1px solid hsla(42, 46%, 58%, 0.4);
     border-radius: var(--radius-2);
-    color: var(--primary);
+    color: var(--gold);
     font-size: var(--fs-2);
     font-family: var(--family-primary);
     font-weight: 600;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.02em;
     text-transform: uppercase;
     cursor: pointer;
     transition: var(--transition-base);
 
     &:hover {
-      background-color: hsl(var(--primary-hsl), 0.1);
-      border-color: var(--primary);
-      box-shadow: 0 0 15px hsl(var(--primary-hsl), 0.2);
+      background-color: hsla(42, 46%, 58%, 0.1);
+      border-color: var(--copper);
+      color: var(--copper);
     }
   }
 }

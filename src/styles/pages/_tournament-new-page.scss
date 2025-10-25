@@ -23,10 +23,10 @@
     align-items: center;
     gap: 8px;
     padding: 8px 14px;
-    background-color: hsl(var(--neutral-hsl), 0.5);
-    border: 1px solid hsl(var(--neutral-hsl), 0.7);
+    background-color: var(--background-charcoal);
+    border: 1px solid hsla(42, 46%, 58%, 0.3);
     border-radius: var(--radius-2);
-    color: hsl(var(--neutral-light-hsl), 0.8);
+    color: var(--text-secondary);
     font-size: var(--fs-2);
     font-family: var(--family-secondary);
     font-weight: 400;
@@ -35,9 +35,9 @@
     width: fit-content;
 
     &:hover {
-      background-color: hsl(var(--neutral-hsl), 0.6);
-      border-color: hsl(var(--neutral-light-hsl), 0.15);
-      color: var(--neutral-light);
+      background-color: var(--background-elevated);
+      border-color: var(--bronze);
+      color: var(--gold);
     }
 
     svg {
@@ -56,7 +56,7 @@
     font-size: var(--fs-6);
     font-family: var(--family-primary);
     font-weight: 700;
-    color: var(--neutral-light);
+    color: var(--text-ivory);
     letter-spacing: 0.02em;
   }
 }
