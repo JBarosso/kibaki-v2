@@ -1,5 +1,6 @@
 ---
-import Base from '@/layouts/Base.astro';
+import SiteLayout from '@/layouts/SiteLayout.astro';
+import Seo from '@/components/Seo.astro';
 import { getLangCookie, resolveLang, setLangCookie, tServer } from '@/i18n';
 import type { Lang } from '@/i18n';
 
@@ -21,53 +22,54 @@ const headings = {
   cookies: tServer(lang, 'legal.cookiesHeading'),
 };
 ---
-<Base title={pageTitle}>
-  <section class="max-w-3xl mx-auto p-6 space-y-4">
-    <h1 class="text-3xl font-bold">{headings.h1}</h1>
-    <p>Cette politique décrit la manière dont Kibaki traite vos données personnelles.</p>
-    <section class="space-y-2">
-      <h2 class="text-xl font-semibold">{headings.data}</h2>
-      <ul class="list-disc pl-6 space-y-1">
+<SiteLayout title={pageTitle}>
+  <Seo slot="head" title={pageTitle} description="Politique de confidentialité de Kibaki" />
+  <section class="legal-page">
+    <h1 class="legal-page__title">{headings.h1}</h1>
+    <p class="legal-page__subtitle">Cette politique décrit la manière dont Kibaki traite vos données personnelles.</p>
+    <section class="legal-page__section">
+      <h2 class="legal-page__heading">{headings.data}</h2>
+      <ul class="legal-page__list">
         <li>Votes (choix effectués, horodatage)</li>
         <li>Adresse IP (anti-fraude, limitation de débit)</li>
         <li>Cookies (session, préférences)</li>
         <li>Mesures d'audience (analytics agrégées)</li>
       </ul>
     </section>
-    <section class="space-y-2">
-      <h2 class="text-xl font-semibold">{headings.purposes}</h2>
-      <ul class="list-disc pl-6 space-y-1">
+    <section class="legal-page__section">
+      <h2 class="legal-page__heading">{headings.purposes}</h2>
+      <ul class="legal-page__list">
         <li>Calcul Elo et affichage des résultats</li>
         <li>Amélioration du service et correction des bugs</li>
         <li>Prévention des abus (vote automatisé, spam)</li>
       </ul>
     </section>
-    <section class="space-y-2">
-      <h2 class="text-xl font-semibold">{headings.legalBasis}</h2>
+    <section class="legal-page__section">
+      <h2 class="legal-page__heading">{headings.legalBasis}</h2>
       <p>Intérêt légitime pour l'exploitation du service et la prévention des abus. Consentement lorsqu'exigé (par ex. cookies analytiques selon votre région).</p>
     </section>
-    <section class="space-y-2">
-      <h2 class="text-xl font-semibold">{headings.retention}</h2>
-      <ul class="list-disc pl-6 space-y-1">
+    <section class="legal-page__section">
+      <h2 class="legal-page__heading">{headings.retention}</h2>
+      <ul class="legal-page__list">
         <li>Votes : durée nécessaire à l'affichage des classements (jusqu'à suppression du compte si applicable)</li>
         <li>IP / logs anti-fraude : 6 à 12 mois</li>
         <li>Cookies de session : durée de session</li>
         <li>Analytics agrégées : durées standard de la solution utilisée</li>
       </ul>
     </section>
-    <section class="space-y-2">
-      <h2 class="text-xl font-semibold">{headings.rights}</h2>
-      <ul class="list-disc pl-6 space-y-1">
+    <section class="legal-page__section">
+      <h2 class="legal-page__heading">{headings.rights}</h2>
+      <ul class="legal-page__list">
         <li>Accès, rectification, effacement</li>
         <li>Opposition et limitation</li>
         <li>Portabilité (le cas échéant)</li>
       </ul>
-      <p>Pour exercer vos droits : <a class="underline" href="mailto:barossojordan@gmail.com">barossojordan@gmail.com</a></p>
+      <p>Pour exercer vos droits : <a class="legal-page__link" href="mailto:barossojordan@gmail.com">barossojordan@gmail.com</a></p>
     </section>
-    <section class="space-y-2">
-      <h2 class="text-xl font-semibold">{headings.cookies}</h2>
+    <section class="legal-page__section">
+      <h2 class="legal-page__heading">{headings.cookies}</h2>
       <p>Nous utilisons des cookies techniques indispensables. Les cookies analytiques sont optionnels selon votre région. Vous pouvez les refuser via les paramètres du navigateur ou un bandeau dédié si activé.</p>
     </section>
-    <p class="text-sm text-zinc-600 pt-4">© {YEAR} Jordan BAROSSO</p>
+    <p class="legal-page__footer">© {YEAR} Jordan BAROSSO</p>
   </section>
-</Base>
+</SiteLayout>

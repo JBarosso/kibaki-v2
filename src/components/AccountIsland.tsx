@@ -145,19 +145,19 @@ export default function AccountIsland() {
 
         {mode==='signin' ? (
           <form onSubmit={doSignIn} className="account-island__form">
-            <input className="account-island__input" type="email" placeholder="Email" value={email} onChange={e=>setEmail(e.target.value)} required />
-            <input className="account-island__input" type="password" placeholder="Mot de passe" value={password} onChange={e=>setPassword(e.target.value)} required />
+            <input className="form-input" type="email" placeholder="Email" value={email} onChange={e=>setEmail(e.target.value)} required />
+            <input className="form-input" type="password" placeholder="Mot de passe" value={password} onChange={e=>setPassword(e.target.value)} required />
             <div className="account-island__forgot-link">
               <a href="/forgot">Mot de passe oublié ?</a>
             </div>
-            <button className="account-island__submit-button">Se connecter</button>
+            <button type="submit" className="form-button form-button--primary form-button--full-width">Se connecter</button>
           </form>
         ) : (
           <form onSubmit={doSignUp} className="account-island__form">
-            <input className="account-island__input" type="email" placeholder="Email" value={email} onChange={e=>setEmail(e.target.value)} required />
-            <input className="account-island__input" type="password" placeholder="Mot de passe" value={password} onChange={e=>setPassword(e.target.value)} required />
-            <input className="account-island__input" type="text" placeholder="Pseudo (optionnel)" value={username} onChange={e=>setUsername(e.target.value)} />
-            <button className="account-island__submit-button">Créer un compte</button>
+            <input className="form-input" type="email" placeholder="Email" value={email} onChange={e=>setEmail(e.target.value)} required />
+            <input className="form-input" type="password" placeholder="Mot de passe" value={password} onChange={e=>setPassword(e.target.value)} required />
+            <input className="form-input" type="text" placeholder="Pseudo (optionnel)" value={username} onChange={e=>setUsername(e.target.value)} />
+            <button type="submit" className="form-button form-button--primary form-button--full-width">Créer un compte</button>
           </form>
         )}
 
@@ -176,15 +176,15 @@ export default function AccountIsland() {
       </div>
 
       <form onSubmit={doUpdateUsername} className="account-island__update-form">
-        <input className="account-island__input" type="text" placeholder="Nouveau pseudo" value={username} onChange={e=>setUsername(e.target.value)} required />
-        <button className="account-island__submit-button">Mettre à jour le pseudo</button>
+        <input className="form-input" type="text" placeholder="Nouveau pseudo" value={username} onChange={e=>setUsername(e.target.value)} required />
+        <button type="submit" className="form-button form-button--primary form-button--full-width">Mettre à jour le pseudo</button>
       </form>
 
       <div className="account-island__password-section">
         <h2 className="account-island__password-title">Changer le mot de passe</h2>
         <form onSubmit={doChangePassword} className="account-island__password-form">
           <input
-            className="account-island__input"
+            className="form-input"
             type="password"
             placeholder="Mot de passe actuel"
             value={currentPassword}
@@ -192,7 +192,7 @@ export default function AccountIsland() {
             required
           />
           <input
-            className="account-island__input"
+            className="form-input"
             type="password"
             placeholder="Nouveau mot de passe"
             value={newPassword}
@@ -200,14 +200,14 @@ export default function AccountIsland() {
             required
           />
           <input
-            className="account-island__input"
+            className="form-input"
             type="password"
             placeholder="Confirmer le mot de passe"
             value={confirmPassword}
             onChange={(e)=>setConfirmPassword(e.target.value)}
             required
           />
-          <button className="account-island__submit-button" disabled={pwSubmitting}>
+          <button type="submit" className="form-button form-button--primary form-button--full-width" disabled={pwSubmitting}>
             {pwSubmitting ? 'Mise à jour…' : 'Mettre à jour le mot de passe'}
           </button>
         </form>
@@ -215,7 +215,7 @@ export default function AccountIsland() {
         {pwErrorMsg && <p className="account-island__password-error">{pwErrorMsg}</p>}
       </div>
 
-      <button onClick={doSignOut} className="account-island__signout-button">Se déconnecter</button>
+      <button onClick={doSignOut} className="form-button form-button--danger form-button--full-width">Se déconnecter</button>
       {errorMsg && <p className="account-island__error">{errorMsg}</p>}
     </div>
   );

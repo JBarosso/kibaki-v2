@@ -1,89 +1,179 @@
 .account-island {
+  margin-top: 2rem;
 
   &__loading {
-
+    text-align: center;
+    padding: 3rem;
+    color: var(--text-secondary);
+    font-size: var(--fs-2);
   }
 
   &__signin-wrapper {
-
+    background: var(--background-elevated);
+    border: 1px solid hsla(var(--gold-hsl), 0.2);
+    border-radius: var(--radius-2);
+    padding: 2rem;
+    box-shadow: var(--shadow-sm);
   }
 
   &__mode-tabs {
-
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+    padding: 0.25rem;
+    background: var(--background-charcoal);
+    border-radius: var(--radius-2);
   }
 
   &__mode-tab {
+    flex: 1;
+    padding: 0.75rem 1.5rem;
+    background: transparent;
+    border: none;
+    border-radius: var(--radius-1);
+    color: var(--text-secondary);
+    font-size: var(--fs-2);
+    font-family: var(--family-primary);
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: var(--transition-base);
+
+    &:hover {
+      color: var(--text-ivory);
+      background: hsla(var(--gold-hsl), 0.08);
+    }
 
     &--active {
+      color: var(--background-rich);
+      background: var(--gold);
+      font-weight: 600;
 
+      &:hover {
+        background: var(--gold);
+      }
     }
   }
 
   &__form {
-
-  }
-
-  &__input {
-
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
   }
 
   &__forgot-link {
+    display: inline-block;
+    margin-top: -0.5rem;
+    font-size: var(--fs-1);
+    color: var(--accent);
+    text-decoration: none;
+    transition: var(--transition-base);
 
-  }
-
-  &__submit-button {
-
+    &:hover {
+      color: var(--accent-hover);
+      text-decoration: underline;
+    }
   }
 
   &__error {
-
+    padding: 1rem;
+    background: hsla(var(--error), 0.1);
+    border: 1px solid hsla(var(--error), 0.3);
+    border-radius: var(--radius-1);
+    color: var(--error);
+    font-size: var(--fs-2);
   }
 
   &__note {
-
+    font-size: var(--fs-1);
+    color: var(--text-muted);
+    margin-top: 1rem;
+    text-align: center;
   }
 
   &__profile-wrapper {
-
+    background: var(--background-elevated);
+    border: 1px solid hsla(var(--gold-hsl), 0.2);
+    border-radius: var(--radius-2);
+    padding: 2rem;
+    box-shadow: var(--shadow-sm);
   }
 
   &__profile-info {
-
+    padding: 1.5rem;
+    background: var(--background-charcoal);
+    border: 1px solid hsla(var(--gold-hsl), 0.15);
+    border-radius: var(--radius-1);
+    margin-bottom: 2rem;
   }
 
   &__profile-label {
-
+    display: block;
+    font-size: var(--fs-1);
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.5rem;
   }
 
   &__profile-username {
-
+    font-size: var(--fs-4);
+    font-family: var(--family-primary);
+    font-weight: 600;
+    color: var(--gold);
+    letter-spacing: 0.02em;
   }
 
   &__update-form {
-
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    margin-bottom: 2rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid hsla(var(--gold-hsl), 0.15);
   }
 
   &__password-section {
-
+    margin-top: 2rem;
   }
 
   &__password-title {
-
+    font-size: var(--fs-3);
+    font-family: var(--family-primary);
+    font-weight: 600;
+    color: var(--text-ivory);
+    letter-spacing: 0.02em;
+    margin-bottom: 1rem;
   }
 
   &__password-form {
-
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
   }
 
   &__password-success {
-
+    padding: 1rem;
+    background: hsla(var(--success), 0.1);
+    border: 1px solid hsla(var(--success), 0.3);
+    border-radius: var(--radius-1);
+    color: var(--success);
+    font-size: var(--fs-2);
+    margin-bottom: 1rem;
   }
 
   &__password-error {
-
+    padding: 1rem;
+    background: hsla(var(--error), 0.1);
+    border: 1px solid hsla(var(--error), 0.3);
+    border-radius: var(--radius-1);
+    color: var(--error);
+    font-size: var(--fs-2);
+    margin-bottom: 1rem;
   }
 
   &__signout-button {
-
+    margin-top: 1.5rem;
   }
 }

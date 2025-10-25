@@ -173,7 +173,7 @@ export default function AdminSubmissionsIsland() {
         <div className="admin-submissions__forbidden">
           <h2 className="admin-submissions__forbidden-title">403 — Accès refusé</h2>
           <p className="admin-submissions__forbidden-message">Cette page est réservée aux administrateurs.</p>
-          <a className="admin-submissions__forbidden-link" href="/">Retour à l'accueil</a>
+          <a href="/" className="form-button form-button--primary">Retour à l'accueil</a>
         </div>
       </div>
     );
@@ -248,7 +248,7 @@ export default function AdminSubmissionsIsland() {
                     <div className="admin-submissions__item-right">
                       <label className="admin-submissions__notes-label">Notes de revue (optionnel)</label>
                       <textarea
-                        className={`admin-submissions__notes-textarea ${processingId === s.id ? 'admin-submissions__notes-textarea--disabled' : ''}`}
+                        className="form-textarea"
                         rows={3}
                         placeholder="Notes internes…"
                         value={notesById[s.id] ?? (s.review_notes ?? '')}
@@ -257,14 +257,14 @@ export default function AdminSubmissionsIsland() {
                       />
                       <div className="admin-submissions__item-actions">
                         <button
-                          className={`admin-submissions__accept-button ${processingId === s.id ? 'admin-submissions__accept-button--disabled' : ''}`}
+                          className="form-button form-button--success"
                           onClick={() => onAccept(s)}
                           disabled={processingId === s.id}
                         >
                           {processingId === s.id ? 'Patientez…' : 'Accepter'}
                         </button>
                         <button
-                          className={`admin-submissions__reject-button ${processingId === s.id ? 'admin-submissions__reject-button--disabled' : ''}`}
+                          className="form-button form-button--danger"
                           onClick={() => onReject(s)}
                           disabled={processingId === s.id}
                         >

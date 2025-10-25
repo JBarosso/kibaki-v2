@@ -1,127 +1,213 @@
 .admin-submissions {
 
   &__loading {
-
+    text-align: center;
+    padding: 3rem;
+    color: var(--text-secondary);
+    font-size: var(--fs-2);
   }
 
   &__forbidden {
-
+    background: var(--background-elevated);
+    border: 1px solid hsla(var(--error), 0.3);
+    border-radius: var(--radius-2);
+    padding: 3rem 2rem;
+    text-align: center;
+    box-shadow: var(--shadow-sm);
   }
 
   &__forbidden-title {
-
+    font-size: var(--fs-4);
+    font-family: var(--family-primary);
+    font-weight: 600;
+    color: var(--error);
+    letter-spacing: 0.02em;
+    margin-bottom: 1rem;
   }
 
   &__forbidden-message {
-
+    font-size: var(--fs-2);
+    color: var(--text-secondary);
+    margin-bottom: 1.5rem;
   }
 
-  &__forbidden-link {
-
-  }
 
   &__wrapper {
-
+    margin-top: 2rem;
   }
 
   &__title {
-
+    font-size: var(--fs-4);
+    font-family: var(--family-primary);
+    font-weight: 600;
+    color: var(--gold);
+    letter-spacing: 0.02em;
+    margin-bottom: 1.5rem;
   }
 
   &__error {
-
+    padding: 1rem;
+    background: hsla(var(--error), 0.1);
+    border: 1px solid hsla(var(--error), 0.3);
+    border-radius: var(--radius-1);
+    color: var(--error);
+    font-size: var(--fs-2);
+    margin-bottom: 1.5rem;
   }
 
   &__success {
-
+    padding: 1rem;
+    background: hsla(var(--success), 0.1);
+    border: 1px solid hsla(var(--success), 0.3);
+    border-radius: var(--radius-1);
+    color: var(--success);
+    font-size: var(--fs-2);
+    margin-bottom: 1.5rem;
   }
 
   &__empty {
-
+    text-align: center;
+    padding: 3rem;
+    color: var(--text-secondary);
+    font-size: var(--fs-2);
+    background: var(--background-elevated);
+    border: 1px solid hsla(var(--gold-hsl), 0.15);
+    border-radius: var(--radius-2);
   }
 
   &__list {
-
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
   }
 
   &__item {
+    background: var(--background-elevated);
+    border: 1px solid hsla(var(--gold-hsl), 0.2);
+    border-radius: var(--radius-2);
+    padding: 1.5rem;
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition-base);
 
+    &:hover {
+      border-color: hsla(var(--gold-hsl), 0.4);
+      box-shadow: var(--shadow-md);
+    }
   }
 
   &__item-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
 
+    @media (min-width: 768px) {
+      flex-direction: row;
+    }
   }
 
   &__item-left {
-
+    flex: 1;
+    min-width: 0;
   }
 
   &__item-image {
-
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: var(--radius-1);
+    border: 1px solid hsla(var(--gold-hsl), 0.2);
+    margin-bottom: 1rem;
   }
 
   &__item-info {
-
+    margin-bottom: 1rem;
   }
 
   &__item-id {
-
+    font-size: var(--fs-1);
+    color: var(--text-muted);
+    font-family: monospace;
+    margin-bottom: 0.25rem;
   }
 
   &__item-name {
-
+    font-size: var(--fs-3);
+    font-family: var(--family-primary);
+    font-weight: 600;
+    color: var(--gold);
+    letter-spacing: 0.02em;
+    margin-bottom: 0.5rem;
   }
 
   &__item-description {
-
+    font-size: var(--fs-2);
+    color: var(--text-secondary);
+    line-height: 1.6;
   }
 
   &__item-meta {
-
+    font-size: var(--fs-1);
+    color: var(--text-muted);
   }
 
   &__item-username-link {
+    color: var(--accent);
+    text-decoration: none;
+    transition: var(--transition-base);
 
+    &:hover {
+      color: var(--accent-hover);
+      text-decoration: underline;
+    }
   }
 
   &__item-username {
-
+    font-weight: 600;
   }
 
   &__item-image-link {
+    color: var(--accent);
+    font-size: var(--fs-1);
+    text-decoration: none;
+    word-break: break-all;
+    transition: var(--transition-base);
 
+    &:hover {
+      color: var(--accent-hover);
+      text-decoration: underline;
+    }
   }
 
   &__item-right {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
 
+    @media (min-width: 768px) {
+      min-width: 300px;
+    }
   }
 
   &__notes-label {
-
+    display: block;
+    font-size: var(--fs-2);
+    color: var(--text-secondary);
+    font-weight: 500;
+    margin-bottom: 0.5rem;
   }
 
-  &__notes-textarea {
-
-    &--disabled {
-
-    }
+  &__notes-label + .form-textarea {
+    width: 100%;
+    min-height: 100px;
+    resize: vertical;
   }
 
   &__item-actions {
+    display: flex;
+    gap: 0.75rem;
 
-  }
-
-  &__accept-button {
-
-    &--disabled {
-
-    }
-  }
-
-  &__reject-button {
-
-    &--disabled {
-
+    .form-button {
+      flex: 1;
     }
   }
 }

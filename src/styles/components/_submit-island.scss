@@ -1,88 +1,103 @@
 .submit-island {
 
   &__loading {
-
+    text-align: center;
+    padding: 3rem;
+    color: var(--text-secondary);
+    font-size: var(--fs-2);
   }
 
   &__signin-prompt {
-
+    background: var(--background-elevated);
+    border: 1px solid hsla(var(--gold-hsl), 0.2);
+    border-radius: var(--radius-2);
+    padding: 3rem 2rem;
+    text-align: center;
+    box-shadow: var(--shadow-sm);
   }
 
   &__signin-message {
-
+    font-size: var(--fs-3);
+    color: var(--text-secondary);
+    margin-bottom: 1.5rem;
   }
 
-  &__signin-button {
-
-  }
 
   &__success {
-
+    background: var(--background-elevated);
+    border: 1px solid hsla(var(--success), 0.3);
+    border-radius: var(--radius-2);
+    padding: 2rem;
+    text-align: center;
+    box-shadow: var(--shadow-sm);
   }
 
   &__success-title {
-
+    font-size: var(--fs-4);
+    font-family: var(--family-primary);
+    font-weight: 600;
+    color: var(--gold);
+    letter-spacing: 0.02em;
+    margin-bottom: 1rem;
   }
 
   &__success-message {
-
+    font-size: var(--fs-2);
+    color: var(--text-secondary);
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
   }
 
   &__success-actions {
-
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
   }
 
-  &__success-button {
-
-  }
-
-  &__success-link {
-
-  }
 
   &__form-wrapper {
-
+    background: var(--background-elevated);
+    border: 1px solid hsla(var(--gold-hsl), 0.2);
+    border-radius: var(--radius-2);
+    padding: 2rem;
+    box-shadow: var(--shadow-sm);
   }
 
   &__title {
-
+    font-size: var(--fs-4);
+    font-family: var(--family-primary);
+    font-weight: 600;
+    color: var(--gold);
+    letter-spacing: 0.02em;
+    margin-bottom: 1.5rem;
   }
 
   &__form {
-
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
   }
 
   &__field {
-
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
   }
 
   &__label {
-
-  }
-
-  &__select {
-
-    &--disabled {
-
-    }
-  }
-
-  &__input {
-
-  }
-
-  &__textarea {
-
+    font-size: var(--fs-2);
+    color: var(--text-secondary);
+    font-weight: 500;
+    letter-spacing: 0.01em;
   }
 
   &__error {
-
-  }
-
-  &__submit-button {
-
-    &--disabled {
-
-    }
+    padding: 1rem;
+    background: hsla(var(--error), 0.1);
+    border: 1px solid hsla(var(--error), 0.3);
+    border-radius: var(--radius-1);
+    color: var(--error);
+    font-size: var(--fs-2);
   }
 }

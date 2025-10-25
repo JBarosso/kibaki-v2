@@ -151,7 +151,7 @@ export default function SubmitIsland() {
     return (
       <div className="submit-island__signin-prompt">
         <div className="submit-island__signin-message">Vous devez être connecté pour soumettre un personnage.</div>
-        <a href="/account" className="submit-island__signin-button">
+        <a href="/account" className="form-button form-button--primary">
           Se connecter / Créer un compte
         </a>
       </div>
@@ -164,10 +164,12 @@ export default function SubmitIsland() {
         <h2 className="submit-island__success-title">Merci !</h2>
         <p className="submit-island__success-message">Votre soumission a été enregistrée et sera examinée.</p>
         <div className="submit-island__success-actions">
-          <button type="button" className="submit-island__success-button" onClick={resetForm}>
+          <button type="button" className="form-button form-button--primary" onClick={resetForm}>
             Nouvelle soumission
           </button>
-          <a className="submit-island__success-link" href="/duel">Retourner aux duels</a>
+          <a href="/duel" className="form-button form-button--secondary">
+            Retourner aux duels
+          </a>
         </div>
       </div>
     );
@@ -200,7 +202,7 @@ export default function SubmitIsland() {
             <label className="submit-island__label">Proposer un univers</label>
             <input
               type="text"
-              className="submit-island__input"
+              className="form-input"
               placeholder="Nom de l'univers"
               value={proposedUniverse}
               onChange={(e) => setProposedUniverse(e.target.value)}
@@ -212,7 +214,7 @@ export default function SubmitIsland() {
           <label className="submit-island__label">Nom du personnage</label>
           <input
             type="text"
-            className="submit-island__input"
+            className="form-input"
             placeholder="Ex. Naruto Uzumaki"
             value={characterName}
             onChange={(e) => setCharacterName(e.target.value)}
@@ -223,7 +225,7 @@ export default function SubmitIsland() {
         <div className="submit-island__field">
           <label className="submit-island__label">Description</label>
           <textarea
-            className="submit-island__textarea"
+            className="form-textarea"
             rows={4}
             placeholder="Brève description du personnage"
             value={description}
@@ -235,7 +237,7 @@ export default function SubmitIsland() {
           <label className="submit-island__label">Image URL (optionnel)</label>
           <input
             type="url"
-            className="submit-island__input"
+            className="form-input"
             placeholder="https://…"
             value={imageUrl}
             onChange={(e) => setImageUrl(e.target.value)}
@@ -248,7 +250,7 @@ export default function SubmitIsland() {
 
         <button
           type="submit"
-          className={`submit-island__submit-button ${submitting ? 'submit-island__submit-button--disabled' : ''}`}
+          className="form-button form-button--primary form-button--full-width"
           disabled={submitting}
         >
           {submitting ? 'Envoi…' : 'Soumettre'}

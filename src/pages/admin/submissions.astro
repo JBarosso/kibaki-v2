@@ -6,9 +6,11 @@ import AdminSubmissionsIsland from '@/components/AdminSubmissionsIsland';
 
 <SiteLayout title="Kibaki — Admin — Soumissions">
   <Seo slot="head" title="Kibaki — Admin — Soumissions" description="Administration des soumissions en attente." />
-  <h1 class="mb-2 text-2xl font-bold">Administration — Soumissions</h1>
-  <p class="mb-6 text-sm text-gray-600">Revue des soumissions en attente. Accès restreint aux administrateurs.</p>
-  <AdminSubmissionsIsland client:load />
+  <div class="admin-page">
+    <h1 class="admin-page__title">Administration — Soumissions</h1>
+    <p class="admin-page__description">Revue des soumissions en attente. Accès restreint aux administrateurs.</p>
+    <AdminSubmissionsIsland client:load />
+  </div>
 </SiteLayout>
 
 

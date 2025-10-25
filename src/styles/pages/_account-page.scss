@@ -1,0 +1,25 @@
+.account-page {
+  max-width: 48rem;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+
+  @media (min-width: 768px) {
+    padding: 3rem 2rem;
+  }
+
+  &__title {
+    font-size: var(--fs-5);
+    font-family: var(--family-primary);
+    font-weight: 600;
+    color: var(--gold);
+    letter-spacing: 0.02em;
+    margin-bottom: 0.5rem;
+  }
+
+  &__description {
+    font-size: var(--fs-2);
+    color: var(--text-secondary);
+    margin-bottom: 2rem;
+  }
+}
+
