@@ -24,7 +24,7 @@
     border: 1px solid var(--primary);
     border-radius: var(--radius-2);
     color: var(--background-dark);
-    font-size: var(--fs-3);
+    font-size: var(--fs-2);
     font-family: var(--family-primary);
     font-weight: 600;
     letter-spacing: 0.04em;
@@ -125,28 +125,22 @@
     gap: 12px;
   }
 
-  &__item {
-    background-color: hsl(var(--neutral-hsl), 0.5);
-    border: 1px solid hsl(var(--neutral-hsl), 0.7);
-    border-radius: var(--radius-2);
-    transition: var(--transition-base);
-    overflow: hidden;
-
-    &:hover {
-      background-color: hsl(var(--neutral-hsl), 0.6);
-      border-color: hsl(var(--neutral-light-hsl), 0.15);
-    }
-  }
-
   &__item-link {
     display: flex;
     justify-content: space-between;
     align-items: center;
     gap: var(--spacing-1);
     padding: 16px 20px;
+    border-radius: var(--radius-2);
     color: var(--neutral-light);
+    border: var(--card-border);
+    background-color: var(--card-background);
     text-decoration: none;
     transition: var(--transition-base);
+    
+    &:hover {
+      border: var(--card-hover-border);
+    }
   }
 
   &__item-name {
@@ -189,6 +183,27 @@
     font-family: var(--family-secondary);
     font-weight: 500;
     letter-spacing: 0.03em;
+
+    // Modifier pour chaque statut
+    &--scheduled {
+      background-color: hsl(200, 70%, 50%, 0.15);
+      color: hsl(200, 70%, 65%);
+    }
+
+    &--running {
+      background-color: hsl(142, 76%, 56%, 0.15);
+      color: hsl(142, 76%, 60%);
+    }
+
+    &--completed {
+      background-color: hsl(var(--neutral-hsl), 0.2);
+      color: hsl(var(--neutral-light-hsl), 0.7);
+    }
+
+    &--canceled {
+      background-color: hsl(var(--secondary-hsl), 0.15);
+      color: var(--secondary);
+    }
   }
 
   &__empty {

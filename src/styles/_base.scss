@@ -128,6 +128,11 @@ h6 {
   // Container
   --container-max-width: 1440px;
   --container-padding: 0 clamp(1rem, 2.08vw + 0.003rem, 1.875rem);
+
+  // CARD
+  --card-background: #1a1a1a;
+  --card-border: 1px solid #ffffff1a;
+  --card-hover-border: 1px solid hsl(var(--neutral-light-hsl), 0.5);
 }
 
 body{

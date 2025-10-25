@@ -82,6 +82,7 @@
     "vote": "Vote",
     "youVoted": "You voted: {name}",
     "winner": "Winner: {name}",
+    "tournamentWinner": "🏆 Tournament Winner",
     "update": "Update (tick)",
     "statusOpens": "Starts in {duration}",
     "statusEnds": "Ends in {duration}",

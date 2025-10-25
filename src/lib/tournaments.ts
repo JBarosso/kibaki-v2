@@ -60,15 +60,15 @@ export async function fetchCharacterNames(ids: number[]) {
   if (ids.length === 0) return {}
   const { data, error } = await supabase
     .from('characters')
-    .select('id, slug, name, description')
+    .select('id, slug, name, description, image_url')
     .in('id', ids)
   if (error) throw error
   return Object.fromEntries(
     (data ?? []).map((r: any) => [
       r.id,
-      { slug: r.slug as string, name: r.name as string, description: r.description as string | null }
+      { slug: r.slug as string, name: r.name as string, description: r.description as string | null, image_url: r.image_url as string | null }
     ])
-  ) as Record<number, { slug: string; name: string; description: string | null }>
+  ) as Record<number, { slug: string; name: string; description: string | null; image_url: string | null }>
 }
 
 export async function voteMatch(matchId: string, choiceId: number) {

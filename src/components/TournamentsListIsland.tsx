@@ -123,7 +123,7 @@ function TournamentsListInner(_: Props) {
                     {t('tournaments.canceled')}
                   </span>
                 )}
-                <span className="tournaments-list__item-status">{getTournamentStatus(t.status)}</span>
+                <span className={`tournaments-list__item-status tournaments-list__item-status--${t.status}`}>{getTournamentStatus(t.status)}</span>
               </div>
             </a>
           </li>

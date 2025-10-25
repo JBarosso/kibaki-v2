@@ -82,6 +82,7 @@
     "vote": "Voter",
     "youVoted": "Tu as voté : {name}",
     "winner": "Vainqueur : {name}",
+    "tournamentWinner": "🏆 Vainqueur du tournoi",
     "update": "Mettre à jour",
     "statusOpens": "Commence dans {duration}",
     "statusEnds": "Se termine dans {duration}",

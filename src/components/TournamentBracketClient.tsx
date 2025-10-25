@@ -13,7 +13,7 @@ import {
 } from '../lib/tournaments'
 import { I18nProvider, useI18n, type Lang } from '@/i18n'
 
-type CharacterInfo = { slug: string; name: string; description: string | null }
+type CharacterInfo = { slug: string; name: string; description: string | null; image_url: string | null }
 
 type RoundWindow = { round: number; opensAt: number; closesAt: number }
 type Phase =
@@ -78,7 +78,7 @@ export default function TournamentBracketClient(props: Props) {
 }
 
 function TournamentBracketClientInner({ tournamentId }: Props) {
-  const { t } = useI18n()
+  const { t, getCharacterText } = useI18n()
   const [matches, setMatches] = useState<Match[]>([])
   const [nameById, setNameById] = useState<Record<number, CharacterInfo>>({})
   const [nowIso, setNowIso] = useState(new Date().toISOString())
@@ -170,6 +170,20 @@ function TournamentBracketClientInner({ tournamentId }: Props) {
   const roundWindows = useMemo(() => buildRoundWindows(matches), [matches])
   const phase: Phase = useMemo(() => computePhase(roundWindows, nowMs), [roundWindows, nowMs])
 
+  // Trouver le vainqueur du tournoi (match final avec winner)
+  const tournamentWinner = useMemo(() => {
+    if (phase.type !== 'completed' || matches.length === 0) return null
+    // Trouver le match avec le round le plus élevé qui a un winner
+    const finalMatch = matches.reduce((max, m) => m.round > max.round ? m : max, matches[0])
+    if (!finalMatch.winner_id) return null
+    const winnerInfo = nameById[finalMatch.winner_id]
+    if (!winnerInfo) return null
+    return {
+      id: finalMatch.winner_id,
+      ...winnerInfo
+    }
+  }, [matches, phase.type, nameById])
+
   let bannerText: string | null = null
   if (phase.type === 'starts') {
     const rest = phase.deadlineMs - nowMs
@@ -180,7 +194,7 @@ function TournamentBracketClientInner({ tournamentId }: Props) {
   } else if (phase.type === 'ends') {
     const rest = phase.deadlineMs - nowMs
     bannerText = t('tournaments.roundEndsIn', { round: phase.round, total: phase.total, duration: formatDuration(rest) })
-  } else if (phase.type === 'completed') {
+  } else if (phase.type === 'completed' && !tournamentWinner) {
     bannerText = t('tournaments.completed')
   }
 
@@ -203,6 +217,33 @@ function TournamentBracketClientInner({ tournamentId }: Props) {
       {bannerText && (
         <div className="tournament-bracket-client__banner" aria-live="polite">
           {bannerText}
+        </div>
+      )}
+
+      {tournamentWinner && (
+        <div className="tournament-bracket-client__winner-banner" aria-live="polite">
+          <div className="tournament-bracket-client__winner-content">
+            <div className="tournament-bracket-client__winner-portrait">
+              {tournamentWinner.image_url ? (
+                <img
+                  src={tournamentWinner.image_url}
+                  alt={tournamentWinner.name}
+                  className="tournament-bracket-client__winner-image"
+                  loading="eager"
+                  decoding="sync"
+                  referrerPolicy="no-referrer"
+                />
+              ) : (
+                <div className="tournament-bracket-client__winner-placeholder">👑</div>
+              )}
+            </div>
+            <div className="tournament-bracket-client__winner-info">
+              <div className="tournament-bracket-client__winner-label">{t('tournaments.tournamentWinner')}</div>
+              <div className="tournament-bracket-client__winner-name">
+                {getCharacterText({ slug: tournamentWinner.slug, name: tournamentWinner.name, description: tournamentWinner.description }).name}
+              </div>
+            </div>
+          </div>
         </div>
       )}
 
