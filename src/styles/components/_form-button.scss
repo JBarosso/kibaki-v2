@@ -32,7 +32,6 @@
 
     &:hover:not(:disabled) {
       background-color: hsl(var(--primary-hsl), 0.85);
-      box-shadow: 0 0 20px hsl(var(--primary-hsl), 0.4);
       transform: translateY(-1px);
     }
 
@@ -49,7 +48,6 @@
 
     &:hover:not(:disabled) {
       background-color: hsl(var(--primary-hsl), 0.1);
-      box-shadow: 0 0 15px hsl(var(--primary-hsl), 0.2);
     }
   }
 
@@ -61,7 +59,6 @@
 
     &:hover:not(:disabled) {
       background-color: hsl(var(--secondary-hsl), 0.85);
-      box-shadow: 0 0 20px hsl(var(--secondary-hsl), 0.4);
       transform: translateY(-1px);
     }
 
@@ -84,13 +81,12 @@
 
   // Success variant
   &--success {
-    background-color: hsl(142, 76%, 56%);
+    background-color: hsl(142, 50%, 50%);
     color: var(--background-dark);
-    border-color: hsl(142, 76%, 56%);
+    border-color: hsl(142, 50%, 50%);
 
     &:hover:not(:disabled) {
-      background-color: hsl(142, 76%, 50%);
-      box-shadow: 0 0 20px hsl(142, 76%, 56%, 0.4);
+      background-color: hsl(142, 50%, 45%);
       transform: translateY(-1px);
     }
   }
@@ -103,7 +99,6 @@
 
     &:hover:not(:disabled) {
       background-color: hsl(38, 92%, 45%);
-      box-shadow: 0 0 20px hsl(38, 92%, 50%, 0.4);
       transform: translateY(-1px);
     }
   }

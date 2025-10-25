@@ -35,7 +35,6 @@
 
     &:hover {
       background-color: hsl(var(--primary-hsl), 0.85);
-      box-shadow: 0 0 20px hsl(var(--primary-hsl), 0.4);
       transform: translateY(-1px);
     }
 
@@ -98,7 +97,6 @@
     &:hover {
       background-color: hsl(var(--secondary-hsl), 0.1);
       border-color: var(--secondary);
-      box-shadow: 0 0 15px hsl(var(--secondary-hsl), 0.2);
     }
 
     &--disabled {
@@ -110,10 +108,10 @@
 
   &__message {
     padding: 16px 20px;
-    background-color: hsl(142, 76%, 56%, 0.1);
-    border: 1px solid hsl(142, 76%, 56%, 0.3);
+    background-color: hsl(142, 50%, 40%, 0.15);
+    border: 1px solid hsl(142, 50%, 50%, 0.4);
     border-radius: var(--radius-2);
-    color: hsl(142, 76%, 56%);
+    color: hsl(142, 50%, 65%);
     font-size: var(--fs-3);
     animation: message-slide-in 0.3s ease-out;
   }
@@ -191,8 +189,8 @@
     }
 
     &--running {
-      background-color: hsl(142, 76%, 56%, 0.15);
-      color: hsl(142, 76%, 60%);
+      background-color: hsl(142, 50%, 40%, 0.15);
+      color: hsl(142, 50%, 65%);
     }
 
     &--completed {

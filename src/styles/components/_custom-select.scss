@@ -40,6 +40,31 @@
     }
   }
 
+  // Style spécifique pour les selects dans les formulaires
+  &--form {
+    .custom-select__trigger {
+      background-color: hsl(0, 0%, 14%);
+      border: 1px solid hsl(0, 0%, 25%);
+
+      &:hover {
+        background-color: hsl(0, 0%, 16%);
+        border-color: hsl(0, 0%, 30%);
+      }
+
+      &:focus {
+        background-color: hsl(0, 0%, 16%);
+        border-color: hsl(var(--primary-hsl), 0.6);
+        box-shadow: 0 0 0 3px hsl(var(--primary-hsl), 0.1);
+      }
+    }
+
+    &.custom-select--open .custom-select__trigger {
+      background-color: hsl(0, 0%, 16%);
+      border-color: hsl(var(--primary-hsl), 0.6);
+      box-shadow: 0 0 0 3px hsl(var(--primary-hsl), 0.1);
+    }
+  }
+
   &__value {
     flex: 1;
     overflow: hidden;

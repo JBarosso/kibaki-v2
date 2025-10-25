@@ -148,6 +148,7 @@ function TournamentNewIslandInner() {
 
           <Field label={t('tournaments.universe')} htmlFor="universe">
             <CustomSelect
+              className="custom-select--form"
               options={[
                 { value: '', label: t('tournaments.allUniverses') },
                 ...universes.map(u => ({ value: String(u.id), label: u.name }))
@@ -162,6 +163,7 @@ function TournamentNewIslandInner() {
           <Field label={t('tournaments.roundDuration')} htmlFor="duration">
             <div className="tournament-new__duration-grid">
               <CustomSelect
+                className="custom-select--form"
                 options={[
                   { value: '1d', label: t('tournaments.duration1d') },
                   { value: '1w', label: t('tournaments.duration1w') },

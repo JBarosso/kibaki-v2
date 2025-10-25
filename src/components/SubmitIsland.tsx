@@ -188,7 +188,7 @@ export default function SubmitIsland() {
             value={selectValue}
             onChange={setSelectValue}
             disabled={universesLoading}
-            className="submit-island__select"
+            className="submit-island__select custom-select--form"
           />
           {universesError && (
             <p className="submit-island__error">{universesError}</p>

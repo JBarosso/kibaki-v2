@@ -2,8 +2,8 @@
 .form-input {
   width: 100%;
   padding: 10px 14px;
-  background-color: hsl(var(--neutral-hsl), 0.6);
-  border: 1px solid hsl(var(--neutral-hsl), 0.8);
+  background-color: hsl(0, 0%, 14%);
+  border: 1px solid hsl(0, 0%, 25%);
   border-radius: var(--radius-2);
   color: var(--neutral-light);
   font-size: var(--fs-3);
@@ -13,25 +13,25 @@
   transition: var(--transition-base);
 
   &::placeholder {
-    color: hsl(var(--neutral-light-hsl), 0.3);
+    color: hsl(var(--neutral-light-hsl), 0.4);
   }
 
   &:hover {
-    background-color: hsl(var(--neutral-hsl), 0.7);
-    border-color: hsl(var(--neutral-light-hsl), 0.15);
+    background-color: hsl(0, 0%, 16%);
+    border-color: hsl(0, 0%, 30%);
   }
 
   &:focus {
     outline: none;
-    background-color: hsl(var(--neutral-hsl), 0.7);
-    border-color: hsl(var(--neutral-light-hsl), 0.2);
-    box-shadow: none;
+    background-color: hsl(0, 0%, 16%);
+    border-color: hsl(var(--primary-hsl), 0.6);
+    box-shadow: 0 0 0 3px hsl(var(--primary-hsl), 0.1);
   }
 
   &:disabled {
     opacity: 0.5;
     cursor: not-allowed;
-    background-color: hsl(var(--neutral-hsl), 0.1);
+    background-color: hsl(0, 0%, 10%);
   }
 
   // Input with icon
@@ -41,19 +41,21 @@
 
   // Error state
   &--error {
-    border-color: var(--secondary);
+    border-color: hsl(var(--secondary-hsl), 0.8);
     
     &:focus {
-      box-shadow: 0 0 0 3px hsl(var(--secondary-hsl), 0.1);
+      border-color: var(--secondary);
+      box-shadow: 0 0 0 3px hsl(var(--secondary-hsl), 0.15);
     }
   }
 
   // Success state
   &--success {
-    border-color: hsl(142, 76%, 56%);
+    border-color: hsl(142, 50%, 50%, 0.8);
     
     &:focus {
-      box-shadow: 0 0 0 3px hsl(142, 76%, 56%, 0.1);
+      border-color: hsl(142, 50%, 50%);
+      box-shadow: 0 0 0 3px hsl(142, 50%, 50%, 0.15);
     }
   }
 
@@ -110,9 +112,9 @@
 // Form label
 .form-label {
   display: block;
-  color: var(--neutral-light);
+  color: hsl(var(--neutral-light-hsl), 0.95);
   font-size: var(--fs-3);
-  font-weight: 500;
+  font-weight: 600;
   font-family: var(--family-primary);
   letter-spacing: 0.02em;
   
