@@ -177,7 +177,6 @@ export default function SubmitIsland() {
 
   return (
     <div className="submit-island__form-wrapper">
-      <h2 className="submit-island__title">Soumettre un personnage</h2>
       <form onSubmit={onSubmit} className="submit-island__form">
         <div className="submit-island__field">
           <label className="submit-island__label">Univers</label>

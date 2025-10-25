@@ -4,11 +4,11 @@ import Seo from '@/components/Seo.astro';
 import AccountIsland from '@/components/AccountIsland';
 ---
 
-<SiteLayout title="Kibaki — Account">
-  <Seo slot="head" title="Kibaki — Account" description="Gère ton compte et ton pseudo." />
+<SiteLayout title="Kibaki — Mon compte">
+  <Seo slot="head" title="Kibaki — Mon compte" description="Gère ton compte et ton pseudo." />
   <div class="account-page">
-    <h1 class="account-page__title">Account</h1>
-    <p class="account-page__description">Sign in / Sign up, then manage your username.</p>
+    <h1 class="account-page__title">Mon compte</h1>
+    <p class="account-page__description">Connecte-toi ou crée un compte, puis gère ton pseudo.</p>
     <AccountIsland client:load />
   </div>
 </SiteLayout>

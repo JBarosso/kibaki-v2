@@ -64,15 +64,6 @@
     box-shadow: var(--shadow-sm);
   }
 
-  &__title {
-    font-size: var(--fs-4);
-    font-family: var(--family-primary);
-    font-weight: 600;
-    color: var(--gold);
-    letter-spacing: 0.02em;
-    margin-bottom: 1.5rem;
-  }
-
   &__form {
     display: flex;
     flex-direction: column;
