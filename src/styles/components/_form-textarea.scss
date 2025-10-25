@@ -3,10 +3,10 @@
   width: 100%;
   min-height: 120px;
   padding: 10px 14px;
-  background-color: hsl(0, 0%, 14%);
-  border: 1px solid hsl(0, 0%, 25%);
+  background-color: var(--background-charcoal);
+  border: 1px solid hsla(42, 46%, 58%, 0.2);
   border-radius: var(--radius-2);
-  color: var(--neutral-light);
+  color: var(--text-ivory);
   font-size: var(--fs-3);
   font-family: var(--family-secondary);
   font-weight: 400;
@@ -15,45 +15,45 @@
   resize: vertical;
 
   &::placeholder {
-    color: hsl(var(--neutral-light-hsl), 0.4);
+    color: var(--text-muted);
   }
 
   &:hover {
-    background-color: hsl(0, 0%, 16%);
-    border-color: hsl(0, 0%, 30%);
+    background-color: var(--background-elevated);
+    border-color: hsla(42, 46%, 58%, 0.3);
   }
 
   &:focus {
     outline: none;
-    background-color: hsl(0, 0%, 16%);
-    border-color: hsl(var(--primary-hsl), 0.6);
-    box-shadow: 0 0 0 3px hsl(var(--primary-hsl), 0.1);
+    background-color: var(--background-elevated);
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px hsla(183, 56%, 64%, 0.15);
   }
 
   &:disabled {
     opacity: 0.5;
     cursor: not-allowed;
-    background-color: hsl(0, 0%, 10%);
+    background-color: var(--background-rich);
     resize: none;
   }
 
   // Error state
   &--error {
-    border-color: hsl(var(--secondary-hsl), 0.8);
+    border-color: var(--error);
     
     &:focus {
-      border-color: var(--secondary);
-      box-shadow: 0 0 0 3px hsl(var(--secondary-hsl), 0.15);
+      border-color: var(--error);
+      box-shadow: 0 0 0 3px hsla(0, 28%, 66%, 0.15);
     }
   }
 
   // Success state
   &--success {
-    border-color: hsl(142, 50%, 50%, 0.8);
+    border-color: var(--success);
     
     &:focus {
-      border-color: hsl(142, 50%, 50%);
-      box-shadow: 0 0 0 3px hsl(142, 50%, 50%, 0.15);
+      border-color: var(--success);
+      box-shadow: 0 0 0 3px hsla(150, 23%, 47%, 0.15);
     }
   }
 
